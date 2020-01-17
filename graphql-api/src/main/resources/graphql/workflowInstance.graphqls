@@ -1,0 +1,19 @@
+type WorkflowInstance {
+    key: ID!
+    bpmnProcessId: String!
+    version: Int!
+    workflowKey: Int!
+    state: WorkflowInstanceState!
+
+    variables: [Variable]
+}
+
+enum WorkflowInstanceState {
+  ACTIVATED
+  COMPLETED
+  TERMINATED
+}
+
+type Query {
+    workflowInstances(count: Int = 10, offset: Int = 0): [WorkflowInstance]
+}

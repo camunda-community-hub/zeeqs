@@ -1,0 +1,10 @@
+type Variable {
+    key: ID!
+    name: String!
+    value: String!
+    workflowInstanceKey: Int!
+}
+
+extend type Query {
+    variables(workflowInstanceKey: ID!): [Variable]
+}
