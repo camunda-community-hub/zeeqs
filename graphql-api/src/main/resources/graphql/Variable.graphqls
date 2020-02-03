@@ -2,7 +2,16 @@ type Variable {
     key: ID!
     name: String!
     value: String!
-    workflowInstanceKey: Int!
+    workflowInstanceKey: ID!
+    scopeKey: Long!
+    timestamp: Long!
+
+    updates: [VariableUpdate!]
+}
+
+type VariableUpdate {
+    value: String!
+    timestamp: Long!
 }
 
 extend type Query {

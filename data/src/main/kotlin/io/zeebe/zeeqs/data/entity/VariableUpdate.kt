@@ -4,15 +4,12 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-class Variable(
-        @Id val key: Long,
+class VariableUpdate(
+        @Id val position: Long,
+        val variableKey: Long,
         val name: String,
+        val value: String,
         val workflowInstanceKey: Long,
         val scopeKey: Long,
-        var value: String,
-        var timestamp: Long
-) {
-
-    @Transient
-    var updates: List<VariableUpdate> = ArrayList()
-}
+        val timestamp: Long
+)

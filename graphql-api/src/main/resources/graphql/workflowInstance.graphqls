@@ -15,7 +15,7 @@ type WorkflowInstance {
     # TODO: change to String?
     endTime: Long
 
-    variables: [Variable]
+    variables: [Variable!]
 }
 
 enum WorkflowInstanceState {
