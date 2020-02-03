@@ -4,17 +4,16 @@ import com.hazelcast.client.HazelcastClient
 import com.hazelcast.client.config.ClientConfig
 import io.zeebe.exporter.proto.Schema
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
-import io.zeebe.zeeqs.data.entity.Variable
-import io.zeebe.zeeqs.data.entity.VariableUpdate
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
-import io.zeebe.zeeqs.data.entity.WorkflowInstanceState
+import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.VariableRepository
 import io.zeebe.zeeqs.data.repository.VariableUpdateRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
+import io.zeebe.zeeqs.data.repository.WorkflowRepository
 import org.springframework.stereotype.Component
 
 @Component
 class HazelcastImporter(
+        val workflowRepository: WorkflowRepository,
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val variableRepository: VariableRepository,
         val variableUpdateRepository: VariableUpdateRepository) {
@@ -28,8 +27,39 @@ class HazelcastImporter(
 
         val zeebeHazelcast = ZeebeHazelcast(hazelcast)
 
+        zeebeHazelcast.addDeploymentListener(this::importDeploymentRecord)
         zeebeHazelcast.addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
         zeebeHazelcast.addVariableListener(this::importVariableRecord)
+    }
+
+    private fun importDeploymentRecord(record: Schema.DeploymentRecord) {
+        for (workflow in record.deployedWorkflowsList) {
+            val resource = record.resourcesList.first { it.resourceName == workflow.resourceName }
+
+            importWorkflow(record, workflow, resource)
+        }
+    }
+
+    private fun importWorkflow(deployment: Schema.DeploymentRecord,
+                               workflow: Schema.DeploymentRecord.Workflow,
+                               resource: Schema.DeploymentRecord.Resource) {
+        val entity = workflowRepository
+                .findById(workflow.workflowKey)
+                .orElse(createWorkflow(deployment, workflow, resource))
+
+        workflowRepository.save(entity)
+    }
+
+    private fun createWorkflow(deployment: Schema.DeploymentRecord,
+                               workflow: Schema.DeploymentRecord.Workflow,
+                               resource: Schema.DeploymentRecord.Resource): Workflow {
+        return Workflow(
+                key = workflow.workflowKey,
+                bpmnProcessId = workflow.bpmnProcessId,
+                version = workflow.version,
+                bpmnXML = resource.resource.toStringUtf8(),
+                timestamp = deployment.metadata.timestamp
+        )
     }
 
     private fun importWorkflowInstanceRecord(record: Schema.WorkflowInstanceRecord) {

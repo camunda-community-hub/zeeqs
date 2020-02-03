@@ -1,0 +1,14 @@
+type Workflow {
+    key: ID!
+    bpmnProcessId: String!
+    version: Int!
+    timestamp: Long!
+
+    bpmnXML: String!
+}
+
+extend type Query {
+    workflow(key: ID!): Workflow
+
+    workflows(count: Int = 10, offset: Int = 0): [Workflow!]!
+}

@@ -25,5 +25,7 @@ enum WorkflowInstanceState {
 }
 
 type Query {
-    workflowInstances(count: Int = 10, offset: Int = 0): [WorkflowInstance]
+    workflowInstance(key: ID!): WorkflowInstance
+
+    workflowInstances(count: Int = 10, offset: Int = 0): [WorkflowInstance!]!
 }

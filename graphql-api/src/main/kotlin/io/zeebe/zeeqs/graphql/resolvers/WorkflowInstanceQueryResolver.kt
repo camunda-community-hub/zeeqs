@@ -8,6 +8,7 @@ import io.zeebe.zeeqs.data.repository.VariableRepository
 import io.zeebe.zeeqs.data.repository.VariableUpdateRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
@@ -39,6 +40,10 @@ class WorkflowInstanceQueryResolver(
 
     private fun getVariableUpdates(variableKey: Long): List<VariableUpdate> {
         return variableUpdateRepository.findByVariableKey(variableKey)
+    }
+
+    fun workflowInstance(key: Long): WorkflowInstance? {
+        return workflowInstanceRepository.findByIdOrNull(key)
     }
 
 }
