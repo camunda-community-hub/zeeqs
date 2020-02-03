@@ -6,6 +6,7 @@ import io.zeebe.exporter.proto.Schema
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.Variable
 import io.zeebe.zeeqs.data.entity.WorkflowInstance
+import io.zeebe.zeeqs.data.entity.WorkflowInstanceState
 import io.zeebe.zeeqs.data.repository.VariableRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
 import org.springframework.stereotype.Component
@@ -24,29 +25,48 @@ class HazelcastImporter(
 
         val zeebeHazelcast = ZeebeHazelcast(hazelcast)
 
-        zeebeHazelcast.addWorkflowInstanceListener(this::importWorkflowInstance)
+        zeebeHazelcast.addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
         zeebeHazelcast.addVariableListener(this::importVariable)
     }
 
-    fun importWorkflowInstance(workflowInstance: Schema.WorkflowInstanceRecord) {
-        if (workflowInstance.workflowInstanceKey == workflowInstance.metadata.key) {
-
-            val entity = workflowInstanceRepository
-                    .findById(workflowInstance.workflowInstanceKey)
-                    .orElse(WorkflowInstance(
-                            workflowInstance.workflowInstanceKey,
-                            workflowInstance.bpmnProcessId,
-                            workflowInstance.version,
-                            workflowInstance.workflowKey
-                    ))
-
-
-
-            workflowInstanceRepository.save(entity)
+    private fun importWorkflowInstanceRecord(record: Schema.WorkflowInstanceRecord) {
+        if (record.workflowInstanceKey == record.metadata.key) {
+            importWorkflowInstance(record)
         }
     }
 
-    fun importVariable(variable: Schema.VariableRecord) {
+    private fun importWorkflowInstance(record: Schema.WorkflowInstanceRecord) {
+        val entity = workflowInstanceRepository
+                .findById(record.workflowInstanceKey)
+                .orElse(
+                        WorkflowInstance(
+                                key = record.workflowInstanceKey,
+                                bpmnProcessId = record.bpmnProcessId,
+                                version = record.version,
+                                workflowKey = record.workflowKey,
+                                parentWorkflowInstanceKey = if (record.parentWorkflowInstanceKey > 0) record.parentWorkflowInstanceKey else null,
+                                parentElementInstanceKey = if (record.parentElementInstanceKey > 0) record.parentElementInstanceKey else null
+                        ))
+
+        when (record.metadata.intent) {
+            "ELEMENT_ACTIVATED" -> {
+                entity.startTime = record.metadata.timestamp
+                entity.state = WorkflowInstanceState.ACTIVATED
+            }
+            "ELEMENT_COMPLETED" -> {
+                entity.endTime = record.metadata.timestamp
+                entity.state = WorkflowInstanceState.COMPLETED
+            }
+            "ELEMENT_TERMINATED" -> {
+                entity.endTime = record.metadata.timestamp
+                entity.state = WorkflowInstanceState.TERMINATED
+            }
+        }
+
+        workflowInstanceRepository.save(entity)
+    }
+
+    private fun importVariable(variable: Schema.VariableRecord) {
 
         val entity = variableRepository.findById(variable.metadata.key)
                 .orElse(Variable(

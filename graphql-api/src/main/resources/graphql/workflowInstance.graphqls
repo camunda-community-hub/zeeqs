@@ -2,8 +2,18 @@ type WorkflowInstance {
     key: ID!
     bpmnProcessId: String!
     version: Int!
-    workflowKey: Int!
+    # TODO: change to ID?
+    workflowKey: Long!
     state: WorkflowInstanceState!
+    # TODO: change to ID?
+    parentWorkflowInstanceKey: Long
+    # TODO: change to ID?
+    parentElementInstanceKey: Long
+
+    # TODO: change to String?
+    startTime: Long
+    # TODO: change to String?
+    endTime: Long
 
     variables: [Variable]
 }
