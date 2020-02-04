@@ -19,4 +19,7 @@ data class WorkflowInstance(
 
     @Transient
     var variables: List<Variable> = ArrayList()
+
+    @Transient
+    var workflow: Workflow? = null
 }

@@ -1,21 +1,18 @@
 type WorkflowInstance {
     key: ID!
-    bpmnProcessId: String!
-    version: Int!
-    # TODO: change to ID?
-    workflowKey: Long!
+
     state: WorkflowInstanceState!
-    # TODO: change to ID?
-    parentWorkflowInstanceKey: Long
-    # TODO: change to ID?
+
+    parentWorkflowInstanceKey: ID
     parentElementInstanceKey: Long
 
-    # TODO: change to String?
+    # TODO: change time to String format?
     startTime: Long
-    # TODO: change to String?
     endTime: Long
 
     variables: [Variable!]
+
+    workflow: Workflow
 }
 
 enum WorkflowInstanceState {
