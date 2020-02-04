@@ -10,15 +10,16 @@ type WorkflowInstance {
     startTime: Long
     endTime: Long
 
-    variables: [Variable!]
-
     workflow: Workflow
+
+    variables: [Variable!]
+    jobs: [Job!]
 }
 
 enum WorkflowInstanceState {
-  ACTIVATED
-  COMPLETED
-  TERMINATED
+    ACTIVATED
+    COMPLETED
+    TERMINATED
 }
 
 type Query {

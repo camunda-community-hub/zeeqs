@@ -5,10 +5,7 @@ import com.hazelcast.client.config.ClientConfig
 import io.zeebe.exporter.proto.Schema
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.*
-import io.zeebe.zeeqs.data.repository.VariableRepository
-import io.zeebe.zeeqs.data.repository.VariableUpdateRepository
-import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
-import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,7 +13,8 @@ class HazelcastImporter(
         val workflowRepository: WorkflowRepository,
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val variableRepository: VariableRepository,
-        val variableUpdateRepository: VariableUpdateRepository) {
+        val variableUpdateRepository: VariableUpdateRepository,
+        val jobRepository: JobRepository) {
 
     fun start(hazelcastConnection: String) {
 
@@ -30,6 +28,7 @@ class HazelcastImporter(
         zeebeHazelcast.addDeploymentListener(this::importDeploymentRecord)
         zeebeHazelcast.addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
         zeebeHazelcast.addVariableListener(this::importVariableRecord)
+        zeebeHazelcast.addJobListener(this::importJobRecord)
     }
 
     private fun importDeploymentRecord(record: Schema.DeploymentRecord) {
@@ -97,8 +96,8 @@ class HazelcastImporter(
                 bpmnProcessId = record.bpmnProcessId,
                 version = record.version,
                 workflowKey = record.workflowKey,
-                parentWorkflowInstanceKey = if (record.parentWorkflowInstanceKey > 0) record.parentWorkflowInstanceKey else null,
-                parentElementInstanceKey = if (record.parentElementInstanceKey > 0) record.parentElementInstanceKey else null
+                parentWorkflowInstanceKey = record.parentWorkflowInstanceKey.takeIf { it > 0 },
+                parentElementInstanceKey = record.parentElementInstanceKey.takeIf { it > 0 }
         )
     }
 
@@ -143,5 +142,35 @@ class HazelcastImporter(
         )
 
         variableUpdateRepository.save(entity)
+    }
+
+    private fun importJobRecord(record: Schema.JobRecord) {
+        val entity = jobRepository
+                .findById(record.metadata.key)
+                .orElse(createJob(record))
+
+        when (record.metadata.intent) {
+            "CREATED", "TIMED_OUT", "RETRIES_UPDATED" -> entity.state = JobState.ACTIVATABLE
+            "ACTIVATED" -> entity.state = JobState.ACTIVATED
+            "FAILED" -> entity.state = JobState.FAILED
+            "COMPLETED" -> entity.state = JobState.COMPLETED
+            "CANCELED" -> entity.state = JobState.CANCELED
+            "ERROR_THROWN" -> entity.state = JobState.ERROR_THROWN
+        }
+
+        entity.worker = record.worker.ifEmpty { null }
+        entity.retries = record.retries
+        entity.timestamp = record.metadata.timestamp
+
+        jobRepository.save(entity)
+    }
+
+    private fun createJob(record: Schema.JobRecord): Job {
+        return Job(
+                key = record.metadata.key,
+                jobType = record.type,
+                workflowInstanceKey = record.workflowInstanceKey,
+                elementInstanceKey = record.elementInstanceKey
+        )
     }
 }

@@ -1,0 +1,29 @@
+type Job {
+    key: ID!
+
+    jobType: String!
+
+    worker: String
+    retries: Int
+
+    state: JobState!
+    timestamp: Long!
+
+    workflowInstance: WorkflowInstance
+    elementInstanceKey: Long!
+}
+
+enum JobState {
+    ACTIVATABLE
+    ACTIVATED
+    FAILED
+    COMPLETED
+    CANCELED
+    ERROR_THROWN
+}
+
+extend type Query {
+    job(key: ID!): Job
+
+    jobs(count: Int = 10, offset: Int = 0): [Job!]!
+}

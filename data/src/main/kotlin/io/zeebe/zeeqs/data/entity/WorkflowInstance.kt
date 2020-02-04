@@ -18,8 +18,11 @@ data class WorkflowInstance(
     var endTime: Long? = null
 
     @Transient
+    var workflow: Workflow? = null
+
+    @Transient
     var variables: List<Variable> = ArrayList()
 
     @Transient
-    var workflow: Workflow? = null
+    var jobs: List<Job> = ArrayList()
 }

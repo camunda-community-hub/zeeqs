@@ -1,14 +1,8 @@
 package io.zeebe.zeeqs.data.resolvers
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
-import io.zeebe.zeeqs.data.entity.Variable
-import io.zeebe.zeeqs.data.entity.VariableUpdate
-import io.zeebe.zeeqs.data.entity.Workflow
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
-import io.zeebe.zeeqs.data.repository.VariableRepository
-import io.zeebe.zeeqs.data.repository.VariableUpdateRepository
-import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
-import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.data.entity.*
+import io.zeebe.zeeqs.data.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -18,7 +12,8 @@ class WorkflowInstanceQueryResolver(
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val variableRepository: VariableRepository,
         val variableUpdateRepository: VariableUpdateRepository,
-        val workflowRepository: WorkflowRepository
+        val workflowRepository: WorkflowRepository,
+        val jobRepository: JobRepository
 ) : GraphQLQueryResolver {
 
     fun getWorkflowInstances(count: Int, offset: Int): List<WorkflowInstance> {
@@ -32,8 +27,9 @@ class WorkflowInstanceQueryResolver(
     }
 
     private fun transformWorkflowInstance(workflowInstance: WorkflowInstance): WorkflowInstance {
-        workflowInstance.variables = getVariables(workflowInstance.key)
         workflowInstance.workflow = getWorkflow(workflowInstance.workflowKey)
+        workflowInstance.variables = getVariables(workflowInstance.key)
+        workflowInstance.jobs = getJobs(workflowInstance.key)
         return workflowInstance
     }
 
@@ -49,6 +45,10 @@ class WorkflowInstanceQueryResolver(
 
     private fun getVariableUpdates(variableKey: Long): List<VariableUpdate> {
         return variableUpdateRepository.findByVariableKey(variableKey)
+    }
+
+    private fun getJobs(workflowInstanceKey: Long): List<Job> {
+        return jobRepository.findByWorkflowInstanceKey(workflowInstanceKey)
     }
 
     private fun getWorkflow(workflowKey: Long): Workflow? {
