@@ -11,6 +11,8 @@ type Job {
 
     workflowInstance: WorkflowInstance
     elementInstanceKey: Long!
+
+    incidents: [Incident!]
 }
 
 enum JobState {

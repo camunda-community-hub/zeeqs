@@ -14,7 +14,8 @@ class HazelcastImporter(
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val variableRepository: VariableRepository,
         val variableUpdateRepository: VariableUpdateRepository,
-        val jobRepository: JobRepository) {
+        val jobRepository: JobRepository,
+        val incidentRepository: IncidentRepository) {
 
     fun start(hazelcastConnection: String) {
 
@@ -29,6 +30,7 @@ class HazelcastImporter(
         zeebeHazelcast.addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
         zeebeHazelcast.addVariableListener(this::importVariableRecord)
         zeebeHazelcast.addJobListener(this::importJobRecord)
+        zeebeHazelcast.addIncidentListener(this::importIncidentRecord)
     }
 
     private fun importDeploymentRecord(record: Schema.DeploymentRecord) {
@@ -171,6 +173,36 @@ class HazelcastImporter(
                 jobType = record.type,
                 workflowInstanceKey = record.workflowInstanceKey,
                 elementInstanceKey = record.elementInstanceKey
+        )
+    }
+
+    private fun importIncidentRecord(record: Schema.IncidentRecord) {
+        val entity = incidentRepository
+                .findById(record.metadata.key)
+                .orElse(createIncident(record))
+
+        when (record.metadata.intent) {
+            "CREATED" -> {
+                entity.state = IncidentState.CREATED
+                entity.creationTime = record.metadata.timestamp
+            }
+            "RESOLVED" -> {
+                entity.state = IncidentState.RESOLVED
+                entity.resolveTime = record.metadata.timestamp
+            }
+        }
+
+        incidentRepository.save(entity)
+    }
+
+    private fun createIncident(record: Schema.IncidentRecord): Incident {
+        return Incident(
+                key = record.metadata.key,
+                errorType = record.errorType,
+                errorMessage = record.errorMessage,
+                workflowInstanceKey = record.workflowInstanceKey,
+                elementInstanceKey = record.elementInstanceKey,
+                jobKey = record.jobKey.takeIf { it > 0 }
         )
     }
 }

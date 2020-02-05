@@ -12,7 +12,7 @@ class WorkflowInstanceQueryResolver(
         val workflowInstanceRepository: WorkflowInstanceRepository
 ) : GraphQLQueryResolver {
 
-    fun getWorkflowInstances(count: Int, offset: Int): List<WorkflowInstance> {
+    fun workflowInstances(count: Int, offset: Int): List<WorkflowInstance> {
         return workflowInstanceRepository.findAll(PageRequest.of(offset, count)).toList()
     }
 

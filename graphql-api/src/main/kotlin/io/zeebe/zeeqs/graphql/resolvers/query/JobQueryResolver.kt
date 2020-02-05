@@ -12,7 +12,7 @@ class JobQueryResolver(
         val jobRepository: JobRepository
 ) : GraphQLQueryResolver {
 
-    fun getJobs(count: Int, offset: Int): List<Job> {
+    fun jobs(count: Int, offset: Int): List<Job> {
         return jobRepository.findAll(PageRequest.of(offset, count)).toList()
     }
 
