@@ -10,6 +10,4 @@ data class Workflow(
         val bpmnProcessId: String,
         val version: Int,
         @Lob val bpmnXML: String,
-        val timestamp: Long) {
-
-}
+        val timestamp: Long)

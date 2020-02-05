@@ -11,8 +11,4 @@ class Variable(
         val scopeKey: Long,
         var value: String,
         var timestamp: Long
-) {
-
-    @Transient
-    var updates: List<VariableUpdate> = ArrayList()
-}
+)

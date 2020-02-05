@@ -17,6 +17,4 @@ class Job(
     var retries: Int? = null
     var worker: String? = null
 
-    @Transient
-    var workflowInstance: WorkflowInstance? = null
 }

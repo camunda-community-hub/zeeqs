@@ -6,7 +6,7 @@ import io.zeebe.zeeqs.data.repository.VariableRepository
 import org.springframework.stereotype.Component
 
 @Component
-class VariablesQueryResolver(
+class VariableQueryResolver(
         val variableRepository: VariableRepository
 ) : GraphQLQueryResolver {
 
