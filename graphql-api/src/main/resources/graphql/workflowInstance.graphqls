@@ -3,7 +3,7 @@ type WorkflowInstance {
 
     state: WorkflowInstanceState!
 
-    parentWorkflowInstanceKey: ID
+    parentWorkflowInstance: WorkflowInstance
     parentElementInstanceKey: Long
 
     # TODO: change time to String format?
@@ -13,8 +13,12 @@ type WorkflowInstance {
     workflow: Workflow
 
     variables: [Variable!]
+
     jobs: [Job!]
+
     incidents: [Incident!]
+
+    childWorkflowInstances: [WorkflowInstance!]
 }
 
 enum WorkflowInstanceState {
