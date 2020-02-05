@@ -3,10 +3,9 @@ type WorkflowInstance {
 
     state: WorkflowInstanceState!
 
-    parentWorkflowInstance: WorkflowInstance
-    parentElementInstanceKey: Long
+    parentElementInstance: ElementInstance
 
-    # TODO: change time to String format?
+    # TODO (saig0): change time to String format?
     startTime: Long
     endTime: Long
 
@@ -19,6 +18,8 @@ type WorkflowInstance {
     incidents: [Incident!]
 
     childWorkflowInstances: [WorkflowInstance!]
+
+    elementInstances: [ElementInstance!]
 }
 
 enum WorkflowInstanceState {

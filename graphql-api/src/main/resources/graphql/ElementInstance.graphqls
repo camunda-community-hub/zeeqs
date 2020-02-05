@@ -1,0 +1,58 @@
+type ElementInstance {
+    key: ID!
+
+    elementId: String!
+    elementName: String
+
+    bpmnElementType: BpmnElementType!
+
+    state: ElementInstanceState!
+
+    workflowInstance: WorkflowInstance
+
+    scope: ElementInstance
+
+    startTime: Long
+    endTime: Long
+
+    incidents: [Incident!]
+
+    stateTransitions: [ElementInstanceStateTransition]
+}
+
+type ElementInstanceStateTransition {
+    state: ElementInstanceState!
+    timestamp: Long
+}
+
+enum ElementInstanceState {
+    ACTIVATING
+    ACTIVATED
+
+    COMPLETING
+    COMPLETED
+
+    TERMINATING
+    TERMINATED
+
+    TAKEN
+}
+
+enum BpmnElementType {
+    UNSPECIFIED
+    PROCESS
+    SUB_PROCESS
+    START_EVENT
+    INTERMEDIATE_CATCH_EVENT
+    BOUNDARY_EVENT
+    END_EVENT
+    SERVICE_TASK
+    RECEIVE_TASK
+    EXCLUSIVE_GATEWAY
+    PARALLEL_GATEWAY
+    EVENT_BASED_GATEWAY
+    SEQUENCE_FLOW
+    MULTI_INSTANCE_BODY
+    CALL_ACTIVITY
+}
+

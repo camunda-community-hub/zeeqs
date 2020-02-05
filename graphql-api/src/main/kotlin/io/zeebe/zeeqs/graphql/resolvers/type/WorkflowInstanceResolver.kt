@@ -12,7 +12,8 @@ class WorkflowInstanceResolver(
         val variableRepository: VariableRepository,
         val workflowRepository: WorkflowRepository,
         val jobRepository: JobRepository,
-        val incidentRepository: IncidentRepository
+        val incidentRepository: IncidentRepository,
+        val elementInstanceRepository: ElementInstanceRepository
 ) : GraphQLResolver<WorkflowInstance> {
 
     fun variables(workflowInstance: WorkflowInstance): List<Variable> {
@@ -31,12 +32,16 @@ class WorkflowInstanceResolver(
         return incidentRepository.findByWorkflowInstanceKey(workflowInstance.key)
     }
 
-    fun parentWorkflowInstance(workflowInstance: WorkflowInstance): WorkflowInstance? {
-        return workflowInstance.parentWorkflowInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
+    fun parentElementInstance(workflowInstance: WorkflowInstance): ElementInstance? {
+        return workflowInstance.parentElementInstanceKey?.let { elementInstanceRepository.findByIdOrNull(it) }
     }
 
     fun childWorkflowInstances(workflowInstance: WorkflowInstance): List<WorkflowInstance> {
         return workflowInstanceRepository.findByParentWorkflowInstanceKey(workflowInstance.key)
+    }
+
+    fun elementInstances(workflowInstance: WorkflowInstance): List<ElementInstance> {
+        return elementInstanceRepository.findByWorkflowInstanceKey(workflowInstance.key)
     }
 
 }

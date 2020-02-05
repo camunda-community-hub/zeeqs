@@ -3,7 +3,8 @@ type Variable {
     name: String!
     value: String!
 
-    scopeKey: Long!
+    scope: ElementInstance
+
     timestamp: Long!
 
     updates: [VariableUpdate!]

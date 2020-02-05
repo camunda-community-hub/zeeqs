@@ -10,7 +10,7 @@ type Job {
     timestamp: Long!
 
     workflowInstance: WorkflowInstance
-    elementInstanceKey: Long!
+    elementInstance: ElementInstance
 
     incidents: [Incident!]
 }

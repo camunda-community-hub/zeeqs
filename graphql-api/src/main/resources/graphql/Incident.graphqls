@@ -10,7 +10,7 @@ type Incident {
     resolveTime: Long
 
     workflowInstance: WorkflowInstance
-    elementInstanceKey: Long!
+    elementInstance: ElementInstance
 
     job: Job
 }

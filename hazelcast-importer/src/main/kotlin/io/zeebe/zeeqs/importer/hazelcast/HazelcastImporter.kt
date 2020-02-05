@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component
 class HazelcastImporter(
         val workflowRepository: WorkflowRepository,
         val workflowInstanceRepository: WorkflowInstanceRepository,
+        val elementInstanceRepository: ElementInstanceRepository,
+        val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
         val variableRepository: VariableRepository,
         val variableUpdateRepository: VariableUpdateRepository,
         val jobRepository: JobRepository,
@@ -67,6 +69,9 @@ class HazelcastImporter(
         if (record.workflowInstanceKey == record.metadata.key) {
             importWorkflowInstance(record)
         }
+
+        importElementInstance(record)
+        importElementInstanceStateTransition(record)
     }
 
     private fun importWorkflowInstance(record: Schema.WorkflowInstanceRecord) {
@@ -101,6 +106,87 @@ class HazelcastImporter(
                 parentWorkflowInstanceKey = record.parentWorkflowInstanceKey.takeIf { it > 0 },
                 parentElementInstanceKey = record.parentElementInstanceKey.takeIf { it > 0 }
         )
+    }
+
+    private fun importElementInstance(record: Schema.WorkflowInstanceRecord) {
+        val entity = elementInstanceRepository
+                .findById(record.metadata.key)
+                .orElse(createElementInstance(record))
+
+        entity.state = getElementInstanceState(record)
+
+        when (record.metadata.intent) {
+            "ELEMENT_ACTIVATING" -> {
+                entity.startTime = record.metadata.timestamp
+            }
+            "ELEMENT_COMPLETED", "ELEMENT_TERMINATED" -> {
+                entity.endTime = record.metadata.timestamp
+            }
+            "SEQUENCE_FLOW_TAKEN" -> {
+                entity.startTime = record.metadata.timestamp
+                entity.endTime = record.metadata.timestamp
+            }
+        }
+
+        elementInstanceRepository.save(entity)
+    }
+
+    private fun createElementInstance(record: Schema.WorkflowInstanceRecord): ElementInstance {
+
+        val bpmnElementType = when (record.bpmnElementType) {
+            Schema.WorkflowInstanceRecord.BpmnElementType.BOUNDARY_EVENT -> BpmnElementType.BOUNDARY_EVENT
+            Schema.WorkflowInstanceRecord.BpmnElementType.CALL_ACTIVITY -> BpmnElementType.CALL_ACTIVITY
+            Schema.WorkflowInstanceRecord.BpmnElementType.END_EVENT -> BpmnElementType.END_EVENT
+            Schema.WorkflowInstanceRecord.BpmnElementType.EVENT_BASED_GATEWAY -> BpmnElementType.EVENT_BASED_GATEWAY
+            Schema.WorkflowInstanceRecord.BpmnElementType.EXCLUSIVE_GATEWAY -> BpmnElementType.EXCLUSIVE_GATEWAY
+            Schema.WorkflowInstanceRecord.BpmnElementType.INTERMEDIATE_CATCH_EVENT -> BpmnElementType.INTERMEDIATE_CATCH_EVENT
+            Schema.WorkflowInstanceRecord.BpmnElementType.MULTI_INSTANCE_BODY -> BpmnElementType.MULTI_INSTANCE_BODY
+            Schema.WorkflowInstanceRecord.BpmnElementType.PARALLEL_GATEWAY -> BpmnElementType.PARALLEL_GATEWAY
+            Schema.WorkflowInstanceRecord.BpmnElementType.PROCESS -> BpmnElementType.PROCESS
+            Schema.WorkflowInstanceRecord.BpmnElementType.RECEIVE_TASK -> BpmnElementType.RECEIVE_TASK
+            Schema.WorkflowInstanceRecord.BpmnElementType.SEQUENCE_FLOW -> BpmnElementType.SEQUENCE_FLOW
+            Schema.WorkflowInstanceRecord.BpmnElementType.SERVICE_TASK -> BpmnElementType.SERVICE_TASK
+            Schema.WorkflowInstanceRecord.BpmnElementType.START_EVENT -> BpmnElementType.START_EVENT
+            Schema.WorkflowInstanceRecord.BpmnElementType.SUB_PROCESS -> BpmnElementType.SUB_PROCESS
+            else -> BpmnElementType.UNSPECIFIED
+        }
+
+        return ElementInstance(
+                key = record.metadata.key,
+                elementId = record.elementId,
+                bpmnElementType = bpmnElementType,
+                workflowInstanceKey = record.workflowInstanceKey,
+                workflowKey = record.workflowKey,
+                scopeKey = record.flowScopeKey.takeIf { it > 0 }
+        )
+    }
+
+    private fun getElementInstanceState(record: Schema.WorkflowInstanceRecord): ElementInstanceState {
+        return when (record.metadata.intent) {
+            "ELEMENT_ACTIVATING" -> ElementInstanceState.ACTIVATING
+            "ELEMENT_ACTIVATED" -> ElementInstanceState.ACTIVATED
+            "ELEMENT_COMPLETING" -> ElementInstanceState.COMPLETING
+            "ELEMENT_COMPLETED" -> ElementInstanceState.COMPLETED
+            "ELEMENT_TERMINATING" -> ElementInstanceState.TERMINATING
+            "ELEMENT_TERMINATED" -> ElementInstanceState.TERMINATED
+            "EVENT_OCCURRED" -> ElementInstanceState.EVENT_OCCURRED
+            "SEQUENCE_FLOW_TAKEN" -> ElementInstanceState.TAKEN
+            else -> ElementInstanceState.ACTIVATING
+        }
+    }
+
+    private fun importElementInstanceStateTransition(record: Schema.WorkflowInstanceRecord) {
+
+        val state = getElementInstanceState(record)
+
+        val entity = ElementInstanceStateTransition(
+                position = record.metadata.position,
+                elementInstanceKey = record.metadata.key,
+                timestamp = record.metadata.timestamp,
+                state = state
+        )
+
+        elementInstanceStateTransitionRepository.save(entity)
     }
 
     private fun importVariableRecord(record: Schema.VariableRecord) {
