@@ -1,0 +1,24 @@
+type Message {
+    key: ID!
+
+    name: String!
+    correlationKey: String
+    messageId: String
+    timeToLive: Long,
+
+    state: MessageState
+    timestamp: Long
+
+    messageCorrelations: [MessageCorrelation!]
+}
+
+enum MessageState {
+    PUBLISHED
+    DELETED
+}
+
+extend type Query {
+    message(key: ID!): Message
+
+    messages(count: Int = 10, offset: Int = 0): [Message!]!
+}

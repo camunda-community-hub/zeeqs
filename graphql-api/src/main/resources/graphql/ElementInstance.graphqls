@@ -15,9 +15,13 @@ type ElementInstance {
     startTime: Long
     endTime: Long
 
+    stateTransitions: [ElementInstanceStateTransition]
+
     incidents: [Incident!]
 
-    stateTransitions: [ElementInstanceStateTransition]
+    timers: [Timer!]
+
+    messageSubscriptions: [MessageSubscription!]
 }
 
 type ElementInstanceStateTransition {

@@ -1,0 +1,22 @@
+type Timer {
+    key: ID!
+
+    dueDate: Long
+    repetitions: Int
+
+    workflowInstance: WorkflowInstance
+    elementInstance: ElementInstance
+
+    workflow: Workflow
+
+    state: TimerState!
+    timestamp: Long!
+}
+
+enum TimerState {
+    CREATED
+    TRIGGERED
+    CANCELED
+}
+
+

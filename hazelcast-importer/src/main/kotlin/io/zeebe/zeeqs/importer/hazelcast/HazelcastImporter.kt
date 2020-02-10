@@ -7,6 +7,7 @@ import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
+import java.time.Duration
 
 @Component
 class HazelcastImporter(
@@ -17,22 +18,42 @@ class HazelcastImporter(
         val variableRepository: VariableRepository,
         val variableUpdateRepository: VariableUpdateRepository,
         val jobRepository: JobRepository,
-        val incidentRepository: IncidentRepository) {
+        val incidentRepository: IncidentRepository,
+        val timerRepository: TimerRepository,
+        val messageRepository: MessageRepository,
+        val messageSubscriptionRepository: MessageSubscriptionRepository,
+        val messageCorrelationRepository: MessageCorrelationRepository) {
+
+    var zeebeHazelcast: ZeebeHazelcast? = null
 
     fun start(hazelcastConnection: String) {
 
         val clientConfig = ClientConfig()
-        clientConfig.networkConfig.addAddress(hazelcastConnection)
+        clientConfig.networkConfig
+                .addAddress(hazelcastConnection)
+                .setConnectionTimeout(Duration.ofSeconds(60).toMillis().toInt())
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
-        val zeebeHazelcast = ZeebeHazelcast(hazelcast)
+        // TODO (saig0): remember the last sequence and continue form there
+        val zeebeHazelcast = ZeebeHazelcast.newBuilder(hazelcast)
+                .addDeploymentListener(this::importDeploymentRecord)
+                .addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
+                .addVariableListener(this::importVariableRecord)
+                .addJobListener(this::importJobRecord)
+                .addIncidentListener(this::importIncidentRecord)
+                .addTimerListener(this::importTimerRecord)
+                .addMessageListener(this::importMessageRecord)
+                .addMessageSubscriptionListener(this::importMessageSubscriptionRecord)
+                .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscriptionRecord)
+                .addWorkflowInstanceSubscriptionListener(this::importWorkflowInstanceSubscriptionRecord)
+                .readFromHead()
+                .build()
 
-        zeebeHazelcast.addDeploymentListener(this::importDeploymentRecord)
-        zeebeHazelcast.addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
-        zeebeHazelcast.addVariableListener(this::importVariableRecord)
-        zeebeHazelcast.addJobListener(this::importJobRecord)
-        zeebeHazelcast.addIncidentListener(this::importIncidentRecord)
+    }
+
+    fun stop() {
+        zeebeHazelcast?.close()
     }
 
     private fun importDeploymentRecord(record: Schema.DeploymentRecord) {
@@ -290,5 +311,136 @@ class HazelcastImporter(
                 elementInstanceKey = record.elementInstanceKey,
                 jobKey = record.jobKey.takeIf { it > 0 }
         )
+    }
+
+    private fun importTimerRecord(record: Schema.TimerRecord) {
+        val entity = timerRepository
+                .findById(record.metadata.key)
+                .orElse(createTimer(record))
+
+        when (record.metadata.intent) {
+            "CREATED" -> entity.state = TimerState.CREATED
+            "TRIGGERED" -> entity.state = TimerState.TRIGGERED
+            "CANCELED" -> entity.state = TimerState.CANCELED
+        }
+
+        entity.timestamp = record.metadata.timestamp
+        entity.repetitions = record.repetitions
+
+        timerRepository.save(entity)
+    }
+
+    private fun createTimer(record: Schema.TimerRecord): Timer {
+        return Timer(
+                key = record.metadata.key,
+                dueDate = record.dueDate,
+                repetitions = record.repetitions,
+                workflowKey = record.workflowKey.takeIf { it > 0 },
+                workflowInstanceKey = record.workflowInstanceKey.takeIf { it > 0 },
+                elementInstanceKey = record.elementInstanceKey.takeIf { it > 0 }
+        );
+    }
+
+    private fun importMessageRecord(record: Schema.MessageRecord) {
+        val entity = messageRepository
+                .findById(record.metadata.key)
+                .orElse(createMessage(record))
+
+        when (record.metadata.intent) {
+            "PUBLISHED" -> entity.state = MessageState.PUBLISHED
+            "DELETED" -> entity.state = MessageState.DELETED
+        }
+
+        entity.timestamp = record.metadata.timestamp
+
+        messageRepository.save(entity)
+    }
+
+    private fun createMessage(record: Schema.MessageRecord): Message {
+        return Message(
+                key = record.metadata.key,
+                name = record.name,
+                correlationKey = record.correlationKey.takeIf { it.isNotEmpty() },
+                messageId = record.messageId.takeIf { it.isNotEmpty() },
+                timeToLive = record.timeToLive
+        );
+    }
+
+    private fun importMessageSubscriptionRecord(record: Schema.MessageSubscriptionRecord) {
+        val entity = messageSubscriptionRepository
+                .findByElementInstanceKeyAndMessageName(record.elementInstanceKey, record.messageName)
+                ?: (createMessageSubscription(record))
+
+        when (record.metadata.intent) {
+            "OPENED" -> entity.state = MessageSubscriptionState.OPENED
+            "CORRELATED" -> entity.state = MessageSubscriptionState.CORRELATED
+            "CLOSED" -> entity.state = MessageSubscriptionState.CLOSED
+        }
+
+        entity.timestamp = record.metadata.timestamp
+
+        messageSubscriptionRepository.save(entity)
+    }
+
+    private fun createMessageSubscription(record: Schema.MessageSubscriptionRecord): MessageSubscription {
+        // TODO (saig0): message subscription doesn't have a key - https://github.com/zeebe-io/zeebe/issues/2805
+        val key = record.metadata.position
+        return MessageSubscription(
+                key = key,
+                messageName = record.messageName,
+                messageCorrelationKey = record.correlationKey,
+                workflowInstanceKey = record.workflowInstanceKey,
+                elementInstanceKey = record.elementInstanceKey,
+                elementId = null,
+                workflowKey = null
+        );
+    }
+
+    private fun importMessageStartEventSubscriptionRecord(record: Schema.MessageStartEventSubscriptionRecord) {
+        val entity = messageSubscriptionRepository
+                .findByWorkflowKeyAndMessageName(record.workflowKey, record.messageName)
+                ?: (createMessageSubscription(record))
+
+        when (record.metadata.intent) {
+            "OPENED" -> entity.state = MessageSubscriptionState.OPENED
+            "CLOSED" -> entity.state = MessageSubscriptionState.CLOSED
+        }
+
+        entity.timestamp = record.metadata.timestamp
+
+        messageSubscriptionRepository.save(entity)
+    }
+
+    private fun createMessageSubscription(record: Schema.MessageStartEventSubscriptionRecord): MessageSubscription {
+        // TODO (saig0): message subscription doesn't have a key - https://github.com/zeebe-io/zeebe/issues/2805
+        val key = record.metadata.position
+        return MessageSubscription(
+                key = key,
+                messageName = record.messageName,
+                workflowKey = record.workflowKey,
+                elementId = record.startEventId,
+                elementInstanceKey = null,
+                workflowInstanceKey = null,
+                messageCorrelationKey = null
+        );
+    }
+
+    private fun importWorkflowInstanceSubscriptionRecord(record: Schema.WorkflowInstanceSubscriptionRecord) {
+        when (record.metadata.intent) {
+            "CORRELATED" -> importMessageCorrelation(record)
+        }
+    }
+
+    private fun importMessageCorrelation(record: Schema.WorkflowInstanceSubscriptionRecord) {
+
+        val entity = MessageCorrelation(
+                position = record.metadata.position,
+                messageKey = record.messageKey,
+                messageName = record.messageName,
+                elementInstanceKey = record.elementInstanceKey,
+                timestamp = record.metadata.timestamp
+        )
+
+        messageCorrelationRepository.save(entity)
     }
 }

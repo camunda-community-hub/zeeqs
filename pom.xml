@@ -16,7 +16,7 @@
   <groupId>io.zeebe.zeeqs</groupId>
   <artifactId>zeeqs-root</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>Zeebe Query Service</name>
+  <name>ZeeQS - Root</name>
   <description>Query API for aggregated Zeebe data</description>
 
   <modules>
@@ -32,9 +32,11 @@
     <zeebe.version>0.22.1</zeebe.version>
 
     <spring.boot.version>2.2.3.RELEASE</spring.boot.version>
-    <hazelcast.exporter.version>0.7.0</hazelcast.exporter.version>
+    <hazelcast.exporter.version>0.8.0-alpha1</hazelcast.exporter.version>
     <graphql.version>5.0.2</graphql.version>
     <graphql.tools.version>5.2.4</graphql.tools.version>
+    <zeebe-test-container.version>0.32.0</zeebe-test-container.version>
+    <test-container.version>1.12.5</test-container.version>
 
     <!-- release parent settings -->
     <version.java>11</version.java>
@@ -110,9 +112,22 @@
         <version>${graphql.tools.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-test-container</artifactId>
+        <version>${zeebe-test-container.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${test-container.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
+  <!-- common dependencies -->
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
@@ -160,6 +175,27 @@
             <version>${kotlin.version}</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>test-compile</id>
+            <goals>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.2</version>
       </plugin>
 
       <plugin>
@@ -176,6 +212,38 @@
         <configuration>
           <!-- Override java source version to workaround javadoc bug https://bugs.openjdk.java.net/browse/JDK-8212233 -->
           <source>8</source>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+              <groupId>io.zeebe.hazelcast</groupId>
+              <artifactId>zeebe-hazelcast-exporter</artifactId>
+              <version>${hazelcast.exporter.version}</version>
+              <type>jar</type>
+              <classifier>jar-with-dependencies</classifier>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}/exporter</outputDirectory>
+              <destFileName>zeebe-hazelcast-exporter.jar</destFileName>
+            </artifactItem>
+          </artifactItems>
+          <outputDirectory>${project.build.directory}/libs</outputDirectory>
+          <overWriteReleases>false</overWriteReleases>
+          <overWriteSnapshots>true</overWriteSnapshots>
         </configuration>
       </plugin>
 

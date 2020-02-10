@@ -1,0 +1,29 @@
+type MessageSubscription {
+    key: ID!
+
+    messageName: String!
+    messageCorrelationKey: String
+
+    workflowInstance: WorkflowInstance
+    elementInstance: ElementInstance
+
+    workflow: Workflow
+
+    state: MessageSubscriptionState
+    timestamp: Long
+
+    messageCorrelations: [MessageCorrelation!]
+}
+
+type MessageCorrelation {
+    messageSubscription: MessageSubscription
+    message: Message
+    timestamp: Long
+}
+
+enum MessageSubscriptionState {
+    OPENED
+    CORRELATED
+    CLOSED
+}
+

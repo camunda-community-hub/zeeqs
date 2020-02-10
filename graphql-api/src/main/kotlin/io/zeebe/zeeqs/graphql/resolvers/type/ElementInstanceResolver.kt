@@ -1,14 +1,8 @@
 package io.zeebe.zeeqs.data.resolvers
 
 import com.coxautodev.graphql.tools.GraphQLResolver
-import io.zeebe.zeeqs.data.entity.ElementInstance
-import io.zeebe.zeeqs.data.entity.ElementInstanceStateTransition
-import io.zeebe.zeeqs.data.entity.Incident
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
-import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
-import io.zeebe.zeeqs.data.repository.ElementInstanceStateTransitionRepository
-import io.zeebe.zeeqs.data.repository.IncidentRepository
-import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
+import io.zeebe.zeeqs.data.entity.*
+import io.zeebe.zeeqs.data.repository.*
 import io.zeebe.zeeqs.data.service.WorkflowService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -19,7 +13,9 @@ class ElementInstanceResolver(
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val incidentRepository: IncidentRepository,
         val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
-        val workflowService: WorkflowService
+        val timerRepository: TimerRepository,
+        val workflowService: WorkflowService,
+        val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<ElementInstance> {
 
     fun workflowInstance(elementInstance: ElementInstance): WorkflowInstance? {
@@ -43,6 +39,14 @@ class ElementInstanceResolver(
                 .getBpmnElementInfo(elementInstance.workflowKey)
                 ?.get(elementInstance.elementId)
                 ?.elementName
+    }
+
+    fun timers(elementInstance: ElementInstance): List<Timer> {
+        return timerRepository.findByElementInstanceKey(elementInstance.key)
+    }
+
+    fun messageSubscriptions(elementInstance: ElementInstance): List<MessageSubscription> {
+        return messageSubscriptionRepository.findByElementInstanceKey(elementInstance.key)
     }
 
 }
