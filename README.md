@@ -9,7 +9,15 @@ A [Zeebe](https://zeebe.io) community extension that provides a GraphQL query AP
 
 The application provides an endpoint `/graphql` for GraphQL queries.
 
-A query can be send via HTTP GET request and a `query` parameter. For example, `localhost:9000/graphql?query={workflows{key,bpmnProcessId,version}}` 
+A query can be send via HTTP POST request and a JSON body containing the `query`. For example:
+
+```
+curl \
+  -X POST \
+  -H "Content-Type: application/json" \
+  --data '{ "query": "{ workflows { key } }" }' \
+  http://localhost:9000/graphql
+```
 
 While development, the graph can be explored using the integrated GraphiQL:
 http://localhost:9000/graphiql
