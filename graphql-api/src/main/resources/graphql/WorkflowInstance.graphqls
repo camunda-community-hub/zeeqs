@@ -20,6 +20,10 @@ type WorkflowInstance {
     childWorkflowInstances: [WorkflowInstance!]
 
     elementInstances: [ElementInstance!]
+
+    timers: [Timer!]
+
+    messageSubscriptions: [MessageSubscription!]
 }
 
 enum WorkflowInstanceState {

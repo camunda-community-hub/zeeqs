@@ -7,32 +7,7 @@ pipeline {
       cloud 'zeebe-ci'
       label "zeebe-ci-build_${buildName}"
       defaultContainer 'jnlp'
-      yaml '''\
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    agent: zeebe-ci-build
-spec:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: slaves
-  tolerations:
-    - key: "slaves"
-      operator: "Exists"
-      effect: "NoSchedule"
-  containers:
-    - name: maven
-      image: maven:3.6.0-jdk-11
-      command: ["cat"]
-      tty: true
-      resources:
-        limits:
-          cpu: 1
-          memory: 2Gi
-        requests:
-          cpu: 1
-          memory: 2Gi
-'''
+      yamlFile '.ci/podSpecs/distribution.yml'
     }
   }
 
@@ -57,8 +32,7 @@ spec:
       steps {
         container('maven') {
           configFileProvider([configFile(fileId: 'maven-nexus-settings-zeebe', variable: 'MAVEN_SETTINGS_XML')]) {
-            sh 'apt-get update'
-            sh 'apt-get install --no-install-recommends -qq -y libatomic1'
+            sh '.ci/scripts/distribution/prepare.sh'
             sh 'mvn clean install -B -s $MAVEN_SETTINGS_XML -DskipTests'
           }
         }

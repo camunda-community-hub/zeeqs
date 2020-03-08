@@ -9,4 +9,5 @@ interface WorkflowInstanceRepository : PagingAndSortingRepository<WorkflowInstan
 
     fun findByParentWorkflowInstanceKey(parentWorkflowInstanceKey: Long): List<WorkflowInstance>
 
+    fun findByWorkflowKey(workflowKey: Long): List<WorkflowInstance>
 }

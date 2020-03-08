@@ -5,6 +5,12 @@ type Workflow {
     timestamp: Long!
 
     bpmnXML: String!
+
+    workflowInstances: [WorkflowInstance!]
+
+    timers: [Timer!]
+
+    messageSubscriptions: [MessageSubscription!]
 }
 
 extend type Query {

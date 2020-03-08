@@ -13,7 +13,9 @@ class WorkflowInstanceResolver(
         val workflowRepository: WorkflowRepository,
         val jobRepository: JobRepository,
         val incidentRepository: IncidentRepository,
-        val elementInstanceRepository: ElementInstanceRepository
+        val elementInstanceRepository: ElementInstanceRepository,
+        val timerRepository: TimerRepository,
+        val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<WorkflowInstance> {
 
     fun variables(workflowInstance: WorkflowInstance): List<Variable> {
@@ -42,6 +44,14 @@ class WorkflowInstanceResolver(
 
     fun elementInstances(workflowInstance: WorkflowInstance): List<ElementInstance> {
         return elementInstanceRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    }
+
+    fun timers(workflowInstance: WorkflowInstance): List<Timer> {
+        return timerRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    }
+
+    fun messageSubscriptions(workflowInstance: WorkflowInstance): List<MessageSubscription> {
+        return messageSubscriptionRepository.findByWorkflowInstanceKey(workflowInstance.key)
     }
 
 }
