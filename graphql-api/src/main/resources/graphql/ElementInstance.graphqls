@@ -40,6 +40,8 @@ enum ElementInstanceState {
     TERMINATED
 
     TAKEN
+
+    EVENT_OCCURRED
 }
 
 enum BpmnElementType {
