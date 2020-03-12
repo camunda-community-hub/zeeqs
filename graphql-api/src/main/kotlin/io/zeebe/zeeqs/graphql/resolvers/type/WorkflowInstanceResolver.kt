@@ -22,16 +22,27 @@ class WorkflowInstanceResolver(
         return variableRepository.findByWorkflowInstanceKey(workflowInstance.key)
     }
 
-    fun jobs(workflowInstance: WorkflowInstance): List<Job> {
-        return jobRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    fun jobs(workflowInstance: WorkflowInstance, stateIn: List<JobState>, jobTypeIn: List<String>): List<Job> {
+        return if (jobTypeIn.isEmpty()) {
+            jobRepository.findByWorkflowInstanceKeyAndStateIn(workflowInstance.key, stateIn)
+        } else {
+            jobRepository.findByWorkflowInstanceKeyAndStateInAndJobTypeIn(
+                    workflowInstanceKey = workflowInstance.key,
+                    stateIn = stateIn,
+                    jobTypeIn = jobTypeIn
+            )
+        }
     }
 
     fun workflow(workflowInstance: WorkflowInstance): Workflow? {
         return workflowRepository.findByIdOrNull(workflowInstance.workflowKey)
     }
 
-    fun incidents(workflowInstance: WorkflowInstance): List<Incident> {
-        return incidentRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    fun incidents(workflowInstance: WorkflowInstance, stateIn: List<IncidentState>): List<Incident> {
+        return incidentRepository.findByWorkflowInstanceKeyAndStateIn(
+                workflowInstanceKey = workflowInstance.key,
+                stateIn = stateIn
+        )
     }
 
     fun parentElementInstance(workflowInstance: WorkflowInstance): ElementInstance? {
@@ -42,8 +53,11 @@ class WorkflowInstanceResolver(
         return workflowInstanceRepository.findByParentWorkflowInstanceKey(workflowInstance.key)
     }
 
-    fun elementInstances(workflowInstance: WorkflowInstance): List<ElementInstance> {
-        return elementInstanceRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    fun elementInstances(workflowInstance: WorkflowInstance, stateIn: List<ElementInstanceState>): List<ElementInstance> {
+        return elementInstanceRepository.findByWorkflowInstanceKeyAndStateIn(
+                workflowInstanceKey = workflowInstance.key,
+                stateIn = stateIn
+        )
     }
 
     fun timers(workflowInstance: WorkflowInstance): List<Timer> {

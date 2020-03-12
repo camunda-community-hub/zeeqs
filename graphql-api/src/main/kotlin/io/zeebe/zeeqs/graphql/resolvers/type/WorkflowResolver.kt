@@ -1,10 +1,7 @@
 package io.zeebe.zeeqs.graphql.resolvers.type
 
 import com.coxautodev.graphql.tools.GraphQLResolver
-import io.zeebe.zeeqs.data.entity.MessageSubscription
-import io.zeebe.zeeqs.data.entity.Timer
-import io.zeebe.zeeqs.data.entity.Workflow
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
+import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
@@ -17,8 +14,8 @@ class WorkflowResolver(
         val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<Workflow> {
 
-    fun workflowInstances(workflow: Workflow): List<WorkflowInstance> {
-        return workflowInstanceRepository.findByWorkflowKey(workflow.key)
+    fun workflowInstances(workflow: Workflow, stateIn: List<WorkflowInstanceState>): List<WorkflowInstance> {
+        return workflowInstanceRepository.findByWorkflowKeyAndStateIn(workflow.key, stateIn)
     }
 
     fun timers(workflow: Workflow): List<Timer> {

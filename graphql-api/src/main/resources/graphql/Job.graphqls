@@ -27,5 +27,10 @@ enum JobState {
 extend type Query {
     job(key: ID!): Job
 
-    jobs(count: Int = 10, offset: Int = 0): [Job!]!
+    jobs(
+        count: Int = 10,
+        offset: Int = 0,
+        stateIn: [JobState!] = [ACTIVATABLE, ACTIVATED, FAILED, COMPLETED, CANCELED, ERROR_THROWN],
+        jobTypeIn: [String!] = []
+    ): [Job!]!
 }
