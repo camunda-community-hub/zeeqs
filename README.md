@@ -24,6 +24,8 @@ http://localhost:9000/graphiql
 
 ### Example Queries:
 
+Get all workflows:
+
 ```graphql
 {
   workflows {
@@ -34,15 +36,17 @@ http://localhost:9000/graphiql
 }
 ```
 
+Get all workflow instances that are active (i.e. not completed or terminated):
+
 ```graphql
 {
-  workflowInstances {
+  workflowInstances(stateIn: [ACTIVATED]) {
     key
     state
     workflow {
       bpmnProcessId
     }
-    elementInstances {
+    elementInstances(stateIn: [ACTIVATED]) {
       elementId
       elementName
       bpmnElementType
@@ -56,20 +60,19 @@ http://localhost:9000/graphiql
 }
 ```
 
+Get all jobs that are activate (i.e. not completed or canceled) and have one of the given job types:
+
 ```graphql
 {
-  jobs {
+  jobs(stateIn: [ACTIVATABLE, ACTIVATED], jobTypeIn: ["task-1", "task-2", "task-3"]) {
     key    
     jobType
-    state
-    
+    state    
     elementInstance {
       elementId
-      elementName
-      
+      elementName      
       workflowInstance {
-        key
-        
+        key        
         workflow {
           key
           bpmnProcessId
