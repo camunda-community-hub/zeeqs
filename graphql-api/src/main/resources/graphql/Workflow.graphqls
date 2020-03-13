@@ -1,20 +1,25 @@
 type Workflow {
+    # the unique key of the workflow
     key: ID!
+    # the BPMN process id (i.e. the technical name of the workflow)
     bpmnProcessId: String!
+    # the deployed version of the workflow based on the BPMN process id
     version: Int!
+    # the time when the workflow was deployed
     timestamp: Long!
-
+    # the BPMN XML of the workflow
     bpmnXML: String!
-
-    workflowInstances: [WorkflowInstance!]
-
+    # the created instances of the workflow
+    workflowInstances(stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]): [WorkflowInstance!]
+    # the scheduled timers of the timer start events of the workflow
     timers: [Timer!]
-
+    # the opened message subscriptions of the message start events of the workflow
     messageSubscriptions: [MessageSubscription!]
 }
 
 extend type Query {
+    # find the workflow with the given key
     workflow(key: ID!): Workflow
-
+    # find all workflows
     workflows(count: Int = 10, offset: Int = 0): [Workflow!]!
 }

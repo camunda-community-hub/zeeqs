@@ -1,28 +1,38 @@
 type WorkflowInstance {
+    # the unique key of the workflow instance
     key: ID!
-
+    # the current state of the workflow instance
     state: WorkflowInstanceState!
-
+    # the parent element instance if the workflow instance is created by a call activity
     parentElementInstance: ElementInstance
 
-    # TODO (saig0): change time to String format?
+    # the time when the workflow instance was created
     startTime: Long
+    # the time when the workflow instance was ended (completed/terminated)
     endTime: Long
 
+    # the workflow the instance is created of
     workflow: Workflow
-
+    # the created variables related to the workflow instance
     variables: [Variable!]
-
-    jobs: [Job!]
-
-    incidents: [Incident!]
-
+    # the created jobs related to the workflow instance
+    jobs(
+        stateIn: [JobState!] = [ACTIVATABLE, ACTIVATED, FAILED, COMPLETED, CANCELED, ERROR_THROWN]
+        jobTypeIn: [String!] = []
+    ): [Job!]
+    # the created incidents related to the workflow instance
+    incidents(
+        stateIn: [IncidentState] = [CREATED, RESOLVED]
+    ): [Incident!]
+    # the child workflow instances that are created by a call activity of this workflow instance
     childWorkflowInstances: [WorkflowInstance!]
-
-    elementInstances: [ElementInstance!]
-
+    # the created element instances (e.g. for start event, service task, etc.) of the workflow instance
+    elementInstances(
+        stateIn: [ElementInstanceState] = [ACTIVATING, ACTIVATED, COMPLETING, COMPLETED, TERMINATING, TERMINATED, TAKEN, EVENT_OCCURRED]
+    ): [ElementInstance!]
+    # the scheduled timers related to the workflow instance (timer catch events)
     timers: [Timer!]
-
+    # the opened message subscriptions related to the workflow instance (e.g. message catch events)
     messageSubscriptions: [MessageSubscription!]
 }
 
@@ -33,7 +43,13 @@ enum WorkflowInstanceState {
 }
 
 type Query {
+    # find the workflow instance with the given key
     workflowInstance(key: ID!): WorkflowInstance
 
-    workflowInstances(count: Int = 10, offset: Int = 0): [WorkflowInstance!]!
+    # find all workflow instances
+    workflowInstances(
+        count: Int = 10,
+        offset: Int = 0,
+        stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]
+    ): [WorkflowInstance!]!
 }
