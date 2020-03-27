@@ -87,7 +87,24 @@ Get all jobs that are activate (i.e. not completed or canceled) and have one of 
 
 ### Docker
 
-...
+The docker image for the ZeeQS application is published to [DockerHub](https://hub.docker.com/r/saig0/zeeqs).
+
+```
+docker pull saig0/zeeqs:latest
+```
+ 
+* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
+* forward the Hazelcast port to the docker container (default: `5701`)
+* configure the connection to Hazelcast by setting `io.zeebe.hazelcast.connection` (default: `localhost:5701`) 
+
+For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the ZeeQS application. 
+
+```
+cd docker
+docker-compose up
+```
+
+* the GraphQL endpoints are available under the port `9000`
 
 ### Manual
 
