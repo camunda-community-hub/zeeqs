@@ -19,6 +19,7 @@ pipeline {
 
   environment {
     NEXUS = credentials("camunda-nexus")
+    DOCKER_HUB = credentials("camunda-dockerhub")
   }
 
   parameters {
@@ -35,6 +36,9 @@ pipeline {
             sh '.ci/scripts/distribution/prepare.sh'
             sh 'mvn clean install -B -s $MAVEN_SETTINGS_XML -DskipTests'
           }
+        }
+        container('docker') {
+            sh 'docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}'
         }
       }
     }
