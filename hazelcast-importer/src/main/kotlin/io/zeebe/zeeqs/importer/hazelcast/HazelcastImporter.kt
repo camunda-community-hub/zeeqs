@@ -11,6 +11,7 @@ import java.time.Duration
 
 @Component
 class HazelcastImporter(
+        val hazelcastConfigRepository: HazelcastConfigRepository,
         val workflowRepository: WorkflowRepository,
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val elementInstanceRepository: ElementInstanceRepository,
@@ -28,15 +29,24 @@ class HazelcastImporter(
 
     fun start(hazelcastConnection: String) {
 
+        val hazelcastConfig = hazelcastConfigRepository.findById(hazelcastConnection)
+                .orElse(HazelcastConfig(
+                        id = hazelcastConnection,
+                        sequence = -1))
+
+        val updateSequence: ((Long) -> Unit) = {
+            hazelcastConfig.sequence = it
+            hazelcastConfigRepository.save(hazelcastConfig)
+        }
+
         val clientConfig = ClientConfig()
-        clientConfig.networkConfig
-                .addAddress(hazelcastConnection)
-                .setConnectionTimeout(Duration.ofSeconds(60).toMillis().toInt())
+        val networkConfig = clientConfig.networkConfig
+        networkConfig.addresses = listOf(hazelcastConnection)
+        networkConfig.connectionTimeout = Duration.ofSeconds(60).toMillis().toInt()
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
-        // TODO (saig0): remember the last sequence and continue form there
-        val zeebeHazelcast = ZeebeHazelcast.newBuilder(hazelcast)
+        val builder = ZeebeHazelcast.newBuilder(hazelcast)
                 .addDeploymentListener(this::importDeploymentRecord)
                 .addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
                 .addVariableListener(this::importVariableRecord)
@@ -47,9 +57,15 @@ class HazelcastImporter(
                 .addMessageSubscriptionListener(this::importMessageSubscriptionRecord)
                 .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscriptionRecord)
                 .addWorkflowInstanceSubscriptionListener(this::importWorkflowInstanceSubscriptionRecord)
-                .readFromHead()
-                .build()
+                .postProcessListener(updateSequence)
 
+        if (hazelcastConfig.sequence >= 0) {
+            builder.readFrom(hazelcastConfig.sequence)
+        } else {
+            builder.readFromHead()
+        }
+
+        zeebeHazelcast = builder.build()
     }
 
     fun stop() {
