@@ -52,7 +52,7 @@
         <version>2.1.0</version>
         <configuration>
           <to>
-            <image>docker.io/saig0/zeeqs</image>
+            <image>docker.io/camunda/zeeqs</image>
             <tags>
               <tag>latest</tag>
               <tag>${project.version}</tag>
