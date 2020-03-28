@@ -10,7 +10,7 @@ type MessageSubscription {
     workflow: Workflow
 
     state: MessageSubscriptionState
-    timestamp: Long
+    timestamp(zoneId: String = "Z"): String
 
     messageCorrelations: [MessageCorrelation!]
 }
@@ -18,7 +18,7 @@ type MessageSubscription {
 type MessageCorrelation {
     messageSubscription: MessageSubscription
     message: Message
-    timestamp: Long
+    timestamp(zoneId: String = "Z"): String
 }
 
 enum MessageSubscriptionState {

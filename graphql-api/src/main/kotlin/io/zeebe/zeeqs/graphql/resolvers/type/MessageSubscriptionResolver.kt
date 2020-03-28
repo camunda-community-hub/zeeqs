@@ -6,6 +6,7 @@ import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.MessageCorrelationRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
@@ -16,6 +17,10 @@ class MessageSubscriptionResolver(
         val workflowRepository: WorkflowRepository,
         val messageCorrelationRepository: MessageCorrelationRepository
 ) : GraphQLResolver<MessageSubscription> {
+
+    fun timestamp(messageSubscription: MessageSubscription, zoneId: String): String? {
+        return messageSubscription.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
+    }
 
     fun workflowInstance(messageSubscription: MessageSubscription): WorkflowInstance? {
         return messageSubscription.workflowInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }

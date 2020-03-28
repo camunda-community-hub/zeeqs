@@ -6,6 +6,7 @@ import io.zeebe.zeeqs.data.entity.MessageCorrelation
 import io.zeebe.zeeqs.data.entity.MessageSubscription
 import io.zeebe.zeeqs.data.repository.MessageRepository
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
+import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
@@ -14,6 +15,10 @@ class MessageCorrelationResolver(
         val messageSubscriptionRepository: MessageSubscriptionRepository,
         val messageRepository: MessageRepository
 ) : GraphQLResolver<MessageCorrelation> {
+
+    fun timestamp(messageCorrelation: MessageCorrelation, zoneId: String): String? {
+        return messageCorrelation.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
+    }
 
     fun messageSubscription(messageCorrelation: MessageCorrelation): MessageSubscription? {
         return messageSubscriptionRepository.findByElementInstanceKeyAndMessageName(

@@ -1,7 +1,7 @@
 type Timer {
     key: ID!
 
-    dueDate: Long
+    dueDate(zoneId: String = "Z"): String
     repetitions: Int
 
     workflowInstance: WorkflowInstance
@@ -10,7 +10,7 @@ type Timer {
     workflow: Workflow
 
     state: TimerState!
-    timestamp: Long!
+    timestamp(zoneId: String = "Z"): String!
 }
 
 enum TimerState {

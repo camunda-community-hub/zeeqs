@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import io.zeebe.zeeqs.data.service.WorkflowService
+import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
@@ -17,6 +18,14 @@ class ElementInstanceResolver(
         val workflowService: WorkflowService,
         val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<ElementInstance> {
+
+    fun startTime(elementInstance: ElementInstance, zoneId: String): String? {
+        return elementInstance.startTime?.let { ResolverExtension.timestampToString(it, zoneId) }
+    }
+
+    fun endTime(elementInstance: ElementInstance, zoneId: String): String? {
+        return elementInstance.endTime?.let { ResolverExtension.timestampToString(it, zoneId) }
+    }
 
     fun workflowInstance(elementInstance: ElementInstance): WorkflowInstance? {
         return workflowInstanceRepository.findByIdOrNull(elementInstance.workflowInstanceKey)

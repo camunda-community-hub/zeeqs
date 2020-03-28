@@ -6,8 +6,8 @@ type Incident {
 
     state: IncidentState!
 
-    creationTime: Long
-    resolveTime: Long
+    creationTime(zoneId: String = "Z"): String
+    resolveTime(zoneId: String = "Z"): String
 
     workflowInstance: WorkflowInstance
     elementInstance: ElementInstance

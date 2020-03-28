@@ -7,7 +7,7 @@ type Job {
     retries: Int
 
     state: JobState!
-    timestamp: Long!
+    timestamp(zoneId: String = "Z"): String!
 
     workflowInstance: WorkflowInstance
     elementInstance: ElementInstance

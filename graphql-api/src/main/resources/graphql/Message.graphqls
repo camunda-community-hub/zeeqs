@@ -4,10 +4,10 @@ type Message {
     name: String!
     correlationKey: String
     messageId: String
-    timeToLive: Long,
+    timeToLive: String,
 
     state: MessageState
-    timestamp: Long
+    timestamp(zoneId: String = "Z"): String
 
     messageCorrelations: [MessageCorrelation!]
 }
