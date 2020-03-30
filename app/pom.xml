@@ -55,10 +55,6 @@
         <configuration>
           <to>
             <image>docker.io/camunda/zeeqs</image>
-            <tags>
-              <tag>latest</tag>
-              <tag>${project.version}</tag>
-            </tags>
           </to>
         </configuration>
       </plugin>

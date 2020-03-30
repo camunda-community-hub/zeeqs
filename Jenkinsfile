@@ -100,7 +100,7 @@ pipeline {
         }
         container('docker') {
             sh 'docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}'
-            sh 'mvn -pl app jib:build'
+            sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION}'
         }
       }
     }
