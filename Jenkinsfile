@@ -93,10 +93,14 @@ pipeline {
                 sh 'git config --global user.email "ci@camunda.com"'
                 sh 'git config --global user.name "camunda-jenkins"'
                 sh 'mkdir ~/.ssh/ && ssh-keyscan github.com >> ~/.ssh/known_hosts'
-                sh 'mvn -B -s $MAVEN_SETTINGS_XML -DskipTests source:jar javadoc:jar release:prepare release:perform jib:build -Prelease'
+                sh 'mvn -B -s $MAVEN_SETTINGS_XML -DskipTests source:jar javadoc:jar release:prepare release:perform -Prelease'
                 sh '.ci/scripts/github-release.sh'
              }
           }
+        }
+        container('docker') {
+            sh 'docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}'
+            sh 'mvn -pl app jib:build'
         }
       }
     }
