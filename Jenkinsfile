@@ -82,6 +82,7 @@ pipeline {
         GITHUB_TOKEN = credentials('camunda-jenkins-github')
         RELEASE_VERSION = "${params.RELEASE_VERSION}"
         DEVELOPMENT_VERSION = "${params.DEVELOPMENT_VERSION}"
+        DOCKER_HUB = credentials("camunda-dockerhub")
       }
 
       steps {
@@ -101,8 +102,7 @@ pipeline {
         container('maven') {
           configFileProvider([configFile(fileId: 'maven-nexus-settings-zeebe', variable: 'MAVEN_SETTINGS_XML')]) {
               sshagent(['camunda-jenkins-github-ssh']) {
-                  sh 'docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}'
-                  sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION}'
+                  sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION} -Djib.to.auth.username=${DOCKER_HUB_USR} -Djib.to.auth.password=${DOCKER_HUB_PSW}'
              }
           }
         }
