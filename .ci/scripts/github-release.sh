@@ -1,6 +1,6 @@
 #!/bin/bash -xeu
 
-cd target
+cd app/target
 
 export PROJECT_NAME="ZeeQS"
 export GITHUB_TOKEN=${GITHUB_TOKEN_PSW}
