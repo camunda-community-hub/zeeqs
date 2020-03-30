@@ -7,9 +7,9 @@ type WorkflowInstance {
     parentElementInstance: ElementInstance
 
     # the time when the workflow instance was created
-    startTime: Long
+    startTime(zoneId: String = "Z"): String
     # the time when the workflow instance was ended (completed/terminated)
-    endTime: Long
+    endTime(zoneId: String = "Z"): String
 
     # the workflow the instance is created of
     workflow: Workflow

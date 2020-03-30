@@ -12,8 +12,8 @@ type ElementInstance {
 
     scope: ElementInstance
 
-    startTime: Long
-    endTime: Long
+    startTime(zoneId: String = "Z"): String
+    endTime(zoneId: String = "Z"): String
 
     stateTransitions: [ElementInstanceStateTransition]
 
@@ -26,7 +26,7 @@ type ElementInstance {
 
 type ElementInstanceStateTransition {
     state: ElementInstanceState!
-    timestamp: Long
+    timestamp(zoneId: String = "Z"): String
 }
 
 enum ElementInstanceState {

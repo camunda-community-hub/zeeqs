@@ -42,7 +42,9 @@ class HazelcastImporter(
         val clientConfig = ClientConfig()
         val networkConfig = clientConfig.networkConfig
         networkConfig.addresses = listOf(hazelcastConnection)
-        networkConfig.connectionTimeout = Duration.ofSeconds(60).toMillis().toInt()
+        // networkConfig.connectionAttemptPeriod = Duration.ofSeconds(10).toMillis().toInt()
+        // networkConfig.connectionAttemptLimit = 10
+        // networkConfig.connectionTimeout = Duration.ofSeconds(10).toMillis().toInt()
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 

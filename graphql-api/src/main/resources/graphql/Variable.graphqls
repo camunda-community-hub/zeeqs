@@ -5,12 +5,12 @@ type Variable {
 
     scope: ElementInstance
 
-    timestamp: Long!
+    timestamp(zoneId: String = "Z"): String!
 
     updates: [VariableUpdate!]
 }
 
 type VariableUpdate {
     value: String!
-    timestamp: Long!
+    timestamp(zoneId: String = "Z"): String!
 }
