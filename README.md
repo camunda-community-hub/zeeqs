@@ -90,7 +90,7 @@ Get all jobs that are activate (i.e. not completed or canceled) and have one of 
 The docker image for the ZeeQS application is published to [DockerHub](https://hub.docker.com/r/saig0/zeeqs).
 
 ```
-docker pull saig0/zeeqs:latest
+docker pull camunda/zeeqs:latest
 ```
  
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  

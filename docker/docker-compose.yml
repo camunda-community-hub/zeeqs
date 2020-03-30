@@ -21,7 +21,7 @@ services:
       - zeebe_network
   monitor:
     container_name: zeeqs
-    image: saig0/zeeqs:latest
+    image: camunda/zeeqs:latest
     environment:
       - io.zeebe.hazelcast.connection=zeebe:5701
     ports:
