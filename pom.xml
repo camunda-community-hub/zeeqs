@@ -13,7 +13,7 @@
 
   <groupId>io.zeebe.zeeqs</groupId>
   <artifactId>zeeqs-root</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0-alpha1</version>
   <name>ZeeQS - Root</name>
   <description>Query API for aggregated Zeebe data</description>
 
@@ -312,7 +312,7 @@
     <url>https://github.com/zeebe-io/zeeqs</url>
     <connection>scm:git:git@github.com:zeebe-io/zeeqs.git</connection>
     <developerConnection>scm:git:git@github.com:zeebe-io/zeeqs.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>1.0.0-alpha1</tag>
   </scm>
 
 </project>
