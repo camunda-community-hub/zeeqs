@@ -99,8 +99,12 @@ pipeline {
           }
         }
         container('docker') {
-            sh 'docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}'
-            sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION}'
+          configFileProvider([configFile(fileId: 'maven-nexus-settings-zeebe', variable: 'MAVEN_SETTINGS_XML')]) {
+              sshagent(['camunda-jenkins-github-ssh']) {
+                sh 'docker login --username ${DOCKER_HUB_USR} --password ${DOCKER_HUB_PSW}'
+                sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION}'
+             }
+          }
         }
       }
     }
