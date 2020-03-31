@@ -126,10 +126,12 @@ docker-compose up
    For version >= 0.23.0-alpha2 `~/zeebe-broker-%{VERSION}/conf/zeebe.cfg.yaml`
    
     ```yaml
-   exporters:
-     hazelcast:
-       className: io.zeebe.hazelcast.exporter.HazelcastExporter
-       jarPath: exporters/zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar
+   zeebe:
+       broker:  
+           exporters:
+               hazelcast:
+                   className: io.zeebe.hazelcast.exporter.HazelcastExporter
+                   jarPath: exporters/zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar
    ```   
 
 1. Start the broker
