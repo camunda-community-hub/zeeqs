@@ -340,12 +340,20 @@ class HazelcastImporter(
                 .orElse(createTimer(record))
 
         when (record.metadata.intent) {
-            "CREATED" -> entity.state = TimerState.CREATED
-            "TRIGGERED" -> entity.state = TimerState.TRIGGERED
-            "CANCELED" -> entity.state = TimerState.CANCELED
+            "CREATED" -> {
+                entity.state = TimerState.CREATED
+                entity.startTime = record.metadata.timestamp
+            }
+            "TRIGGERED" -> {
+                entity.state = TimerState.TRIGGERED
+                entity.endTime = record.metadata.timestamp
+            }
+            "CANCELED" -> {
+                entity.state = TimerState.CANCELED
+                entity.endTime = record.metadata.timestamp
+            }
         }
 
-        entity.timestamp = record.metadata.timestamp
         entity.repetitions = record.repetitions
 
         timerRepository.save(entity)

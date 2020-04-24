@@ -14,6 +14,8 @@ class Timer(
 ) {
 
     var state: TimerState = TimerState.CREATED
-    var timestamp: Long = -1
+
+    var startTime: Long? = null
+    var endTime: Long? = null
 
 }
