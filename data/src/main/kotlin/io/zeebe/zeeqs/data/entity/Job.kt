@@ -14,6 +14,9 @@ class Job(
     var state: JobState = JobState.ACTIVATABLE
     var timestamp: Long = -1
 
+    var startTime: Long? = null
+    var endTime: Long? = null
+
     var retries: Int? = null
     var worker: String? = null
 
