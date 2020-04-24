@@ -7,7 +7,6 @@ import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
-import java.time.Duration
 
 @Component
 class HazelcastImporter(
@@ -49,16 +48,16 @@ class HazelcastImporter(
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
         val builder = ZeebeHazelcast.newBuilder(hazelcast)
-                .addDeploymentListener(this::importDeploymentRecord)
-                .addWorkflowInstanceListener(this::importWorkflowInstanceRecord)
-                .addVariableListener(this::importVariableRecord)
-                .addJobListener(this::importJobRecord)
-                .addIncidentListener(this::importIncidentRecord)
-                .addTimerListener(this::importTimerRecord)
-                .addMessageListener(this::importMessageRecord)
+                .addDeploymentListener { it.takeIf { it.metadata.key > 0 }?.let(this::importDeploymentRecord) }
+                .addWorkflowInstanceListener { it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceRecord) }
+                .addVariableListener { it.takeIf { it.metadata.key > 0 }?.let(this::importVariableRecord) }
+                .addJobListener { it.takeIf { it.metadata.key > 0 }?.let(this::importJobRecord) }
+                .addIncidentListener { it.takeIf { it.metadata.key > 0 }?.let(this::importIncidentRecord) }
+                .addTimerListener { it.takeIf { it.metadata.key > 0 }?.let(this::importTimerRecord) }
+                .addMessageListener { it.takeIf { it.metadata.key > 0 }?.let(this::importMessageRecord) }
                 .addMessageSubscriptionListener(this::importMessageSubscriptionRecord)
                 .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscriptionRecord)
-                .addWorkflowInstanceSubscriptionListener(this::importWorkflowInstanceSubscriptionRecord)
+                .addWorkflowInstanceSubscriptionListener { it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceSubscriptionRecord) }
                 .postProcessListener(updateSequence)
 
         if (hazelcastConfig.sequence >= 0) {
@@ -218,12 +217,14 @@ class HazelcastImporter(
 
         val state = getElementInstanceState(record)
 
-        val entity = ElementInstanceStateTransition(
-                position = record.metadata.position,
-                elementInstanceKey = record.metadata.key,
-                timestamp = record.metadata.timestamp,
-                state = state
-        )
+        val entity = elementInstanceStateTransitionRepository
+                .findById(record.metadata.position)
+                .orElse(ElementInstanceStateTransition(
+                        position = record.metadata.position,
+                        elementInstanceKey = record.metadata.key,
+                        timestamp = record.metadata.timestamp,
+                        state = state
+                ))
 
         elementInstanceStateTransitionRepository.save(entity)
     }
@@ -258,15 +259,17 @@ class HazelcastImporter(
 
     private fun importVariableUpdate(record: Schema.VariableRecord) {
 
-        val entity = VariableUpdate(
-                position = record.metadata.position,
-                variableKey = record.metadata.key,
-                name = record.name,
-                value = record.value,
-                workflowInstanceKey = record.workflowInstanceKey,
-                scopeKey = record.scopeKey,
-                timestamp = record.metadata.timestamp
-        )
+        val entity = variableUpdateRepository
+                .findById(record.metadata.position)
+                .orElse(VariableUpdate(
+                        position = record.metadata.position,
+                        variableKey = record.metadata.key,
+                        name = record.name,
+                        value = record.value,
+                        workflowInstanceKey = record.workflowInstanceKey,
+                        scopeKey = record.scopeKey,
+                        timestamp = record.metadata.timestamp
+                ))
 
         variableUpdateRepository.save(entity)
     }
@@ -451,13 +454,16 @@ class HazelcastImporter(
 
     private fun importMessageCorrelation(record: Schema.WorkflowInstanceSubscriptionRecord) {
 
-        val entity = MessageCorrelation(
-                position = record.metadata.position,
-                messageKey = record.messageKey,
-                messageName = record.messageName,
-                elementInstanceKey = record.elementInstanceKey,
-                timestamp = record.metadata.timestamp
-        )
+        val entity = messageCorrelationRepository
+                .findById(record.metadata.position)
+                .orElse(
+                        MessageCorrelation(
+                                position = record.metadata.position,
+                                messageKey = record.messageKey,
+                                messageName = record.messageName,
+                                elementInstanceKey = record.elementInstanceKey,
+                                timestamp = record.metadata.timestamp
+                        ))
 
         messageCorrelationRepository.save(entity)
     }
