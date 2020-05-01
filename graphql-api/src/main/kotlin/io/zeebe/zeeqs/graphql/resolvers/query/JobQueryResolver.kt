@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Job
 import io.zeebe.zeeqs.data.entity.JobState
 import io.zeebe.zeeqs.data.repository.JobRepository
+import io.zeebe.zeeqs.graphql.resolvers.type.JobList
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -14,18 +15,30 @@ class JobQueryResolver(
 ) : GraphQLQueryResolver {
 
     fun jobs(
-            count: Int,
-            offset: Int,
+            limit: Int,
+            page: Int,
             stateIn: List<JobState>,
-            jobTypeIn: List<String>): List<Job> {
+            jobTypeIn: List<String>): JobList {
 
-        return if (jobTypeIn.isEmpty()) {
-            jobRepository.findByStateIn(stateIn, PageRequest.of(offset, count)).toList()
+        if (jobTypeIn.isEmpty()) {
+            return JobList(
+                    getItems = { jobRepository.findByStateIn(stateIn, PageRequest.of(page, limit)).toList() },
+                    getCount = { jobRepository.countByStateIn(stateIn) }
+            )
         } else {
-            jobRepository.findByStateInAndJobTypeIn(
-                    stateIn = stateIn,
-                    jobTypeIn = jobTypeIn,
-                    pageable = PageRequest.of(offset, count)
+            return JobList(
+                    getItems = {
+                        jobRepository.findByStateInAndJobTypeIn(
+                                stateIn = stateIn,
+                                jobTypeIn = jobTypeIn,
+                                pageable = PageRequest.of(page, limit)
+                        )
+                    },
+                    getCount = {
+                        jobRepository.countByStateInAndJobTypeIn(
+                                stateIn = stateIn,
+                                jobTypeIn = jobTypeIn)
+                    }
             )
         }
     }

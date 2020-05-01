@@ -17,8 +17,12 @@ interface JobRepository : PagingAndSortingRepository<Job, Long> {
 
     fun findByStateIn(stateIn: List<JobState>, pageable: Pageable): List<Job>
 
+    fun countByStateIn(stateIn: List<JobState>): Long
+
     fun findByJobTypeIn(jobTypeIn: List<String>, pageable: Pageable): List<Job>
 
     fun findByStateInAndJobTypeIn(stateIn: List<JobState>, jobTypeIn: List<String>, pageable: Pageable): List<Job>
+
+    fun countByStateInAndJobTypeIn(stateIn: List<JobState>, jobTypeIn: List<String>): Long
 
 }

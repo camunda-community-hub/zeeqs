@@ -15,5 +15,7 @@ interface IncidentRepository : PagingAndSortingRepository<Incident, Long> {
 
     fun findByStateIn(stateIn: List<IncidentState>, pageable: Pageable): List<Incident>
 
+    fun countByStateIn(stateIn: List<IncidentState>): Long
+
     fun findByWorkflowInstanceKeyAndStateIn(workflowInstanceKey: Long, stateIn: List<IncidentState>): List<Incident>
 }

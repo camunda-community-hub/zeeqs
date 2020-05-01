@@ -3,6 +3,7 @@ package io.zeebe.zeeqs.data.resolvers
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Workflow
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.graphql.resolvers.type.WorkflowList
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -12,8 +13,11 @@ class WorkflowQueryResolver(
         val workflowRepository: WorkflowRepository
 ) : GraphQLQueryResolver {
 
-    fun workflows(count: Int, offset: Int): List<Workflow> {
-        return workflowRepository.findAll(PageRequest.of(offset, count)).toList()
+    fun workflows(limit: Int, page: Int): WorkflowList {
+        return WorkflowList(
+                getItems = { workflowRepository.findAll(PageRequest.of(page, limit)).toList() },
+                getCount = { workflowRepository.count() }
+        )
     }
 
     fun getWorkflow(key: Long): Workflow? {
