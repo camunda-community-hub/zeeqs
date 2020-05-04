@@ -14,6 +14,10 @@ class WorkflowResolver(
         val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<Workflow> {
 
+    fun deployTime(workflow: Workflow, zoneId: String): String? {
+        return workflow.deployTime.let { ResolverExtension.timestampToString(it, zoneId) }
+    }
+
     fun workflowInstances(workflow: Workflow, stateIn: List<WorkflowInstanceState>): List<WorkflowInstance> {
         return workflowInstanceRepository.findByWorkflowKeyAndStateIn(workflow.key, stateIn)
     }

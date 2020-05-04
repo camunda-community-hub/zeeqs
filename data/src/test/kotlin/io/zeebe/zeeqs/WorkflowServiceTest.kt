@@ -38,7 +38,7 @@ class WorkflowServiceTest(
                 bpmnProcessId = "wf",
                 version = 1,
                 bpmnXML = Bpmn.convertToString(bpmn),
-                timestamp = Instant.now().toEpochMilli()
+                deployTime = Instant.now().toEpochMilli()
         ));
 
         // when

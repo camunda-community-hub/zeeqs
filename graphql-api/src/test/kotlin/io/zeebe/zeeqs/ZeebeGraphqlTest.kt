@@ -34,7 +34,7 @@ class ZeebeGraphqlTest(
                 bpmnProcessId = "wf",
                 version = 1,
                 bpmnXML = "<...>",
-                timestamp = Instant.now().toEpochMilli()
+                deployTime = Instant.now().toEpochMilli()
         ));
 
         // when

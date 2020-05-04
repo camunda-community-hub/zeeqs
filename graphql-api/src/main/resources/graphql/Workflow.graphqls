@@ -6,7 +6,7 @@ type Workflow {
     # the deployed version of the workflow based on the BPMN process id
     version: Int!
     # the time when the workflow was deployed
-    timestamp: Long!
+    deployTime(zoneId: String = "Z"): String!
     # the BPMN XML of the workflow
     bpmnXML: String!
     # the created instances of the workflow

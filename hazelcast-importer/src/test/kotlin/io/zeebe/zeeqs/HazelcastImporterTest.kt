@@ -74,7 +74,7 @@ class HazelcastImporterTest(
         assertThat(workflow.key).isGreaterThan(0)
         assertThat(workflow.bpmnProcessId).isEqualTo("wf")
         assertThat(workflow.version).isEqualTo(1)
-        assertThat(workflow.timestamp).isGreaterThan(0)
+        assertThat(workflow.deployTime).isGreaterThan(0)
         assertThat(workflow.bpmnXML).isNotEmpty()
     }
 
