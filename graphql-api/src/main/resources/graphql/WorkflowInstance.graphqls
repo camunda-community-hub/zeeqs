@@ -42,9 +42,9 @@ enum WorkflowInstanceState {
     TERMINATED
 }
 
-type WorkflowInstanceList {
+type WorkflowInstanceConnection {
     totalCount: Int!
-    items: [WorkflowInstance!]!
+    nodes: [WorkflowInstance!]!
 }
 
 type Query {
@@ -56,5 +56,5 @@ type Query {
         limit: Int = 10,
         page: Int = 0,
         stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]
-    ): WorkflowInstanceList!
+    ): WorkflowInstanceConnection!
 }

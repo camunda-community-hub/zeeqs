@@ -1,4 +1,4 @@
-package io.zeebe.zeeqs.graphql.resolvers.type
+package io.zeebe.zeeqs.graphql.resolvers.connection
 
 import com.coxautodev.graphql.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.MessageSubscription
@@ -8,6 +8,7 @@ import io.zeebe.zeeqs.data.entity.WorkflowInstanceState
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
+import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
@@ -18,8 +19,8 @@ class WorkflowResolver(
         val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<Workflow> {
 
-    fun workflowInstances(workflow: Workflow, limit: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceList {
-        return WorkflowInstanceList(
+    fun workflowInstances(workflow: Workflow, limit: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
+        return WorkflowInstanceConnection(
                 getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(workflow.key, stateIn, PageRequest.of(page, limit)).toList() },
                 getCount = { workflowInstanceRepository.countByWorkflowKeyAndStateIn(workflow.key, stateIn) }
         )

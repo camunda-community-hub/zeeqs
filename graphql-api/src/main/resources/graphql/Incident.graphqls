@@ -20,9 +20,9 @@ enum IncidentState {
     RESOLVED
 }
 
-type IncidentList {
+type IncidentConnection {
     totalCount: Int!
-    items: [Incident!]!
+    nodes: [Incident!]!
 }
 
 extend type Query {
@@ -32,5 +32,5 @@ extend type Query {
         limit: Int = 10,
         page: Int = 0,
         stateIn: [IncidentState] = [CREATED, RESOLVED]
-    ): IncidentList!
+    ): IncidentConnection!
 }

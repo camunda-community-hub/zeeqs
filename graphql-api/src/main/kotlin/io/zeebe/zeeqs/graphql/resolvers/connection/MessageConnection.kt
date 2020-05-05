@@ -1,8 +1,8 @@
-package io.zeebe.zeeqs.graphql.resolvers.type
+package io.zeebe.zeeqs.graphql.resolvers.connection
 
 import io.zeebe.zeeqs.data.entity.Message
 
-class MessageList(
+class MessageConnection(
         val getItems: () -> List<Message>,
         val getCount: () -> Long
 )

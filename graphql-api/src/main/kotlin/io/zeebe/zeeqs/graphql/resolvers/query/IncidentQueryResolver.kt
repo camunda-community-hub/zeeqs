@@ -4,7 +4,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Incident
 import io.zeebe.zeeqs.data.entity.IncidentState
 import io.zeebe.zeeqs.data.repository.IncidentRepository
-import io.zeebe.zeeqs.graphql.resolvers.type.IncidentList
+import io.zeebe.zeeqs.graphql.resolvers.connection.IncidentConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -18,9 +18,9 @@ class IncidentQueryResolver(
             limit: Int,
             page: Int,
             stateIn: List<IncidentState>
-    ): IncidentList {
+    ): IncidentConnection {
 
-        return IncidentList(
+        return IncidentConnection(
                 getItems = {
                     incidentRepository.findByStateIn(
                             stateIn = stateIn,
