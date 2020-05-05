@@ -29,9 +29,9 @@ enum JobState {
     ERROR_THROWN
 }
 
-type JobList {
+type JobConnection {
     totalCount: Int!
-    items: [Job!]!
+    nodes: [Job!]!
 }
 
 extend type Query {
@@ -42,5 +42,5 @@ extend type Query {
         page: Int = 0,
         stateIn: [JobState!] = [ACTIVATABLE, ACTIVATED, FAILED, COMPLETED, CANCELED, ERROR_THROWN],
         jobTypeIn: [String!] = []
-    ): JobList!
+    ): JobConnection!
 }

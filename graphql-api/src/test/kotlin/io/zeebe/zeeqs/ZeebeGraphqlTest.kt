@@ -38,14 +38,14 @@ class ZeebeGraphqlTest(
         ));
 
         // when
-        val response = sendQuery("{workflows{items{key,bpmnProcessId,version}}}")
+        val response = sendQuery("{workflows{nodes{key,bpmnProcessId,version}}}")
 
         // then
         assertThat(response.statusCode()).isEqualTo(200)
         assertThat(response.body()).isEqualToIgnoringWhitespace("""
             {"data":
             {"workflows":
-            {"items":[
+            {"nodes":[
             {"key":"1",
             "bpmnProcessId":"wf", 
             "version":1}

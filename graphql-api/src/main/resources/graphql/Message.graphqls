@@ -17,9 +17,9 @@ enum MessageState {
     DELETED
 }
 
-type MessageList {
+type MessageConnection {
     totalCount: Int!
-    items: [Message!]!
+    nodes: [Message!]!
 }
 
 extend type Query {
@@ -27,5 +27,5 @@ extend type Query {
 
     messages(
         limit: Int = 10,
-        page: Int = 0): MessageList!
+        page: Int = 0): MessageConnection!
 }
