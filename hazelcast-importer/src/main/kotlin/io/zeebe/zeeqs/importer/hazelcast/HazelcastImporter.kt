@@ -280,12 +280,25 @@ class HazelcastImporter(
                 .orElse(createJob(record))
 
         when (record.metadata.intent) {
-            "CREATED", "TIMED_OUT", "RETRIES_UPDATED" -> entity.state = JobState.ACTIVATABLE
+            "CREATED" -> {
+                entity.state = JobState.ACTIVATABLE
+                entity.startTime = record.metadata.timestamp
+            }
+            "TIMED_OUT", "RETRIES_UPDATED" -> entity.state = JobState.ACTIVATABLE
             "ACTIVATED" -> entity.state = JobState.ACTIVATED
             "FAILED" -> entity.state = JobState.FAILED
-            "COMPLETED" -> entity.state = JobState.COMPLETED
-            "CANCELED" -> entity.state = JobState.CANCELED
-            "ERROR_THROWN" -> entity.state = JobState.ERROR_THROWN
+            "COMPLETED" -> {
+                entity.state = JobState.COMPLETED
+                entity.endTime = record.metadata.timestamp
+            }
+            "CANCELED" -> {
+                entity.state = JobState.CANCELED
+                entity.endTime = record.metadata.timestamp
+            }
+            "ERROR_THROWN" -> {
+                entity.state = JobState.ERROR_THROWN
+                entity.endTime = record.metadata.timestamp
+            }
         }
 
         entity.worker = record.worker.ifEmpty { null }
@@ -340,12 +353,20 @@ class HazelcastImporter(
                 .orElse(createTimer(record))
 
         when (record.metadata.intent) {
-            "CREATED" -> entity.state = TimerState.CREATED
-            "TRIGGERED" -> entity.state = TimerState.TRIGGERED
-            "CANCELED" -> entity.state = TimerState.CANCELED
+            "CREATED" -> {
+                entity.state = TimerState.CREATED
+                entity.startTime = record.metadata.timestamp
+            }
+            "TRIGGERED" -> {
+                entity.state = TimerState.TRIGGERED
+                entity.endTime = record.metadata.timestamp
+            }
+            "CANCELED" -> {
+                entity.state = TimerState.CANCELED
+                entity.endTime = record.metadata.timestamp
+            }
         }
 
-        entity.timestamp = record.metadata.timestamp
         entity.repetitions = record.repetitions
 
         timerRepository.save(entity)

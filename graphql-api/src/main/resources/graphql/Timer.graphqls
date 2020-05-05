@@ -10,7 +10,11 @@ type Timer {
     workflow: Workflow
 
     state: TimerState!
-    timestamp(zoneId: String = "Z"): String!
+
+    # the time when the timer subscription was created
+    startTime(zoneId: String = "Z"): String
+    # the time when the timer subscritpion was removed (triggered/cancled)
+    endTime(zoneId: String = "Z"): String
 }
 
 enum TimerState {

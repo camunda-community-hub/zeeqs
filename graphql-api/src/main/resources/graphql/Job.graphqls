@@ -9,6 +9,11 @@ type Job {
     state: JobState!
     timestamp(zoneId: String = "Z"): String!
 
+    # the time when the job was created
+    startTime(zoneId: String = "Z"): String
+    # the time when the job was removed (completed/error-thrown/canceled)
+    endTime(zoneId: String = "Z"): String
+
     workflowInstance: WorkflowInstance
     elementInstance: ElementInstance
 

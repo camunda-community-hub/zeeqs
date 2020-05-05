@@ -1,7 +1,10 @@
 package io.zeebe.zeeqs.graphql.resolvers.type
 
 import com.coxautodev.graphql.tools.GraphQLResolver
-import io.zeebe.zeeqs.data.entity.*
+import io.zeebe.zeeqs.data.entity.ElementInstance
+import io.zeebe.zeeqs.data.entity.Timer
+import io.zeebe.zeeqs.data.entity.Workflow
+import io.zeebe.zeeqs.data.entity.WorkflowInstance
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
@@ -15,8 +18,12 @@ class TimerResolver(
         val elementInstanceRepository: ElementInstanceRepository
 ) : GraphQLResolver<Timer> {
 
-    fun timestamp(timer: Timer, zoneId: String): String? {
-        return timer.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
+    fun startTime(timer: Timer, zoneId: String): String? {
+        return timer.startTime?.let { ResolverExtension.timestampToString(it, zoneId) }
+    }
+
+    fun endTime(timer: Timer, zoneId: String): String? {
+        return timer.endTime?.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
     fun dueDate(timer: Timer, zoneId: String): String? {
