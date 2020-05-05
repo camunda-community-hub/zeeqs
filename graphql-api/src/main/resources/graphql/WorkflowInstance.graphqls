@@ -42,14 +42,19 @@ enum WorkflowInstanceState {
     TERMINATED
 }
 
+type WorkflowInstanceList {
+    totalCount: Int!
+    items: [WorkflowInstance!]!
+}
+
 type Query {
     # find the workflow instance with the given key
     workflowInstance(key: ID!): WorkflowInstance
 
     # find all workflow instances
     workflowInstances(
-        count: Int = 10,
-        offset: Int = 0,
+        limit: Int = 10,
+        page: Int = 0,
         stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]
-    ): [WorkflowInstance!]!
+    ): WorkflowInstanceList!
 }

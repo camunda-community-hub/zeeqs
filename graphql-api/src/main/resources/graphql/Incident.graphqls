@@ -20,12 +20,17 @@ enum IncidentState {
     RESOLVED
 }
 
+type IncidentList {
+    totalCount: Int!
+    items: [Incident!]!
+}
+
 extend type Query {
     incident(key: ID!): Incident
 
     incidents(
-        count: Int = 10,
-        offset: Int = 0,
+        limit: Int = 10,
+        page: Int = 0,
         stateIn: [IncidentState] = [CREATED, RESOLVED]
-    ): [Incident!]!
+    ): IncidentList!
 }

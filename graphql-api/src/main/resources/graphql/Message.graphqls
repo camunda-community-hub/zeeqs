@@ -17,8 +17,15 @@ enum MessageState {
     DELETED
 }
 
+type MessageList {
+    totalCount: Int!
+    items: [Message!]!
+}
+
 extend type Query {
     message(key: ID!): Message
 
-    messages(count: Int = 10, offset: Int = 0): [Message!]!
+    messages(
+        limit: Int = 10,
+        page: Int = 0): MessageList!
 }

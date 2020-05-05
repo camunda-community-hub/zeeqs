@@ -38,17 +38,18 @@ class ZeebeGraphqlTest(
         ));
 
         // when
-        val response = sendQuery("{workflows{key,bpmnProcessId,version}}")
+        val response = sendQuery("{workflows{items{key,bpmnProcessId,version}}}")
 
         // then
         assertThat(response.statusCode()).isEqualTo(200)
         assertThat(response.body()).isEqualToIgnoringWhitespace("""
             {"data":
-            {"workflows":[
+            {"workflows":
+            {"items":[
             {"key":"1",
             "bpmnProcessId":"wf", 
             "version":1}
-            ]}}""".trimIndent())
+            ]}}}""".trimIndent())
     }
 
     private fun sendQuery(query: String): HttpResponse<String> {

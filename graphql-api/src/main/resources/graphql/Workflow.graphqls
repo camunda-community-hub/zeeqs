@@ -10,16 +10,26 @@ type Workflow {
     # the BPMN XML of the workflow
     bpmnXML: String!
     # the created instances of the workflow
-    workflowInstances(stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]): [WorkflowInstance!]
+    workflowInstances(
+        limit: Int = 10,
+        page: Int = 0,
+        stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]): WorkflowInstanceList!
     # the scheduled timers of the timer start events of the workflow
     timers: [Timer!]
     # the opened message subscriptions of the message start events of the workflow
     messageSubscriptions: [MessageSubscription!]
 }
 
+type WorkflowList {
+    totalCount: Int!
+    items: [Workflow!]!
+}
+
 extend type Query {
     # find the workflow with the given key
     workflow(key: ID!): Workflow
     # find all workflows
-    workflows(count: Int = 10, offset: Int = 0): [Workflow!]!
+    workflows(
+        limit: Int = 10,
+        page: Int = 0,): WorkflowList!
 }

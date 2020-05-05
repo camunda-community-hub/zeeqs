@@ -11,10 +11,12 @@ interface WorkflowInstanceRepository : PagingAndSortingRepository<WorkflowInstan
 
     fun findByParentWorkflowInstanceKey(parentWorkflowInstanceKey: Long): List<WorkflowInstance>
 
-    fun findByWorkflowKey(workflowKey: Long): List<WorkflowInstance>
+    fun findByWorkflowKeyAndStateIn(workflowKey: Long, stateIn: List<WorkflowInstanceState>, pageable: Pageable): List<WorkflowInstance>
 
-    fun findByWorkflowKeyAndStateIn(workflowKey: Long, stateIn: List<WorkflowInstanceState>): List<WorkflowInstance>
+    fun countByWorkflowKeyAndStateIn(workflowKey: Long, stateIn: List<WorkflowInstanceState>): Long
 
     fun findByStateIn(stateIn: List<WorkflowInstanceState>, pageable: Pageable): List<WorkflowInstance>
+
+    fun countByStateIn(stateIn: List<WorkflowInstanceState>): Long
 
 }
