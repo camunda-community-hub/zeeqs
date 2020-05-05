@@ -99,7 +99,7 @@ class HazelcastImporter(
                 bpmnProcessId = workflow.bpmnProcessId,
                 version = workflow.version,
                 bpmnXML = resource.resource.toStringUtf8(),
-                timestamp = deployment.metadata.timestamp
+                deployTime = deployment.metadata.timestamp
         )
     }
 
