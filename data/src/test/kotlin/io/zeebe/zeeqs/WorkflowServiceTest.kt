@@ -29,7 +29,7 @@ class WorkflowServiceTest(
         val bpmn = Bpmn.createExecutableProcess("wf")
                 .startEvent("s").name("start")
                 .serviceTask("t").name("task")
-                .zeebeTaskType("test")
+                .zeebeJobType("test")
                 .endEvent("e").name("")
                 .done()
 

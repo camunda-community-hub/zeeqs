@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs.data.resolvers
 
-import com.coxautodev.graphql.tools.GraphQLResolver
+import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.Message
 import io.zeebe.zeeqs.data.entity.MessageCorrelation
 import io.zeebe.zeeqs.data.entity.MessageSubscription

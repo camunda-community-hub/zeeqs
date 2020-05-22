@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs.data.resolvers
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver
+import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Message
 import io.zeebe.zeeqs.data.repository.MessageRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.MessageConnection

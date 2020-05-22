@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs.data.resolvers
 
-import com.coxautodev.graphql.tools.GraphQLResolver
+import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Variable
 import io.zeebe.zeeqs.data.entity.VariableUpdate

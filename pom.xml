@@ -27,12 +27,16 @@
   <properties>
     <kotlin.version>1.3.70</kotlin.version>
 
-    <zeebe.version>0.22.1</zeebe.version>
+    <zeebe.version>0.23.1</zeebe.version>
 
-    <spring.boot.version>2.2.3.RELEASE</spring.boot.version>
-    <hazelcast.exporter.version>0.8.0-alpha2</hazelcast.exporter.version>
-    <graphql.version>5.0.2</graphql.version>
-    <graphql.tools.version>5.2.4</graphql.tools.version>
+    <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+
+    <hazelcast.exporter.version>0.9.0</hazelcast.exporter.version>
+    <!-- pin Hazelcast version because of spring-boot-dependencies -->
+    <version.hazelcast>4.0.1</version.hazelcast>
+
+    <version.graphql>7.0.1</version.graphql>
+    <version.graphql.tools>6.0.2</version.graphql.tools>
     <zeebe-test-container.version>0.32.0</zeebe-test-container.version>
     <test-container.version>1.12.5</test-container.version>
 
@@ -93,21 +97,27 @@
       </dependency>
 
       <dependency>
-        <groupId>com.graphql-java</groupId>
+        <groupId>com.hazelcast</groupId>
+        <artifactId>hazelcast</artifactId>
+        <version>${version.hazelcast}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.graphql-java-kickstart</groupId>
         <artifactId>graphql-spring-boot-starter</artifactId>
-        <version>${graphql.version}</version>
+        <version>${version.graphql}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.graphql-java</groupId>
+        <groupId>com.graphql-java-kickstart</groupId>
         <artifactId>graphiql-spring-boot-starter</artifactId>
-        <version>${graphql.version}</version>
+        <version>${version.graphql}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.graphql-java</groupId>
+        <groupId>com.graphql-java-kickstart</groupId>
         <artifactId>graphql-java-tools</artifactId>
-        <version>${graphql.tools.version}</version>
+        <version>${version.graphql.tools}</version>
       </dependency>
 
       <dependency>

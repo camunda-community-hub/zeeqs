@@ -46,7 +46,7 @@ class HazelcastImporterTest(
     fun `should import workflow`() {
         // given
         val port = zeebe.getMappedPort(hazelcastPort)
-        importer.start("localhost:$port")
+        importer.start("localhost:$port", Duration.ofSeconds(10))
 
         val client = ZeebeClient.newClientBuilder()
                 .brokerContactPoint(zeebe.getExternalAddress(ZeebePort.GATEWAY))
@@ -58,7 +58,7 @@ class HazelcastImporterTest(
                 .addWorkflowModel(
                         Bpmn.createExecutableProcess("wf")
                                 .startEvent()
-                                .serviceTask("task-1").zeebeTaskType("test")
+                                .serviceTask("task-1").zeebeJobType("test")
                                 .endEvent()
                                 .done(),
                         "wf.bpmn")
