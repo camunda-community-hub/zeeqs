@@ -15,7 +15,7 @@ A query can be send via HTTP POST request and a JSON body containing the `query`
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  --data '{ "query": "{ workflows { key } }" }' \
+  --data '{ "query": "{ workflows { nodes { key } } }" }' \
   http://localhost:9000/graphql
 ```
 
@@ -27,55 +27,263 @@ http://localhost:9000/graphiql
 Get all workflows:
 
 ```graphql
+{  
+   workflows {
+    totalCount
+    nodes {
+      key
+      bpmnProcessId
+      version
+    }
+  }   
+}
+```
+
+<details>
+  <summary>Query Response</summary>
+  <p>
+
+```
 {
-  workflows {
-    key
-    bpmnProcessId
-    version    
+  "data": {
+    "workflows": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "key": "2251799813685249",
+          "bpmnProcessId": "demo-process",
+          "version": 1
+        },
+        {
+          "key": "2251799813685251",
+          "bpmnProcessId": "demo-2",
+          "version": 1
+        },
+        {
+          "key": "2251799813685269",
+          "bpmnProcessId": "demo-3",
+          "version": 1
+        }
+      ]
+    }
   }
 }
 ```
+
+  </p>
+</details>
 
 Get all workflow instances that are active (i.e. not completed or terminated):
 
 ```graphql
 {
   workflowInstances(stateIn: [ACTIVATED]) {
-    key
-    state
-    workflow {
-      bpmnProcessId
-    }
-    elementInstances(stateIn: [ACTIVATED]) {
-      elementId
-      elementName
-      bpmnElementType
+    totalCount
+    nodes {
+      key
       state
-    }
-    variables {
-      name
-      value
+      workflow {
+        bpmnProcessId
+      }
+      elementInstances(stateIn: [ACTIVATED]) {
+        elementId
+        elementName
+        bpmnElementType
+        state
+      }
+      variables {
+        name
+        value
+      }
     }
   }
 }
 ```
+
+<details>
+  <summary>Query Response</summary>
+  <p>
+
+```
+{
+  "data": {
+    "workflowInstances": {
+      "totalCount": 6,
+      "nodes": [
+        {
+          "key": "2251799813685261",
+          "state": "ACTIVATED",
+          "workflow": {
+            "bpmnProcessId": "demo-process"
+          },
+          "elementInstances": [
+            {
+              "elementId": "demo-process",
+              "elementName": null,
+              "bpmnElementType": "PROCESS",
+              "state": "ACTIVATED"
+            },
+            {
+              "elementId": "ServiceTask_0f8l2yf",
+              "elementName": "task 3",
+              "bpmnElementType": "SERVICE_TASK",
+              "state": "ACTIVATED"
+            }
+          ],
+          "variables": [
+            {
+              "name": "x",
+              "value": "1"
+            },
+            {
+              "name": "y",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "key": "2251799813685271",
+          "state": "ACTIVATED",
+          "workflow": {
+            "bpmnProcessId": "demo-2"
+          },
+          "elementInstances": [
+            {
+              "elementId": "demo-2",
+              "elementName": null,
+              "bpmnElementType": "PROCESS",
+              "state": "ACTIVATED"
+            },
+            {
+              "elementId": "ServiceTask_0mhbd5b",
+              "elementName": "task 3",
+              "bpmnElementType": "SERVICE_TASK",
+              "state": "ACTIVATED"
+            }
+          ],
+          "variables": [
+            {
+              "name": "key",
+              "value": "\"key-1\""
+            }
+          ]
+        },
+        {
+          "key": "2251799813685277",
+          "state": "ACTIVATED",
+          "workflow": {
+            "bpmnProcessId": "demo-2"
+          },
+          "elementInstances": [
+            {
+              "elementId": "demo-2",
+              "elementName": null,
+              "bpmnElementType": "PROCESS",
+              "state": "ACTIVATED"
+            },
+            {
+              "elementId": "ServiceTask_19bf066",
+              "elementName": "task 1",
+              "bpmnElementType": "SERVICE_TASK",
+              "state": "ACTIVATED"
+            }
+          ],
+          "variables": []
+        },
+        {
+          "key": "2251799813685287",
+          "state": "ACTIVATED",
+          "workflow": {
+            "bpmnProcessId": "demo-3"
+          },
+          "elementInstances": [
+            {
+              "elementId": "demo-3",
+              "elementName": null,
+              "bpmnElementType": "PROCESS",
+              "state": "ACTIVATED"
+            },
+            {
+              "elementId": "ServiceTask_0t5azxx",
+              "elementName": "task 2",
+              "bpmnElementType": "SERVICE_TASK",
+              "state": "ACTIVATED"
+            }
+          ],
+          "variables": []
+        },
+        {
+          "key": "2251799813685304",
+          "state": "ACTIVATED",
+          "workflow": {
+            "bpmnProcessId": "demo-process"
+          },
+          "elementInstances": [
+            {
+              "elementId": "demo-process",
+              "elementName": null,
+              "bpmnElementType": "PROCESS",
+              "state": "ACTIVATED"
+            },
+            {
+              "elementId": "ServiceTask_01flslu",
+              "elementName": "task 2",
+              "bpmnElementType": "SERVICE_TASK",
+              "state": "ACTIVATED"
+            }
+          ],
+          "variables": []
+        },
+        {
+          "key": "2251799813685310",
+          "state": "ACTIVATED",
+          "workflow": {
+            "bpmnProcessId": "demo-process"
+          },
+          "elementInstances": [
+            {
+              "elementId": "demo-process",
+              "elementName": null,
+              "bpmnElementType": "PROCESS",
+              "state": "ACTIVATED"
+            },
+            {
+              "elementId": "ServiceTask_0m7fzva",
+              "elementName": "task 1",
+              "bpmnElementType": "SERVICE_TASK",
+              "state": "ACTIVATED"
+            }
+          ],
+          "variables": []
+        }
+      ]
+    }
+  }
+}
+```
+
+  </p>
+</details>
 
 Get all jobs that are activate (i.e. not completed or canceled) and have one of the given job types:
 
 ```graphql
 {
   jobs(stateIn: [ACTIVATABLE, ACTIVATED], jobTypeIn: ["task-1", "task-2", "task-3"]) {
-    key    
-    jobType
-    state    
-    elementInstance {
-      elementId
-      elementName      
-      workflowInstance {
-        key        
-        workflow {
+    totalCount
+    nodes {
+      key
+      jobType
+      state
+      elementInstance {
+        elementId
+        elementName
+        workflowInstance {
           key
-          bpmnProcessId
+          workflow {
+            key
+            bpmnProcessId
+          }
         }
       }
     }
@@ -83,11 +291,110 @@ Get all jobs that are activate (i.e. not completed or canceled) and have one of 
 }
 ```
 
+<details>
+  <summary>Query Response</summary>
+  <p>
+
+```
+{
+  "data": {
+    "jobs": {
+      "totalCount": 5,
+      "nodes": [
+        {
+          "key": "2251799813685282",
+          "jobType": "task-1",
+          "state": "ACTIVATABLE",
+          "elementInstance": {
+            "elementId": "ServiceTask_19bf066",
+            "elementName": "task 1",
+            "workflowInstance": {
+              "key": "2251799813685277",
+              "workflow": {
+                "key": "2251799813685251",
+                "bpmnProcessId": "demo-2"
+              }
+            }
+          }
+        },
+        {
+          "key": "2251799813685303",
+          "jobType": "task-2",
+          "state": "ACTIVATABLE",
+          "elementInstance": {
+            "elementId": "ServiceTask_0t5azxx",
+            "elementName": "task 2",
+            "workflowInstance": {
+              "key": "2251799813685287",
+              "workflow": {
+                "key": "2251799813685269",
+                "bpmnProcessId": "demo-3"
+              }
+            }
+          }
+        },
+        {
+          "key": "2251799813685315",
+          "jobType": "task-1",
+          "state": "ACTIVATABLE",
+          "elementInstance": {
+            "elementId": "ServiceTask_0m7fzva",
+            "elementName": "task 1",
+            "workflowInstance": {
+              "key": "2251799813685310",
+              "workflow": {
+                "key": "2251799813685249",
+                "bpmnProcessId": "demo-process"
+              }
+            }
+          }
+        },
+        {
+          "key": "2251799813685321",
+          "jobType": "task-3",
+          "state": "ACTIVATABLE",
+          "elementInstance": {
+            "elementId": "ServiceTask_0f8l2yf",
+            "elementName": "task 3",
+            "workflowInstance": {
+              "key": "2251799813685261",
+              "workflow": {
+                "key": "2251799813685249",
+                "bpmnProcessId": "demo-process"
+              }
+            }
+          }
+        },
+        {
+          "key": "2251799813685324",
+          "jobType": "task-2",
+          "state": "ACTIVATABLE",
+          "elementInstance": {
+            "elementId": "ServiceTask_01flslu",
+            "elementName": "task 2",
+            "workflowInstance": {
+              "key": "2251799813685304",
+              "workflow": {
+                "key": "2251799813685249",
+                "bpmnProcessId": "demo-process"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+  </p>
+</details>
+
 ## Install
 
 ### Docker
 
-The docker image for the ZeeQS application is published to [DockerHub](https://hub.docker.com/r/saig0/zeeqs).
+The docker image for the ZeeQS application is published to [DockerHub](https://hub.docker.com/r/camunda/zeeqs).
 
 ```
 docker pull camunda/zeeqs:latest
@@ -100,68 +407,127 @@ docker pull camunda/zeeqs:latest
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the ZeeQS application. 
 
 ```
+mvn clean install -DskipTests
 cd docker
 docker-compose up
 ```
 
-* the GraphQL endpoints are available under the port `9000`
+* the GraphQL endpoint is available under the port `9000:`
 
 ### Manual
-
-1. Download the latest [Zeebe distribution](https://github.com/zeebe-io/zeebe/releases) _(zeebe-distribution-%{VERSION}.tar.gz
-)_
-
-1. Download the latest [Hazelcast exporter JAR](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) _(zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar)_ (>= 0.8.0-alpha1)
-
-1. Copy the JAR into the broker folder `~/zeebe-broker-%{VERSION}/exporters`
-
-1. Add the exporter to the broker configuration `~/zeebe-broker-%{VERSION}/conf/zeebe.cfg.toml`.
-    ```
-    [[exporters]]
-    id = "hazelcast"
-    className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
-    jarPath = "exporters/zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar"
-    ```
-   
-   For version >= 0.23.0-alpha2 `~/zeebe-broker-%{VERSION}/conf/zeebe.cfg.yaml`
-   
-    ```yaml
-   zeebe:
-       broker:  
-           exporters:
-               hazelcast:
-                   className: io.zeebe.hazelcast.exporter.HazelcastExporter
-                   jarPath: exporters/zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar
-   ```   
-
-1. Start the broker
-    `~/zeebe-broker-%{VERSION}/bin/broker`
     
-1. Download the latest [ZeeQS application JAR](https://github.com/zeebe-io/zeeqs/releases)    
+1. Download the latest [application JAR](https://github.com/zeebe-io/zeeqs/releases) _(zeeqs-%{VERSION}.jar )_   
 
-1. Start the application
-    `java -jar zeeqs-{VERSION}.jar`
+1. Start the application `java -jar zeeqs-{VERSION}.jar`
 
 ### Configuration
 
-The following configuration properties can be changes via environment variables or application.yaml file (see [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config)) 
+The application is a Spring Boot application. The configuration can be changed via environment variables or an `application.yaml` file. See also the following resources:
+* [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config)
+
+By default, the port is set to `9000` and the database is only in-memory (i.e. not persistent).
 
 ```
-# application database
-spring.datasource.url=jdbc:h2:mem:zeeqs;DB_CLOSE_DELAY=-1
-spring.datasource.user=sa
-spring.datasource.password=
-spring.jpa.hibernate.ddl-auto=create
+zeebe:
+  hazelcast:
+    connection: localhost:5701
+    connectionTimeout: PT30S
 
-server.port=9000
+spring:
 
-# connection to Hazelcast
-io.zeebe.hazelcast.connection=localhost:5701
+  datasource:
+    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
 
-# logging
-logging.level.io.zeebe.zeeqs=DEBUG
-logging.level.com.hazelcast=WARN
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+
+server:
+  port: 9000
 ```
+
+Using a different database, for example, PostgreSQL:
+
+* change the following database configuration settings
+
+```
+- spring.datasource.url=jdbc:postgresql://db:5432/postgres
+- spring.datasource.username=postgres
+- spring.datasource.password=zeebe
+- spring.datasource.driverClassName=org.postgresql.Driver
+- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+* add the database driver JAR to the classpath 
+  * using docker, the JAR should be mounted to the `/app/libs/` folder (e.g. `/app/libs/postgresql-42.2.12.jar`)
+
+
+<details>
+  <summary>Full docker-compose.yml with PostgreSQL</summary>
+  <p>
+
+```
+version: "2"
+
+networks:
+  zeebe_network:
+    driver: bridge
+
+services:
+  zeebe:
+    container_name: zeebe_broker
+    image: camunda/zeebe:0.23.0
+    environment:
+      - ZEEBE_LOG_LEVEL=debug
+    ports:
+      - "26500:26500"
+      - "9600:9600"
+      - "5701:5701"
+    volumes:
+      - ../target/exporter/zeebe-hazelcast-exporter.jar:/usr/local/zeebe/exporters/zeebe-hazelcast-exporter.jar
+      - ./application.yaml:/usr/local/zeebe/config/application.yaml
+    networks:
+      - zeebe_network
+      
+  zeeqs:
+    container_name: zeeqs
+    image: camunda/zeeqs:latest
+    environment:
+      - zeebe.hazelcast.connection=zeebe:5701
+      - spring.datasource.url=jdbc:postgresql://db:5432/postgres
+      - spring.datasource.username=postgres
+      - spring.datasource.password=zeebe
+      - spring.datasource.driverClassName=org.postgresql.Driver
+      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+    volumes:
+      - ./lib/postgresql-42.2.12.jar:/app/libs/postgresql-42.2.12.jar
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    networks:
+      - zeebe_network
+
+  db:
+    image: postgres:12.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: zeebe
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    networks:
+      - zeebe_network
+
+volumes:
+  database-data:
+```
+
+  </p>
+</details>
 
 ## Build from Source
 
