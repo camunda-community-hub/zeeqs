@@ -1,4 +1,0 @@
-[[exporters]]
-id = "hazelcast"
-className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
-jarPath = "exporters/zeebe-hazelcast-exporter.jar"

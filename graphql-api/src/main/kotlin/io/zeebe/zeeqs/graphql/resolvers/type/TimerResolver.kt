@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs.graphql.resolvers.type
 
-import com.coxautodev.graphql.tools.GraphQLResolver
+import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Timer
 import io.zeebe.zeeqs.data.entity.Workflow

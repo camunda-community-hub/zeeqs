@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
+import java.time.Duration
 import javax.annotation.PostConstruct
 
 @SpringBootApplication
@@ -20,9 +21,10 @@ class ZeeqlApplication(
     @PostConstruct
     fun init() {
         val connection = hazelcastProperties.connection
+        val connectionTimeout = Duration.parse(hazelcastProperties.connectionTimeout)
 
         logger.info("connect to Hazelcast: '$connection'")
-        hazelcastImporter.start(connection)
+        hazelcastImporter.start(connection, connectionTimeout)
     }
 }
 

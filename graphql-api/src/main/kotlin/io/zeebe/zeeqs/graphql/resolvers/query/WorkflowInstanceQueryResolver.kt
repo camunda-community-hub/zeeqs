@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs.data.resolvers
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver
+import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.WorkflowInstance
 import io.zeebe.zeeqs.data.entity.WorkflowInstanceState
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository

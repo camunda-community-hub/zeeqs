@@ -7,6 +7,8 @@ import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
+import java.time.Duration
+
 
 @Component
 class HazelcastImporter(
@@ -26,7 +28,7 @@ class HazelcastImporter(
 
     var zeebeHazelcast: ZeebeHazelcast? = null
 
-    fun start(hazelcastConnection: String) {
+    fun start(hazelcastConnection: String, hazelcastConnectionTimeout: Duration) {
 
         val hazelcastConfig = hazelcastConfigRepository.findById(hazelcastConnection)
                 .orElse(HazelcastConfig(
@@ -41,9 +43,9 @@ class HazelcastImporter(
         val clientConfig = ClientConfig()
         val networkConfig = clientConfig.networkConfig
         networkConfig.addresses = listOf(hazelcastConnection)
-        // networkConfig.connectionAttemptPeriod = Duration.ofSeconds(10).toMillis().toInt()
-        // networkConfig.connectionAttemptLimit = 10
-        // networkConfig.connectionTimeout = Duration.ofSeconds(10).toMillis().toInt()
+
+        val connectionRetryConfig = clientConfig.connectionStrategyConfig.connectionRetryConfig
+        connectionRetryConfig.clusterConnectTimeoutMillis = hazelcastConnectionTimeout.toMillis()
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
