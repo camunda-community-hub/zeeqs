@@ -22,20 +22,65 @@ curl \
 While development, the graph can be explored using the integrated GraphiQL:
 http://localhost:9000/graphiql
 
-### Example Queries:
+### Queries
 
-Get all workflows:
+The API provide the following queries:
+* workflows
+* workflowInstances
+* jobs
+* messages 
+* incidents
+
+And additional queries to request a single object by its key (e.g. `workflow(key: "2251799813685249")`).
+
+### Pagination
+
+In order to limit the response size and the query processing, each list query uses pagination to return only a subset of the data. By default, it returns the first 10 items of the list.
+
+In addition to the items, the query result contains also the total count of the items. 
 
 ```graphql
-{  
-   workflows {
+{
+  workflows(limit: 10, page: 0) {
+    totalCount
+    nodes {
+      key
+    }
+  }
+}
+```
+
+### Filters
+
+Some queries allow to filter the result by passing arguments in the query. 
+
+```graphql
+{
+  workflowInstances(stateIn: [ACTIVATED]) {
+    nodes {
+      key
+    }
+  }
+}
+```
+
+### Examples
+
+Get workflows including their workflow instance count: 
+
+```graphql
+{
+  workflows {
     totalCount
     nodes {
       key
       bpmnProcessId
       version
+      workflowInstances {
+        totalCount
+      }
     }
-  }   
+  }
 }
 ```
 
@@ -52,17 +97,26 @@ Get all workflows:
         {
           "key": "2251799813685249",
           "bpmnProcessId": "demo-process",
-          "version": 1
+          "version": 1,
+          "workflowInstances": {
+            "totalCount": 3
+          }
         },
         {
           "key": "2251799813685251",
           "bpmnProcessId": "demo-2",
-          "version": 1
+          "version": 1,
+          "workflowInstances": {
+            "totalCount": 2
+          }
         },
         {
           "key": "2251799813685269",
           "bpmnProcessId": "demo-3",
-          "version": 1
+          "version": 1,
+          "workflowInstances": {
+            "totalCount": 1
+          }
         }
       ]
     }
@@ -73,7 +127,7 @@ Get all workflows:
   </p>
 </details>
 
-Get all workflow instances that are active (i.e. not completed or terminated):
+Get workflow instances that are active including their active element instances:
 
 ```graphql
 {
@@ -90,10 +144,6 @@ Get all workflow instances that are active (i.e. not completed or terminated):
         elementName
         bpmnElementType
         state
-      }
-      variables {
-        name
-        value
       }
     }
   }
@@ -129,16 +179,6 @@ Get all workflow instances that are active (i.e. not completed or terminated):
               "bpmnElementType": "SERVICE_TASK",
               "state": "ACTIVATED"
             }
-          ],
-          "variables": [
-            {
-              "name": "x",
-              "value": "1"
-            },
-            {
-              "name": "y",
-              "value": "2"
-            }
           ]
         },
         {
@@ -159,12 +199,6 @@ Get all workflow instances that are active (i.e. not completed or terminated):
               "elementName": "task 3",
               "bpmnElementType": "SERVICE_TASK",
               "state": "ACTIVATED"
-            }
-          ],
-          "variables": [
-            {
-              "name": "key",
-              "value": "\"key-1\""
             }
           ]
         },
@@ -187,8 +221,7 @@ Get all workflow instances that are active (i.e. not completed or terminated):
               "bpmnElementType": "SERVICE_TASK",
               "state": "ACTIVATED"
             }
-          ],
-          "variables": []
+          ]
         },
         {
           "key": "2251799813685287",
@@ -209,8 +242,7 @@ Get all workflow instances that are active (i.e. not completed or terminated):
               "bpmnElementType": "SERVICE_TASK",
               "state": "ACTIVATED"
             }
-          ],
-          "variables": []
+          ]
         },
         {
           "key": "2251799813685304",
@@ -231,8 +263,7 @@ Get all workflow instances that are active (i.e. not completed or terminated):
               "bpmnElementType": "SERVICE_TASK",
               "state": "ACTIVATED"
             }
-          ],
-          "variables": []
+          ]
         },
         {
           "key": "2251799813685310",
@@ -253,8 +284,7 @@ Get all workflow instances that are active (i.e. not completed or terminated):
               "bpmnElementType": "SERVICE_TASK",
               "state": "ACTIVATED"
             }
-          ],
-          "variables": []
+          ]
         }
       ]
     }
@@ -265,7 +295,7 @@ Get all workflow instances that are active (i.e. not completed or terminated):
   </p>
 </details>
 
-Get all jobs that are activate (i.e. not completed or canceled) and have one of the given job types:
+Get jobs that are activate (i.e. not completed or canceled) and have one of the given job types:
 
 ```graphql
 {
