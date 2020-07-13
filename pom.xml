@@ -37,7 +37,7 @@
 
     <version.graphql>7.0.1</version.graphql>
     <version.graphql.tools>6.0.2</version.graphql.tools>
-    <zeebe-test-container.version>0.32.0</zeebe-test-container.version>
+    <zeebe-test-container.version>0.33.0</zeebe-test-container.version>
     <test-container.version>1.12.5</test-container.version>
 
     <!-- release parent settings -->
