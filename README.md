@@ -16,7 +16,7 @@ curl \
   -X POST \
   -H "Content-Type: application/json" \
   --data '{ "query": "{ workflows { nodes { key } } }" }' \
-  http://localhost:9000/graphql
+  http://localhost:9000/graphiql
 ```
 
 While development, the graph can be explored using the integrated GraphiQL:

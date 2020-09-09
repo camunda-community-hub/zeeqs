@@ -1,2 +1,13 @@
 server:
   port: 9000
+
+zeebe:
+  client:
+    worker:
+      hazelcast:
+        connection: "localhost:5701"
+        connectionTimeout: "PT1M"
+        ringbuffer: "zeebe"
+        connectionInitialBackoff: 15000
+        connectionBackoffMultiplier: 2.0
+        connectionMaxBackoff: 60000
