@@ -20,6 +20,7 @@
   <modules>
     <module>data</module>
     <module>graphql-api</module>
+    <module>protobuf-importer</module>
     <module>hazelcast-importer</module>
     <module>app</module>
   </modules>
@@ -71,6 +72,12 @@
       <dependency>
         <groupId>io.zeebe.zeeqs</groupId>
         <artifactId>hazelcast-importer</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.zeebe.zeeqs</groupId>
+        <artifactId>protobuf-importer</artifactId>
         <version>${project.version}</version>
       </dependency>
 

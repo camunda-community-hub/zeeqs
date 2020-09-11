@@ -8,23 +8,18 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>hazelcast-importer</artifactId>
-  <name>ZeeQS - Hazelcast Importer</name>
+  <artifactId>protobuf-importer</artifactId>
+  <name>ZeeQS - Protobuf Importer</name>
 
   <dependencies>
     <dependency>
       <groupId>io.zeebe.zeeqs</groupId>
       <artifactId>data</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>io.zeebe.zeeqs</groupId>
-      <artifactId>protobuf-importer</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.zeebe.hazelcast</groupId>
-      <artifactId>zeebe-hazelcast-connector</artifactId>
+      <groupId>io.zeebe</groupId>
+      <artifactId>zeebe-exporter-protobuf</artifactId>
+      <version>0.11.0</version>
     </dependency>
 
     <dependency>
