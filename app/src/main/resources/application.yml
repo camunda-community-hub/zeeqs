@@ -8,6 +8,6 @@ zeebe:
         connection: "localhost:5701"
         connectionTimeout: "PT1M"
         ringbuffer: "zeebe"
-        connectionInitialBackoff: 15000
+        connectionInitialBackoff: "PT15S"
         connectionBackoffMultiplier: 2.0
-        connectionMaxBackoff: 60000
+        connectionMaxBackoff: "PT30S"

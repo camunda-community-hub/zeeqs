@@ -33,6 +33,9 @@ class HazelcastImporter(
         val hazelcastConnection = hazelcastProperties.connection
         val hazelcastConnectionTimeout = Duration.parse(hazelcastProperties.connectionTimeout)
         val hazelcastRingbuffer = hazelcastProperties.ringbuffer
+        val hazelcastConnectionInitialBackoff = Duration.parse(hazelcastProperties.connectionInitialBackoff)
+        val hazelcastConnectionBackoffMultiplier = hazelcastProperties.connectionBackoffMultiplier
+        val hazelcastConnectionMaxBackoff = Duration.parse(hazelcastProperties.connectionMaxBackoff)
 
         val hazelcastConfig = hazelcastConfigRepository.findById(hazelcastConnection)
                 .orElse(HazelcastConfig(
@@ -51,9 +54,9 @@ class HazelcastImporter(
         val connectionRetryConfig = clientConfig.connectionStrategyConfig.connectionRetryConfig
         connectionRetryConfig.clusterConnectTimeoutMillis = hazelcastConnectionTimeout.toMillis()
         // These retry configs can be user-configured in application.yml
-        connectionRetryConfig.initialBackoffMillis = hazelcastProperties.connectionInitialBackoff
-        connectionRetryConfig.multiplier = hazelcastProperties.connectionBackoffMultiplier
-        connectionRetryConfig.maxBackoffMillis = hazelcastProperties.connectionMaxBackoff
+        connectionRetryConfig.initialBackoffMillis = hazelcastConnectionInitialBackoff.toMillis().toInt()
+        connectionRetryConfig.multiplier = hazelcastConnectionBackoffMultiplier
+        connectionRetryConfig.maxBackoffMillis = hazelcastConnectionMaxBackoff.toMillis().toInt()
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 

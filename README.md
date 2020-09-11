@@ -16,7 +16,7 @@ curl \
   -X POST \
   -H "Content-Type: application/json" \
   --data '{ "query": "{ workflows { nodes { key } } }" }' \
-  http://localhost:9000/graphiql
+  http://localhost:9000/graphql
 ```
 
 While development, the graph can be explored using the integrated GraphiQL:
@@ -459,9 +459,15 @@ By default, the port is set to `9000` and the database is only in-memory (i.e. n
 
 ```
 zeebe:
-  hazelcast:
-    connection: localhost:5701
-    connectionTimeout: PT30S
+  client:
+    worker:
+      hazelcast:
+        connection: "localhost:5701"
+        connectionTimeout: "PT1M"
+        ringbuffer: "zeebe"
+        connectionInitialBackoff: "PT15S"
+        connectionBackoffMultiplier: 2.0
+        connectionMaxBackoff: "PT30S"
 
 spring:
 

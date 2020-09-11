@@ -7,9 +7,9 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConfigurationProperties("zeebe.client.worker.hazelcast")
 data class HazelcastProperties(
         val connection: String = "localhost:5701",
-        val connectionTimeout: String = "PT30S",
+        val connectionTimeout: String = "PT1M",
         val ringbuffer: String = "zeebe",
-        val connectionInitialBackoff: Int = 15 * 1000,
+        val connectionInitialBackoff: String = "PT15S",
         val connectionBackoffMultiplier: Double = 2.0,
-        val connectionMaxBackoff: Int = 60 * 1000
+        val connectionMaxBackoff: String = "PT30S"
 )
