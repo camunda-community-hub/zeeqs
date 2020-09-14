@@ -5,9 +5,9 @@ zeebe:
   client:
     worker:
       hazelcast:
-        connection: "localhost:5701"
-        connectionTimeout: "PT1M"
-        ringbuffer: "zeebe"
-        connectionInitialBackoff: "PT15S"
+        connection: localhost:5701
+        connectionTimeout: PT1M
+        ringbuffer: zeebe
+        connectionInitialBackoff: PT15S
         connectionBackoffMultiplier: 2.0
-        connectionMaxBackoff: "PT30S"
+        connectionMaxBackoff: PT30S

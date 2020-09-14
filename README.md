@@ -432,7 +432,7 @@ docker pull camunda/zeeqs:latest
  
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
 * forward the Hazelcast port to the docker container (default: `5701`)
-* configure the connection to Hazelcast by setting `io.zeebe.hazelcast.connection` (default: `localhost:5701`) 
+* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
 
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the ZeeQS application. 
 
@@ -462,12 +462,12 @@ zeebe:
   client:
     worker:
       hazelcast:
-        connection: "localhost:5701"
-        connectionTimeout: "PT1M"
-        ringbuffer: "zeebe"
-        connectionInitialBackoff: "PT15S"
+        connection: localhost:5701
+        connectionTimeout: PT1M
+        ringbuffer: zeebe
+        connectionInitialBackoff: PT15S
         connectionBackoffMultiplier: 2.0
-        connectionMaxBackoff: "PT30S"
+        connectionMaxBackoff: PT30S
 
 spring:
 
@@ -533,7 +533,7 @@ services:
     container_name: zeeqs
     image: camunda/zeeqs:latest
     environment:
-      - zeebe.hazelcast.connection=zeebe:5701
+      - zeebe.client.worker.hazelcast.connection=zeebe:5701
       - spring.datasource.url=jdbc:postgresql://db:5432/postgres
       - spring.datasource.username=postgres
       - spring.datasource.password=zeebe
