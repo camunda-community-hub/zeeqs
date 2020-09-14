@@ -24,7 +24,7 @@ services:
     container_name: zeeqs
     image: camunda/zeeqs:latest
     environment:
-      - zeebe.hazelcast.connection=zeebe:5701
+      - zeebe.client.worker.hazelcast.connection=zeebe:5701
     ports:
       - "9000:9000"
     depends_on:
