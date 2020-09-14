@@ -28,7 +28,14 @@ class HazelcastImporter(
 
     var zeebeHazelcast: ZeebeHazelcast? = null
 
-    fun start(hazelcastConnection: String, hazelcastConnectionTimeout: Duration) {
+    fun start(hazelcastProperties: HazelcastProperties) {
+
+        val hazelcastConnection = hazelcastProperties.connection
+        val hazelcastConnectionTimeout = Duration.parse(hazelcastProperties.connectionTimeout)
+        val hazelcastRingbuffer = hazelcastProperties.ringbuffer
+        val hazelcastConnectionInitialBackoff = Duration.parse(hazelcastProperties.connectionInitialBackoff)
+        val hazelcastConnectionBackoffMultiplier = hazelcastProperties.connectionBackoffMultiplier
+        val hazelcastConnectionMaxBackoff = Duration.parse(hazelcastProperties.connectionMaxBackoff)
 
         val hazelcastConfig = hazelcastConfigRepository.findById(hazelcastConnection)
                 .orElse(HazelcastConfig(
@@ -46,10 +53,14 @@ class HazelcastImporter(
 
         val connectionRetryConfig = clientConfig.connectionStrategyConfig.connectionRetryConfig
         connectionRetryConfig.clusterConnectTimeoutMillis = hazelcastConnectionTimeout.toMillis()
+        // These retry configs can be user-configured in application.yml
+        connectionRetryConfig.initialBackoffMillis = hazelcastConnectionInitialBackoff.toMillis().toInt()
+        connectionRetryConfig.multiplier = hazelcastConnectionBackoffMultiplier
+        connectionRetryConfig.maxBackoffMillis = hazelcastConnectionMaxBackoff.toMillis().toInt()
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
-        val builder = ZeebeHazelcast.newBuilder(hazelcast)
+        val builder = ZeebeHazelcast.newBuilder(hazelcast).name(hazelcastRingbuffer)
                 .addDeploymentListener { it.takeIf { it.metadata.key > 0 }?.let(this::importDeploymentRecord) }
                 .addWorkflowInstanceListener { it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceRecord) }
                 .addVariableListener { it.takeIf { it.metadata.key > 0 }?.let(this::importVariableRecord) }

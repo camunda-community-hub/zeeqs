@@ -6,6 +6,7 @@ import io.zeebe.containers.ZeebePort
 import io.zeebe.model.bpmn.Bpmn
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
+import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +47,9 @@ class HazelcastImporterTest(
     fun `should import workflow`() {
         // given
         val port = zeebe.getMappedPort(hazelcastPort)
-        importer.start("localhost:$port", Duration.ofSeconds(10))
+        val hazelcastProperties = HazelcastProperties(
+                "localhost:$port", "PT10S", "zeebe")
+        importer.start(hazelcastProperties)
 
         val client = ZeebeClient.newClientBuilder()
                 .brokerContactPoint(zeebe.getExternalAddress(ZeebePort.GATEWAY))
@@ -88,5 +91,4 @@ class HazelcastImporterTest(
     @SpringBootApplication
     class TestConfiguration
 }
-
 

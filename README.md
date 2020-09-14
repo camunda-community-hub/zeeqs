@@ -459,9 +459,15 @@ By default, the port is set to `9000` and the database is only in-memory (i.e. n
 
 ```
 zeebe:
-  hazelcast:
-    connection: localhost:5701
-    connectionTimeout: PT30S
+  client:
+    worker:
+      hazelcast:
+        connection: "localhost:5701"
+        connectionTimeout: "PT1M"
+        ringbuffer: "zeebe"
+        connectionInitialBackoff: "PT15S"
+        connectionBackoffMultiplier: 2.0
+        connectionMaxBackoff: "PT30S"
 
 spring:
 
