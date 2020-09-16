@@ -5,6 +5,8 @@ import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
 import java.time.Duration
+import io.zeebe.exporter.source.ProtobufSourceConnector
+import io.zeebe.exporter.source.ProtobufSource
 
 @Component
 class ProtobufImporter(
@@ -19,9 +21,22 @@ class ProtobufImporter(
         val timerRepository: TimerRepository,
         val messageRepository: MessageRepository,
         val messageSubscriptionRepository: MessageSubscriptionRepository,
-        val messageCorrelationRepository: MessageCorrelationRepository) {
+        val messageCorrelationRepository: MessageCorrelationRepository) : ProtobufSourceConnector { 
 
-    public fun importDeploymentRecord(record: Schema.DeploymentRecord) {
+    override fun connectTo(source: ProtobufSource) {
+      source.addDeploymentListener { it.takeIf { it.metadata.key > 0 }?.let(this::importDeploymentRecord) }
+      source.addWorkflowInstanceListener { it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceRecord) }
+      source.addVariableListener { it.takeIf { it.metadata.key > 0 }?.let(this::importVariableRecord) }
+      source.addJobListener { it.takeIf { it.metadata.key > 0 }?.let(this::importJobRecord) }
+      source.addIncidentListener { it.takeIf { it.metadata.key > 0 }?.let(this::importIncidentRecord) }
+      source.addTimerListener { it.takeIf { it.metadata.key > 0 }?.let(this::importTimerRecord) }
+      source.addMessageListener { it.takeIf { it.metadata.key > 0 }?.let(this::importMessageRecord) }
+      source.addMessageSubscriptionListener(this::importMessageSubscriptionRecord)
+      source.addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscriptionRecord)
+      source.addWorkflowInstanceSubscriptionListener { it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceSubscriptionRecord) }
+    }
+
+    private fun importDeploymentRecord(record: Schema.DeploymentRecord) {
         for (workflow in record.deployedWorkflowsList) {
             val resource = record.resourcesList.first { it.resourceName == workflow.resourceName }
 
@@ -29,7 +44,7 @@ class ProtobufImporter(
         }
     }
 
-    public fun importWorkflow(deployment: Schema.DeploymentRecord,
+    private fun importWorkflow(deployment: Schema.DeploymentRecord,
                                workflow: Schema.DeploymentRecord.Workflow,
                                resource: Schema.DeploymentRecord.Resource) {
         val entity = workflowRepository
@@ -51,7 +66,7 @@ class ProtobufImporter(
         )
     }
 
-    public fun importWorkflowInstanceRecord(record: Schema.WorkflowInstanceRecord) {
+    private fun importWorkflowInstanceRecord(record: Schema.WorkflowInstanceRecord) {
         if (record.workflowInstanceKey == record.metadata.key) {
             importWorkflowInstance(record)
         }
@@ -60,7 +75,7 @@ class ProtobufImporter(
         importElementInstanceStateTransition(record)
     }
 
-    public fun importWorkflowInstance(record: Schema.WorkflowInstanceRecord) {
+    private fun importWorkflowInstance(record: Schema.WorkflowInstanceRecord) {
         val entity = workflowInstanceRepository
                 .findById(record.workflowInstanceKey)
                 .orElse(createWorkflowInstance(record))
@@ -94,7 +109,7 @@ class ProtobufImporter(
         )
     }
 
-    public fun importElementInstance(record: Schema.WorkflowInstanceRecord) {
+    private fun importElementInstance(record: Schema.WorkflowInstanceRecord) {
         val entity = elementInstanceRepository
                 .findById(record.metadata.key)
                 .orElse(createElementInstance(record))
@@ -161,7 +176,7 @@ class ProtobufImporter(
         }
     }
 
-    public fun importElementInstanceStateTransition(record: Schema.WorkflowInstanceRecord) {
+    private fun importElementInstanceStateTransition(record: Schema.WorkflowInstanceRecord) {
 
         val state = getElementInstanceState(record)
 
@@ -177,12 +192,12 @@ class ProtobufImporter(
         elementInstanceStateTransitionRepository.save(entity)
     }
 
-    public fun importVariableRecord(record: Schema.VariableRecord) {
+    private fun importVariableRecord(record: Schema.VariableRecord) {
         importVariable(record)
         importVariableUpdate(record)
     }
 
-    public fun importVariable(record: Schema.VariableRecord) {
+    private fun importVariable(record: Schema.VariableRecord) {
 
         val entity = variableRepository
                 .findById(record.metadata.key)
@@ -205,7 +220,7 @@ class ProtobufImporter(
         )
     }
 
-    public fun importVariableUpdate(record: Schema.VariableRecord) {
+    private fun importVariableUpdate(record: Schema.VariableRecord) {
 
         val entity = variableUpdateRepository
                 .findById(record.metadata.position)
@@ -222,7 +237,7 @@ class ProtobufImporter(
         variableUpdateRepository.save(entity)
     }
 
-    public fun importJobRecord(record: Schema.JobRecord) {
+    private fun importJobRecord(record: Schema.JobRecord) {
         val entity = jobRepository
                 .findById(record.metadata.key)
                 .orElse(createJob(record))
@@ -265,7 +280,7 @@ class ProtobufImporter(
         )
     }
 
-    public fun importIncidentRecord(record: Schema.IncidentRecord) {
+    private fun importIncidentRecord(record: Schema.IncidentRecord) {
         val entity = incidentRepository
                 .findById(record.metadata.key)
                 .orElse(createIncident(record))
@@ -295,7 +310,7 @@ class ProtobufImporter(
         )
     }
 
-    public fun importTimerRecord(record: Schema.TimerRecord) {
+    private fun importTimerRecord(record: Schema.TimerRecord) {
         val entity = timerRepository
                 .findById(record.metadata.key)
                 .orElse(createTimer(record))
@@ -331,7 +346,7 @@ class ProtobufImporter(
         );
     }
 
-    public fun importMessageRecord(record: Schema.MessageRecord) {
+    private fun importMessageRecord(record: Schema.MessageRecord) {
         val entity = messageRepository
                 .findById(record.metadata.key)
                 .orElse(createMessage(record))
@@ -356,7 +371,7 @@ class ProtobufImporter(
         );
     }
 
-    public fun importMessageSubscriptionRecord(record: Schema.MessageSubscriptionRecord) {
+    private fun importMessageSubscriptionRecord(record: Schema.MessageSubscriptionRecord) {
         val entity = messageSubscriptionRepository
                 .findByElementInstanceKeyAndMessageName(record.elementInstanceKey, record.messageName)
                 ?: (createMessageSubscription(record))
@@ -386,7 +401,7 @@ class ProtobufImporter(
         );
     }
 
-    public fun importMessageStartEventSubscriptionRecord(record: Schema.MessageStartEventSubscriptionRecord) {
+    private fun importMessageStartEventSubscriptionRecord(record: Schema.MessageStartEventSubscriptionRecord) {
         val entity = messageSubscriptionRepository
                 .findByWorkflowKeyAndMessageName(record.workflowKey, record.messageName)
                 ?: (createMessageSubscription(record))
@@ -415,13 +430,13 @@ class ProtobufImporter(
         );
     }
 
-    public fun importWorkflowInstanceSubscriptionRecord(record: Schema.WorkflowInstanceSubscriptionRecord) {
+    private fun importWorkflowInstanceSubscriptionRecord(record: Schema.WorkflowInstanceSubscriptionRecord) {
         when (record.metadata.intent) {
             "CORRELATED" -> importMessageCorrelation(record)
         }
     }
 
-    public fun importMessageCorrelation(record: Schema.WorkflowInstanceSubscriptionRecord) {
+    private fun importMessageCorrelation(record: Schema.WorkflowInstanceSubscriptionRecord) {
 
         val entity = messageCorrelationRepository
                 .findById(record.metadata.position)

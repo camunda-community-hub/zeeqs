@@ -8,13 +8,12 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import java.time.Duration
 import javax.annotation.PostConstruct
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Import
+import io.zeebe.exporter.source.hazelcast.HazelcastSourceConfiguration
 
-@SpringBootApplication
-@EnableCaching
-class ZeeqlApplication() {
-
-}
-
-fun main(args: Array<String>) {
-    runApplication<ZeeqlApplication>(*args)
+@ConditionalOnProperty(name=["zeeqs.hazelcast.enabled"], havingValue="true")
+@Import(HazelcastSourceConfiguration::class)
+class ZeeqlHazelcastConfiguration {
+  
 }
