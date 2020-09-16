@@ -15,7 +15,7 @@ class Timer(
         val workflowKey: Long?
 ) {
 
-    @Enumerated(EnumType.STRING)      
+    @Enumerated(EnumType.STRING)
     var state: TimerState = TimerState.CREATED
 
     var startTime: Long? = null

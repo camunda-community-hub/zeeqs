@@ -9,7 +9,7 @@ import javax.persistence.EnumType
 class ElementInstanceStateTransition(
         @Id val position: Long,
         val elementInstanceKey: Long,
-        @Enumerated(EnumType.STRING)      
+        @Enumerated(EnumType.STRING)
         val state: ElementInstanceState,
         val timestamp: Long
 )

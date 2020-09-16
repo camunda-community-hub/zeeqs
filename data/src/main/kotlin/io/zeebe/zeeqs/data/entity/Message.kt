@@ -14,7 +14,7 @@ class Message(
         val timeToLive: Long
 ) {
 
-    @Enumerated(EnumType.STRING)      
+    @Enumerated(EnumType.STRING)
     var state: MessageState = MessageState.PUBLISHED
     var timestamp: Long = -1
 }

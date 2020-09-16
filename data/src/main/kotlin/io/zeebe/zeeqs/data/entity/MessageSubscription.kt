@@ -16,7 +16,7 @@ class MessageSubscription(
         val elementId: String?
 ) {
 
-    @Enumerated(EnumType.STRING)      
+    @Enumerated(EnumType.STRING)
     var state: MessageSubscriptionState = MessageSubscriptionState.OPENED
     var timestamp: Long = -1
 }

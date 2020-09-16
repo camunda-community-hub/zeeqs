@@ -16,7 +16,7 @@ class Incident(
         val jobKey: Long?
 ) {
 
-    @Enumerated(EnumType.STRING)      
+    @Enumerated(EnumType.STRING)
     var state: IncidentState = IncidentState.CREATED
     var creationTime: Long? = null
     var resolveTime: Long? = null

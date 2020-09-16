@@ -13,7 +13,7 @@ class Job(
         val elementInstanceKey: Long
 ) {
 
-    @Enumerated(EnumType.STRING)      
+    @Enumerated(EnumType.STRING)
     var state: JobState = JobState.ACTIVATABLE
     var timestamp: Long = -1
 

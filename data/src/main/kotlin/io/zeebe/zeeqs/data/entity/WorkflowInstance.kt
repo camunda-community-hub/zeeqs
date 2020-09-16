@@ -14,7 +14,7 @@ data class WorkflowInstance(
         val parentWorkflowInstanceKey: Long?,
         val parentElementInstanceKey: Long?) {
 
-    @Enumerated(EnumType.STRING)      
+    @Enumerated(EnumType.STRING)
     var state: WorkflowInstanceState = WorkflowInstanceState.ACTIVATED
 
     var startTime: Long? = null
