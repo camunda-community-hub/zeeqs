@@ -1,7 +1,10 @@
 package io.zeebe.zeeqs.data.entity
 
 import javax.persistence.Entity
+import javax.persistence.Enumerated
+import javax.persistence.EnumType
 import javax.persistence.Id
+import javax.persistence.Lob
 
 @Entity
 class Incident(
@@ -13,6 +16,7 @@ class Incident(
         val jobKey: Long?
 ) {
 
+    @Enumerated(EnumType.STRING)      
     var state: IncidentState = IncidentState.CREATED
     var creationTime: Long? = null
     var resolveTime: Long? = null
