@@ -10,7 +10,7 @@ import javax.persistence.Lob
 class Incident(
         @Id val key: Long,
         val errorType: String,
-        val errorMessage: String,
+        @Lob val errorMessage: String,
         val workflowInstanceKey: Long,
         val elementInstanceKey: Long,
         val jobKey: Long?
