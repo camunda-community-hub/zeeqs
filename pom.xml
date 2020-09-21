@@ -33,7 +33,7 @@
 
     <hazelcast.exporter.version>0.9.1</hazelcast.exporter.version>
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
-    <version.hazelcast>4.0.2</version.hazelcast>
+    <version.hazelcast>4.0.3</version.hazelcast>
 
     <version.graphql>7.0.1</version.graphql>
     <version.graphql.tools>6.0.2</version.graphql.tools>
