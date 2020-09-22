@@ -1,6 +1,8 @@
 package io.zeebe.zeeqs.data.entity
 
 import javax.persistence.Entity
+import javax.persistence.Enumerated
+import javax.persistence.EnumType
 import javax.persistence.Id
 
 @Entity
@@ -13,6 +15,7 @@ class Timer(
         val workflowKey: Long?
 ) {
 
+    @Enumerated(EnumType.STRING)
     var state: TimerState = TimerState.CREATED
 
     var startTime: Long? = null
