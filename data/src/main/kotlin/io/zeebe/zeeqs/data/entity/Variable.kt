@@ -2,6 +2,7 @@ package io.zeebe.zeeqs.data.entity
 
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.Lob
 
 @Entity
 class Variable(
@@ -9,6 +10,6 @@ class Variable(
         val name: String,
         val workflowInstanceKey: Long,
         val scopeKey: Long,
-        var value: String,
+        @Lob var value: String,
         var timestamp: Long
 )
