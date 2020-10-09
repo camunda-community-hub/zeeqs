@@ -41,7 +41,7 @@ In addition to the items, the query result contains also the total count of the 
 
 ```graphql
 {
-  workflows(limit: 10, page: 0) {
+  workflows(perPage: 10, page: 0) {
     totalCount
     nodes {
       key

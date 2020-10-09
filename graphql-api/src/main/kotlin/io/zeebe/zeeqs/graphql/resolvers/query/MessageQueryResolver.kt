@@ -13,9 +13,9 @@ class MessageQueryResolver(
         val messageRepository: MessageRepository
 ) : GraphQLQueryResolver {
 
-    fun messages(limit: Int, page: Int): MessageConnection {
+    fun messages(perPage: Int, page: Int): MessageConnection {
         return MessageConnection(
-                getItems = { messageRepository.findAll(PageRequest.of(page, limit)).toList() },
+                getItems = { messageRepository.findAll(PageRequest.of(page, perPage)).toList() },
                 getCount = { messageRepository.count() }
         )
     }

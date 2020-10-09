@@ -13,9 +13,9 @@ class WorkflowQueryResolver(
         val workflowRepository: WorkflowRepository
 ) : GraphQLQueryResolver {
 
-    fun workflows(limit: Int, page: Int): WorkflowConnection {
+    fun workflows(perPage: Int, page: Int): WorkflowConnection {
         return WorkflowConnection(
-                getItems = { workflowRepository.findAll(PageRequest.of(page, limit)).toList() },
+                getItems = { workflowRepository.findAll(PageRequest.of(page, perPage)).toList() },
                 getCount = { workflowRepository.count() }
         )
     }

@@ -14,9 +14,9 @@ class WorkflowInstanceQueryResolver(
         val workflowInstanceRepository: WorkflowInstanceRepository
 ) : GraphQLQueryResolver {
 
-    fun workflowInstances(limit: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
+    fun workflowInstances(perPage: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
         return WorkflowInstanceConnection(
-                getItems = { workflowInstanceRepository.findByStateIn(stateIn, PageRequest.of(page, limit)).toList() },
+                getItems = { workflowInstanceRepository.findByStateIn(stateIn, PageRequest.of(page, perPage)).toList() },
                 getCount = { workflowInstanceRepository.countByStateIn(stateIn) }
         )
     }

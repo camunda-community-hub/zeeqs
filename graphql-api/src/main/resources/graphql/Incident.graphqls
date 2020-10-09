@@ -29,7 +29,7 @@ extend type Query {
     incident(key: ID!): Incident
 
     incidents(
-        limit: Int = 10,
+        perPage: Int = 10,
         page: Int = 0,
         stateIn: [IncidentState] = [CREATED, RESOLVED]
     ): IncidentConnection!

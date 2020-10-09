@@ -38,7 +38,7 @@ extend type Query {
     job(key: ID!): Job
 
     jobs(
-        limit: Int = 10,
+        perPage: Int = 10,
         page: Int = 0,
         stateIn: [JobState!] = [ACTIVATABLE, ACTIVATED, FAILED, COMPLETED, CANCELED, ERROR_THROWN],
         jobTypeIn: [String!] = []
