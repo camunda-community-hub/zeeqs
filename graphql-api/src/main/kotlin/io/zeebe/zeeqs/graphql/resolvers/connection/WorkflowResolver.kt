@@ -19,9 +19,9 @@ class WorkflowResolver(
         val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<Workflow> {
 
-    fun workflowInstances(workflow: Workflow, limit: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
+    fun workflowInstances(workflow: Workflow, perPage: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
         return WorkflowInstanceConnection(
-                getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(workflow.key, stateIn, PageRequest.of(page, limit)).toList() },
+                getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(workflow.key, stateIn, PageRequest.of(page, perPage)).toList() },
                 getCount = { workflowInstanceRepository.countByWorkflowKeyAndStateIn(workflow.key, stateIn) }
         )
     }

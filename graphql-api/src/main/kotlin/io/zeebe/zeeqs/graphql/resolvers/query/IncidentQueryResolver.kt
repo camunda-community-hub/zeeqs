@@ -15,7 +15,7 @@ class IncidentQueryResolver(
 ) : GraphQLQueryResolver {
 
     fun incidents(
-            limit: Int,
+            perPage: Int,
             page: Int,
             stateIn: List<IncidentState>
     ): IncidentConnection {
@@ -24,7 +24,7 @@ class IncidentQueryResolver(
                 getItems = {
                     incidentRepository.findByStateIn(
                             stateIn = stateIn,
-                            pageable = PageRequest.of(page, limit)
+                            pageable = PageRequest.of(page, perPage)
                     )
                 },
                 getCount = { incidentRepository.countByStateIn(stateIn = stateIn) }

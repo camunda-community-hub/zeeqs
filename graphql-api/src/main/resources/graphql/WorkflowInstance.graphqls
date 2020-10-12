@@ -53,7 +53,7 @@ type Query {
 
     # find all workflow instances
     workflowInstances(
-        limit: Int = 10,
+        perPage: Int = 10,
         page: Int = 0,
         stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]
     ): WorkflowInstanceConnection!

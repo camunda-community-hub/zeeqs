@@ -15,14 +15,14 @@ class JobQueryResolver(
 ) : GraphQLQueryResolver {
 
     fun jobs(
-            limit: Int,
+            perPage: Int,
             page: Int,
             stateIn: List<JobState>,
             jobTypeIn: List<String>): JobConnection {
 
         if (jobTypeIn.isEmpty()) {
             return JobConnection(
-                    getItems = { jobRepository.findByStateIn(stateIn, PageRequest.of(page, limit)).toList() },
+                    getItems = { jobRepository.findByStateIn(stateIn, PageRequest.of(page, perPage)).toList() },
                     getCount = { jobRepository.countByStateIn(stateIn) }
             )
         } else {
@@ -31,7 +31,7 @@ class JobQueryResolver(
                         jobRepository.findByStateInAndJobTypeIn(
                                 stateIn = stateIn,
                                 jobTypeIn = jobTypeIn,
-                                pageable = PageRequest.of(page, limit)
+                                pageable = PageRequest.of(page, perPage)
                         )
                     },
                     getCount = {

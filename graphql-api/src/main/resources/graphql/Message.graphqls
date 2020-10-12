@@ -26,6 +26,6 @@ extend type Query {
     message(key: ID!): Message
 
     messages(
-        limit: Int = 10,
+        perPage: Int = 10,
         page: Int = 0): MessageConnection!
 }

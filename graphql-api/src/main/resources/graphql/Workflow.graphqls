@@ -11,7 +11,7 @@ type Workflow {
     bpmnXML: String!
     # the created instances of the workflow
     workflowInstances(
-        limit: Int = 10,
+        perPage: Int = 10,
         page: Int = 0,
         stateIn: [WorkflowInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]): WorkflowInstanceConnection!
     # the scheduled timers of the timer start events of the workflow
@@ -30,6 +30,6 @@ extend type Query {
     workflow(key: ID!): Workflow
     # find all workflows
     workflows(
-        limit: Int = 10,
+        perPage: Int = 10,
         page: Int = 0,): WorkflowConnection!
 }
