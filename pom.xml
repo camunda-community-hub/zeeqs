@@ -31,7 +31,7 @@
 
     <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
 
-    <hazelcast.exporter.version>0.9.1</hazelcast.exporter.version>
+    <hazelcast.exporter.version>0.10.0</hazelcast.exporter.version>
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
     <version.hazelcast>4.0.3</version.hazelcast>
 
