@@ -2,6 +2,7 @@ package io.zeebe.zeeqs
 
 import io.zeebe.client.ZeebeClient
 import io.zeebe.containers.ZeebeBrokerContainer
+import io.zeebe.containers.ZeebeContainer
 import io.zeebe.containers.ZeebePort
 import io.zeebe.model.bpmn.Bpmn
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
@@ -33,10 +34,18 @@ class HazelcastImporterTest(
     val hazelcastPort = 5701
 
     @Container
-    var zeebe = ZeebeBrokerContainer("0.22.1")
-            .withConfigurationResource("zeebe.cfg.toml")
-            .withCopyFileToContainer(MountableFile.forHostPath(exporterJarPath), containerPath)
-            .withExposedPorts(hazelcastPort)
+    var zeebe = zeebeContainer()
+
+    private fun zeebeContainer(): ZeebeContainer {
+        val container = ZeebeContainer()
+                .withEnv("ZEEBE_BROKER_EXPORTERS_HAZELCAST_CLASSNAME", "io.zeebe.hazelcast.exporter.HazelcastExporter")
+                .withEnv("ZEEBE_BROKER_EXPORTERS_HAZELCAST_JARPATH", "exporter/zeebe-hazelcast-exporter.jar")
+                .withCopyFileToContainer(MountableFile.forHostPath(exporterJarPath), containerPath)
+
+        container.addExposedPort(hazelcastPort)
+
+        return container
+    }
 
     @BeforeEach
     fun init() {
@@ -52,7 +61,7 @@ class HazelcastImporterTest(
         importer.start(hazelcastProperties)
 
         val client = ZeebeClient.newClientBuilder()
-                .brokerContactPoint(zeebe.getExternalAddress(ZeebePort.GATEWAY))
+                .gatewayAddress(zeebe.externalGatewayAddress)
                 .usePlaintext()
                 .build()
 
