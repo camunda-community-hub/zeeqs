@@ -35,7 +35,7 @@
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
     <version.hazelcast>4.1.1</version.hazelcast>
 
-    <version.graphql>8.1.1</version.graphql>
+    <version.graphql>11.0.0</version.graphql>
     <version.graphql.tools>6.3.0</version.graphql.tools>
 
     <zeebe-test-container.version>1.0.1</zeebe-test-container.version>
