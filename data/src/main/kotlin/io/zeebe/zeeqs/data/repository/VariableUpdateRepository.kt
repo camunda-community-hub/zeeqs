@@ -3,11 +3,14 @@ package io.zeebe.zeeqs.data.repository
 import io.zeebe.zeeqs.data.entity.VariableUpdate
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface VariableUpdateRepository : PagingAndSortingRepository<VariableUpdate, Long> {
 
+    @Transactional(readOnly = true)
     fun findByWorkflowInstanceKey(workflowInstanceKey: Long): List<VariableUpdate>
 
+    @Transactional(readOnly = true)
     fun findByVariableKey(variableKey: Long): List<VariableUpdate>
 }
