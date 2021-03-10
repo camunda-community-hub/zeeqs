@@ -30,7 +30,8 @@ The API provide the following queries:
 * jobs
 * messages 
 * incidents
-
+* errors
+ 
 And additional queries to request a single object by its key (e.g. `workflow(key: "2251799813685249")`).
 
 ### Pagination
