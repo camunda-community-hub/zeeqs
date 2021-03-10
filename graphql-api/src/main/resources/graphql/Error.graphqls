@@ -1,0 +1,20 @@
+type Error {
+    position: ID!
+
+    errorEventPosition: String!
+    exceptionMessage: String!
+    stacktrace: String!
+
+    workflowInstance: WorkflowInstance
+}
+
+type ErrorConnection {
+    totalCount: Int!
+    nodes: [Error!]!
+}
+
+extend type Query {
+    errors(
+        perPage: Int = 10,
+        page: Int = 0): ErrorConnection!
+}
