@@ -24,7 +24,9 @@ class HazelcastImporter(
         val timerRepository: TimerRepository,
         val messageRepository: MessageRepository,
         val messageSubscriptionRepository: MessageSubscriptionRepository,
-        val messageCorrelationRepository: MessageCorrelationRepository) {
+        val messageCorrelationRepository: MessageCorrelationRepository,
+        val errorRepository: ErrorRepository
+        ) {
 
     var zeebeHazelcast: ZeebeHazelcast? = null
 
@@ -71,6 +73,7 @@ class HazelcastImporter(
                 .addMessageSubscriptionListener(this::importMessageSubscriptionRecord)
                 .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscriptionRecord)
                 .addWorkflowInstanceSubscriptionListener { it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceSubscriptionRecord) }
+                .addErrorListener(this::importError)
                 .postProcessListener(updateSequence)
 
         if (hazelcastConfig.sequence >= 0) {
@@ -501,4 +504,19 @@ class HazelcastImporter(
 
         messageCorrelationRepository.save(entity)
     }
+
+    private fun importError(record: Schema.ErrorRecord) {
+
+        val entity = errorRepository.findById(record.metadata.position)
+                .orElse(Error(
+                    position = record.metadata.position,
+                      errorEventPosition = record.errorEventPosition,
+                        exceptionMessage = record.exceptionMessage,
+                        stacktrace = record.stacktrace,
+                        workflowInstanceKey = record.workflowInstanceKey.takeIf { it > 0 }
+                ))
+
+        errorRepository.save(entity)
+    }
+
 }
