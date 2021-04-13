@@ -25,3 +25,5 @@ jobs:
           ${{ runner.os }}-maven-
     - name: Run Maven
       run: mvn -B clean verify com.mycila:license-maven-plugin:check
+    - name: Deploy Docker Image
+      run: mvn -pl app jib:build -Djib.to.tags=snapshot

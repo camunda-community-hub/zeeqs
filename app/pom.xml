@@ -52,7 +52,7 @@
         <version>2.8.0</version>
         <configuration>
           <to>
-            <image>docker.io/camunda/zeeqs</image>
+            <image>gcrh.io/camunda-community-hub/zeeqs</image>
           </to>
         </configuration>
       </plugin>
