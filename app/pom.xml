@@ -52,7 +52,7 @@
         <version>3.0.0</version>
         <configuration>
           <to>
-            <image>gcrh.io/camunda-community-hub/zeeqs</image>
+            <image>ghcr.io/camunda-community-hub/zeeqs</image>
           </to>
         </configuration>
       </plugin>
