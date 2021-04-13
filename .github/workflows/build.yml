@@ -1,6 +1,6 @@
 name: Build project with Maven
 on:
-  pull_request: 
+  pull_request:
   push:
     branches-ignore: [ master ]
   schedule:
@@ -24,4 +24,4 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Run Maven
-      run: mvn -B clean test com.mycila:license-maven-plugin:check
+      run: mvn -B clean verify com.mycila:license-maven-plugin:check
