@@ -38,7 +38,7 @@
     <version.graphql>8.1.1</version.graphql>
     <version.graphql.tools>6.3.0</version.graphql.tools>
 
-    <zeebe-test-container.version>1.0.1</zeebe-test-container.version>
+    <zeebe-test-container.version>2.0.0</zeebe-test-container.version>
     <test-container.version>1.15.2</test-container.version>
 
     <!-- release parent settings -->
@@ -293,31 +293,31 @@
 
   <profiles>
     <profile>
-      <id>release</id>
-      <properties>
-        <plugin.version.gpg>1.6</plugin.version.gpg>
-        <gpg.passphrase>${env.GPG_PASS}</gpg.passphrase>
-        <resume>false</resume>
-        <tag>${env.RELEASE_VERSION}</tag>
-        <releaseVersion>${env.RELEASE_VERSION}</releaseVersion>
-        <developmentVersion>${env.DEVELOPMENT_VERSION}</developmentVersion>
-        <arguments>-DskipTests</arguments>
-      </properties>
+      <id>community-action-maven-release</id>
       <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-gpg-plugin</artifactId>
-              <configuration>
-                <gpgArguments>
-                  <arg>--pinentry-mode</arg>
-                  <arg>loopback</arg>
-                </gpgArguments>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Prevent gpg from using pinentry programs -->
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
