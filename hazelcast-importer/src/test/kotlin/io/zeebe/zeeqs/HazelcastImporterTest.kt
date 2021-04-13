@@ -37,7 +37,7 @@ class HazelcastImporterTest(
     var zeebe = zeebeContainer()
 
     private fun zeebeContainer(): ZeebeContainer {
-        val container = ZeebeContainer()
+        val container = ZeebeContainer("camunda/zeebe:0.26.3")
                 .withEnv("ZEEBE_BROKER_EXPORTERS_HAZELCAST_CLASSNAME", "io.zeebe.hazelcast.exporter.HazelcastExporter")
                 .withEnv("ZEEBE_BROKER_EXPORTERS_HAZELCAST_JARPATH", "exporter/zeebe-hazelcast-exporter.jar")
                 .withCopyFileToContainer(MountableFile.forHostPath(exporterJarPath), containerPath)
