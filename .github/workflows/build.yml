@@ -26,4 +26,7 @@ jobs:
     - name: Run Maven
       run: mvn -B clean verify com.mycila:license-maven-plugin:check
     - name: Deploy Docker Image
-      run: mvn -pl app jib:build -Djib.to.tags=snapshot
+      run: |
+        # new login with new container registry url and PAT
+        echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+        mvn -pl app jib:build -Djib.to.tags=snapshot
