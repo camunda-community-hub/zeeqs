@@ -39,6 +39,11 @@ jobs:
         maven-psw: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_PSW }}
         maven-gpg-passphrase: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Deploy Docker Image SNAPSHOT
+      run: |
+        # new login with new container registry url and PAT
+        echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+        mvn -pl app jib:build -Djib.to.tags=snapshot
       id: release
     - if: github.event.release
       name: Attach artifacts to GitHub Release (Release only)
@@ -50,3 +55,9 @@ jobs:
         asset_path: ${{ steps.release.outputs.artifacts_archive_path }}
         asset_name: ${{ steps.release.outputs.artifacts_archive_path }}
         asset_content_type: application/zip
+    - if: github.event.release
+      name: Deploy Docker Image Latest and Release (Release only)
+      run: |
+        # new login with new container registry url and PAT
+        echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+        mvn -pl app jib:build -Djib.to.tags=latest,${{ github.event.release.tag_name }}

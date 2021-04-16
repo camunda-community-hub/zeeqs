@@ -1,8 +1,6 @@
 name: Build project with Maven
 on:
   pull_request:
-  push:
-    branches-ignore: [ master ]
   schedule:
   - cron: '2 2 * * 1-5' # run nightly master builds on weekdays
 
