@@ -29,16 +29,16 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
         gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
     - name: Define Docker Tags for SNAPSHOT
-        run: |
-          echo "DOCKER_IMAGE_TAGS=snapshot" >> $GITHUB_ENV
+      run: |
+        echo "DOCKER_IMAGE_TAGS=snapshot" >> $GITHUB_ENV
     - name: Define Docker Tags for the GitHub Release (Release only)
-        if: github.event.release
-        run: |
-          echo "DOCKER_IMAGE_TAGS=latest,${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+      if: github.event.release
+      run: |
+        echo "DOCKER_IMAGE_TAGS=latest,${{ github.event.release.tag_name }}" >> $GITHUB_ENV
     - name: Login to Docker
-        run: |
-          # new login with new container registry url and PAT
-          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      run: |
+        # new login with new container registry url and PAT
+        echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
     - name: Deploy SNAPSHOT / Release
       uses: camunda-community-hub/community-action-maven-release@a9e964bf56978eef9bca81551cecceebb246a8e5 # pin@v1
       with:
