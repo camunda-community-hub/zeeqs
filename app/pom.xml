@@ -50,9 +50,18 @@
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
         <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <to>
             <image>ghcr.io/camunda-community-hub/zeeqs</image>
+            <tags>${env.DOCKER_IMAGE_TAGS}</tags>
           </to>
         </configuration>
       </plugin>
