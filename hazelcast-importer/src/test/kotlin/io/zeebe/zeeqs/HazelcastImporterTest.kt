@@ -1,10 +1,10 @@
 package io.zeebe.zeeqs
 
-import io.zeebe.client.ZeebeClient
+import io.camunda.zeebe.client.ZeebeClient
 import io.zeebe.containers.ZeebeBrokerContainer
 import io.zeebe.containers.ZeebeContainer
 import io.zeebe.containers.ZeebePort
-import io.zeebe.model.bpmn.Bpmn
+import io.camunda.zeebe.model.bpmn.Bpmn
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
@@ -60,7 +60,7 @@ class HazelcastImporterTest(
 
         // when
         client.newDeployCommand()
-                .addWorkflowModel(
+                .addProcessModel(
                         Bpmn.createExecutableProcess("wf")
                                 .startEvent()
                                 .serviceTask("task-1").zeebeJobType("test")

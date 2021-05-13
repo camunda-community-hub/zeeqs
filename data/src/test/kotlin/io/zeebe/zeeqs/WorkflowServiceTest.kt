@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs
 
-import io.zeebe.model.bpmn.Bpmn
+import io.camunda.zeebe.model.bpmn.Bpmn
 import io.zeebe.zeeqs.data.entity.Workflow
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo

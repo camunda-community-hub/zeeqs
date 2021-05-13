@@ -1,8 +1,8 @@
 package io.zeebe.zeeqs.data.service
 
-import io.zeebe.model.bpmn.Bpmn
-import io.zeebe.model.bpmn.BpmnModelInstance
-import io.zeebe.model.bpmn.instance.FlowElement
+import io.camunda.zeebe.model.bpmn.Bpmn
+import io.camunda.zeebe.model.bpmn.BpmnModelInstance
+import io.camunda.zeebe.model.bpmn.instance.FlowElement
 import io.zeebe.zeeqs.data.repository.WorkflowRepository
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
