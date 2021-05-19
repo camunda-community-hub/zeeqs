@@ -13,7 +13,7 @@
 
   <groupId>io.zeebe.zeeqs</groupId>
   <artifactId>zeeqs-root</artifactId>
-  <version>1.0.0</version>
+  <version>2.0.0-SNAPSHOT</version>
   <name>ZeeQS - Root</name>
   <description>Query API for aggregated Zeebe data</description>
 
@@ -38,7 +38,7 @@
     <version.graphql>8.1.1</version.graphql>
     <version.graphql.tools>6.3.0</version.graphql.tools>
 
-    <zeebe-test-container.version>2.0.0</zeebe-test-container.version>
+    <zeebe-test-container.version>3.0.0</zeebe-test-container.version>
     <test-container.version>1.15.3</test-container.version>
 
     <!-- release parent settings -->
