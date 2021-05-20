@@ -61,7 +61,7 @@
         <configuration>
           <to>
             <image>ghcr.io/camunda-community-hub/zeeqs</image>
-            <tags>${env.DOCKER_IMAGE_TAGS}</tags>
+            <tags>${project.version}</tags>
           </to>
         </configuration>
       </plugin>
