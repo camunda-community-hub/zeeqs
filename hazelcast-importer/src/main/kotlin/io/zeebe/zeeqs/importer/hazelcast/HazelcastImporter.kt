@@ -3,6 +3,7 @@ package io.zeebe.zeeqs.importer.hazelcast
 import com.hazelcast.client.HazelcastClient
 import com.hazelcast.client.config.ClientConfig
 import io.zeebe.exporter.proto.Schema
+import io.zeebe.exporter.proto.Schema.RecordMetadata.RecordType
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
@@ -68,25 +69,42 @@ class HazelcastImporter(
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
         val builder = ZeebeHazelcast.newBuilder(hazelcast).name(hazelcastRingbuffer)
-            .addProcessListener { it.takeIf { it.metadata.key > 0 }?.let(this::importProcess) }
+            .addProcessListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importProcess)
+            }
             .addProcessInstanceListener {
-                it.takeIf { it.metadata.key > 0 }?.let(this::importWorkflowInstanceRecord)
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importWorkflowInstanceRecord)
             }
             .addVariableListener {
-                it.takeIf { it.metadata.key > 0 }?.let(this::importVariableRecord)
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importVariableRecord)
             }
-            .addJobListener { it.takeIf { it.metadata.key > 0 }?.let(this::importJobRecord) }
+            .addJobListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importJobRecord)
+            }
             .addIncidentListener {
-                it.takeIf { it.metadata.key > 0 }?.let(this::importIncidentRecord)
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importIncidentRecord)
             }
-            .addTimerListener { it.takeIf { it.metadata.key > 0 }?.let(this::importTimerRecord) }
+            .addTimerListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importTimerRecord)
+            }
             .addMessageListener {
-                it.takeIf { it.metadata.key > 0 }?.let(this::importMessageRecord)
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importMessageRecord)
             }
-            .addMessageSubscriptionListener(this::importMessageSubscriptionRecord)
-            .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscriptionRecord)
+            .addMessageSubscriptionListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importMessageSubscriptionRecord)
+            }
+            .addMessageStartEventSubscriptionListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importMessageStartEventSubscriptionRecord)
+            }
             .addProcessMessageSubscriptionListener {
-                it.takeIf { it.metadata.key > 0 }
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
                     ?.let(this::importWorkflowInstanceSubscriptionRecord)
             }
             .addErrorListener(this::importError)
