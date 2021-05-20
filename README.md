@@ -430,10 +430,10 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
 
 ### Docker
 
-The docker image for the ZeeQS application is published to [DockerHub](https://hub.docker.com/r/camunda/zeeqs).
+The docker image for the ZeeQS application is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeeqs).
 
 ```
-docker pull camunda/zeeqs:latest
+docker pull ghcr.io/camunda-community-hub/zeeqs:2.0.0-snapshot
 ```
  
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
