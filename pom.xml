@@ -13,7 +13,7 @@
 
   <groupId>io.zeebe.zeeqs</groupId>
   <artifactId>zeeqs-root</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <name>ZeeQS - Root</name>
   <description>Query API for aggregated Zeebe data</description>
 
@@ -27,18 +27,18 @@
   <properties>
     <kotlin.version>1.5.0</kotlin.version>
 
-    <zeebe.version>0.26.3</zeebe.version>
+    <zeebe.version>1.0.0</zeebe.version>
 
     <spring.boot.version>2.4.5</spring.boot.version>
 
-    <hazelcast.exporter.version>0.10.0</hazelcast.exporter.version>
+    <hazelcast.exporter.version>1.0.0</hazelcast.exporter.version>
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
     <version.hazelcast>4.2</version.hazelcast>
 
     <version.graphql>8.1.1</version.graphql>
     <version.graphql.tools>6.3.0</version.graphql.tools>
 
-    <zeebe-test-container.version>2.0.0</zeebe-test-container.version>
+    <zeebe-test-container.version>3.0.0</zeebe-test-container.version>
     <test-container.version>1.15.3</test-container.version>
 
     <!-- release parent settings -->
@@ -76,7 +76,7 @@
       </dependency>
 
       <dependency>
-        <groupId>io.zeebe</groupId>
+        <groupId>io.camunda</groupId>
         <artifactId>zeebe-bom</artifactId>
         <version>${zeebe.version}</version>
         <scope>import</scope>

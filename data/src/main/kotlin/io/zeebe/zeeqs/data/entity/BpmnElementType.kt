@@ -15,5 +15,6 @@ enum class BpmnElementType {
     EVENT_BASED_GATEWAY,
     SEQUENCE_FLOW,
     MULTI_INSTANCE_BODY,
-    CALL_ACTIVITY
+    CALL_ACTIVITY,
+    USER_TASK
 }
