@@ -1,10 +1,10 @@
 package io.zeebe.zeeqs
 
 import io.camunda.zeebe.model.bpmn.Bpmn
-import io.zeebe.zeeqs.data.entity.Workflow
-import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.data.entity.Process
+import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
-import io.zeebe.zeeqs.data.service.WorkflowService
+import io.zeebe.zeeqs.data.service.ProcessService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test
@@ -16,33 +16,37 @@ import java.time.Instant
 
 @SpringBootTest
 @TestConfiguration
-class WorkflowServiceTest(
-        @Autowired val workflowService: WorkflowService,
-        @Autowired val workflowRepository: WorkflowRepository
+class ProcessServiceTest(
+    @Autowired val processService: ProcessService,
+    @Autowired val processRepository: ProcessRepository
 ) {
 
     @Test
     fun `should return element-id and element-name`() {
         // given
-        val workflowKey = 1L
+        val processDefinitionKey = 1L
 
-        val bpmn = Bpmn.createExecutableProcess("wf")
+        val bpmn = Bpmn.createExecutableProcess("process")
                 .startEvent("s").name("start")
                 .serviceTask("t").name("task")
                 .zeebeJobType("test")
                 .endEvent("e").name("")
                 .done()
 
-        workflowRepository.save(Workflow(
-                key = workflowKey,
-                bpmnProcessId = "wf",
+        processRepository.save(
+            Process(
+                key = processDefinitionKey,
+                bpmnProcessId = "process",
                 version = 1,
                 bpmnXML = Bpmn.convertToString(bpmn),
-                deployTime = Instant.now().toEpochMilli()
-        ));
+                deployTime = Instant.now().toEpochMilli(),
+                resourceName = "process.bpmn",
+                checksum = "checksum"
+            )
+        );
 
         // when
-        val info = workflowService.getBpmnElementInfo(workflowKey)
+        val info = processService.getBpmnElementInfo(processDefinitionKey)
 
         // then
         assertThat(info)
@@ -53,12 +57,12 @@ class WorkflowServiceTest(
     }
 
     @Test
-    fun `should return nothing if workflow does not exist`() {
+    fun `should return nothing if process does not exist`() {
         // given
-        val workflowKey = 2L
+        val processDefinitionKey = 2L
 
         // when
-        val info = workflowService.getBpmnElementInfo(workflowKey)
+        val info = processService.getBpmnElementInfo(processDefinitionKey)
 
         // then
         assertThat(info).isNullOrEmpty()

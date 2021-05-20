@@ -58,6 +58,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility-kotlin</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

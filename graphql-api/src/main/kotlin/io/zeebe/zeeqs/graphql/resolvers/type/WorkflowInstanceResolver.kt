@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component
 
 @Component
 class WorkflowInstanceResolver(
-        val workflowInstanceRepository: WorkflowInstanceRepository,
-        val variableRepository: VariableRepository,
-        val workflowRepository: WorkflowRepository,
-        val jobRepository: JobRepository,
-        val incidentRepository: IncidentRepository,
-        val elementInstanceRepository: ElementInstanceRepository,
-        val timerRepository: TimerRepository,
-        val messageSubscriptionRepository: MessageSubscriptionRepository
+    val workflowInstanceRepository: WorkflowInstanceRepository,
+    val variableRepository: VariableRepository,
+    val processRepository: ProcessRepository,
+    val jobRepository: JobRepository,
+    val incidentRepository: IncidentRepository,
+    val elementInstanceRepository: ElementInstanceRepository,
+    val timerRepository: TimerRepository,
+    val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<WorkflowInstance> {
 
     fun startTime(workflowInstance: WorkflowInstance, zoneId: String): String? {
@@ -43,8 +43,8 @@ class WorkflowInstanceResolver(
         }
     }
 
-    fun workflow(workflowInstance: WorkflowInstance): Workflow? {
-        return workflowRepository.findByIdOrNull(workflowInstance.workflowKey)
+    fun workflow(workflowInstance: WorkflowInstance): Process? {
+        return processRepository.findByIdOrNull(workflowInstance.workflowKey)
     }
 
     fun incidents(workflowInstance: WorkflowInstance, stateIn: List<IncidentState>): List<Incident> {

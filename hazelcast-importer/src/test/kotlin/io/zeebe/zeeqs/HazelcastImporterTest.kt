@@ -1,14 +1,13 @@
 package io.zeebe.zeeqs
 
 import io.camunda.zeebe.client.ZeebeClient
-import io.zeebe.containers.ZeebeBrokerContainer
 import io.zeebe.containers.ZeebeContainer
-import io.zeebe.containers.ZeebePort
 import io.camunda.zeebe.model.bpmn.Bpmn
-import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +25,7 @@ import java.time.Instant
 @Testcontainers
 class HazelcastImporterTest(
         @Autowired val importer: HazelcastImporter,
-        @Autowired val workflowRepository: WorkflowRepository) {
+        @Autowired val processRepository: ProcessRepository) {
 
     val exporterJarPath: Path = Paths.get("../target/exporter/zeebe-hazelcast-exporter.jar")
     val containerPath = "/usr/local/zeebe/exporter/zeebe-hazelcast-exporter.jar"
@@ -46,7 +45,7 @@ class HazelcastImporterTest(
     }
 
     @Test
-    fun `should import workflow`() {
+    fun `should import process`() {
         // given
         val port = zeebe.getMappedPort(hazelcastPort)
         val hazelcastProperties = HazelcastProperties(
@@ -61,31 +60,31 @@ class HazelcastImporterTest(
         // when
         client.newDeployCommand()
                 .addProcessModel(
-                        Bpmn.createExecutableProcess("wf")
+                        Bpmn.createExecutableProcess("process")
                                 .startEvent()
                                 .serviceTask("task-1").zeebeJobType("test")
                                 .endEvent()
                                 .done(),
-                        "wf.bpmn")
+                        "process.bpmn")
                 .send()
                 .join()
 
         // verify
-        waitUntilWorkflowIsImported()
+        await.untilAsserted { assertThat(processRepository.findAll()).hasSize(1) }
 
-        assertThat(workflowRepository.findAll()).hasSize(1)
-
-        val workflow = workflowRepository.findAll().toList()[0]
-        assertThat(workflow.key).isGreaterThan(0)
-        assertThat(workflow.bpmnProcessId).isEqualTo("wf")
-        assertThat(workflow.version).isEqualTo(1)
-        assertThat(workflow.deployTime).isGreaterThan(0)
-        assertThat(workflow.bpmnXML).isNotEmpty()
+        val process = processRepository.findAll().toList()[0]
+        assertThat(process.key).isGreaterThan(0)
+        assertThat(process.bpmnProcessId).isEqualTo("process")
+        assertThat(process.version).isEqualTo(1)
+        assertThat(process.deployTime).isGreaterThan(0)
+        assertThat(process.bpmnXML).isNotEmpty()
+        assertThat(process.resourceName).isEqualTo("process.bpmn")
+        assertThat(process.checksum).isNotEmpty()
     }
 
-    private fun waitUntilWorkflowIsImported() {
+    private fun waitUntilProcessIsImported() {
         val timeout = Instant.now().plus(Duration.ofSeconds(10))
-        while (workflowRepository.count() < 1 && Instant.now().isBefore(timeout)) {
+        while (processRepository.count() < 1 && Instant.now().isBefore(timeout)) {
             Thread.sleep(10)
         }
     }

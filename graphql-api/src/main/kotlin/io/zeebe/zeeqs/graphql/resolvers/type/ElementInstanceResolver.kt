@@ -3,20 +3,20 @@ package io.zeebe.zeeqs.data.resolvers
 import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
-import io.zeebe.zeeqs.data.service.WorkflowService
+import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
 class ElementInstanceResolver(
-        val elementInstanceRepository: ElementInstanceRepository,
-        val workflowInstanceRepository: WorkflowInstanceRepository,
-        val incidentRepository: IncidentRepository,
-        val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
-        val timerRepository: TimerRepository,
-        val workflowService: WorkflowService,
-        val messageSubscriptionRepository: MessageSubscriptionRepository
+    val elementInstanceRepository: ElementInstanceRepository,
+    val workflowInstanceRepository: WorkflowInstanceRepository,
+    val incidentRepository: IncidentRepository,
+    val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
+    val timerRepository: TimerRepository,
+    val processService: ProcessService,
+    val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<ElementInstance> {
 
     fun startTime(elementInstance: ElementInstance, zoneId: String): String? {
@@ -44,7 +44,7 @@ class ElementInstanceResolver(
     }
 
     fun elementName(elementInstance: ElementInstance): String? {
-        return workflowService
+        return processService
                 .getBpmnElementInfo(elementInstance.workflowKey)
                 ?.get(elementInstance.elementId)
                 ?.elementName

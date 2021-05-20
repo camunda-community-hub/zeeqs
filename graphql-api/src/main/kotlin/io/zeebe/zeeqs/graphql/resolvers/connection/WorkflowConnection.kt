@@ -1,8 +1,8 @@
 package io.zeebe.zeeqs.graphql.resolvers.connection
 
-import io.zeebe.zeeqs.data.entity.Workflow
+import io.zeebe.zeeqs.data.entity.Process
 
 class WorkflowConnection(
-        val getItems: () -> List<Workflow>,
-        val getCount: () -> Long
+    val getItems: () -> List<Process>,
+    val getCount: () -> Long
 )

@@ -133,6 +133,12 @@
         <version>${test-container.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility-kotlin</artifactId>
+        <version>4.0.3</version>
+      </dependency>
+
       <!-- Kotlin deps -->
 
       <dependency>

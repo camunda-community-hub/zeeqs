@@ -3,7 +3,7 @@ package io.zeebe.zeeqs.graphql.resolvers.connection
 import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.MessageSubscription
 import io.zeebe.zeeqs.data.entity.Timer
-import io.zeebe.zeeqs.data.entity.Workflow
+import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.entity.WorkflowInstanceState
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
@@ -17,25 +17,25 @@ class WorkflowResolver(
         val workflowInstanceRepository: WorkflowInstanceRepository,
         val timerRepository: TimerRepository,
         val messageSubscriptionRepository: MessageSubscriptionRepository
-) : GraphQLResolver<Workflow> {
+) : GraphQLResolver<Process> {
 
-    fun workflowInstances(workflow: Workflow, perPage: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
+    fun workflowInstances(process: Process, perPage: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
         return WorkflowInstanceConnection(
-                getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(workflow.key, stateIn, PageRequest.of(page, perPage)).toList() },
-                getCount = { workflowInstanceRepository.countByWorkflowKeyAndStateIn(workflow.key, stateIn) }
+                getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(process.key, stateIn, PageRequest.of(page, perPage)).toList() },
+                getCount = { workflowInstanceRepository.countByWorkflowKeyAndStateIn(process.key, stateIn) }
         )
     }
 
-    fun deployTime(workflow: Workflow, zoneId: String): String? {
-        return workflow.deployTime.let { ResolverExtension.timestampToString(it, zoneId) }
+    fun deployTime(process: Process, zoneId: String): String? {
+        return process.deployTime.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun timers(workflow: Workflow): List<Timer> {
-        return timerRepository.findByWorkflowKey(workflow.key)
+    fun timers(process: Process): List<Timer> {
+        return timerRepository.findByWorkflowKey(process.key)
     }
 
-    fun messageSubscriptions(workflow: Workflow): List<MessageSubscription> {
-        return messageSubscriptionRepository.findByWorkflowKey(workflow.key)
+    fun messageSubscriptions(process: Process): List<MessageSubscription> {
+        return messageSubscriptionRepository.findByWorkflowKey(process.key)
     }
 
 }
