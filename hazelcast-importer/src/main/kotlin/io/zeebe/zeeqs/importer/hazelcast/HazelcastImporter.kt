@@ -105,7 +105,7 @@ class HazelcastImporter(
             }
             .addProcessMessageSubscriptionListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                    ?.let(this::importWorkflowInstanceSubscriptionRecord)
+                    ?.let(this::importProcessMessageSubscriptionRecord)
             }
             .addErrorListener(this::importError)
             .postProcessListener(updateSequence)
@@ -454,13 +454,15 @@ class HazelcastImporter(
 
     private fun importMessageSubscriptionRecord(record: Schema.MessageSubscriptionRecord) {
         val entity = messageSubscriptionRepository
-            .findByElementInstanceKeyAndMessageName(record.elementInstanceKey, record.messageName)
-            ?: (createMessageSubscription(record))
+            .findById(record.metadata.key)
+            .orElse(createMessageSubscription(record))
 
         when (record.metadata.intent) {
-            "OPENED" -> entity.state = MessageSubscriptionState.OPENED
+            "CREATED" -> entity.state = MessageSubscriptionState.CREATED
+            "CORRELATING" -> entity.state = MessageSubscriptionState.CORRELATING
             "CORRELATED" -> entity.state = MessageSubscriptionState.CORRELATED
-            "CLOSED" -> entity.state = MessageSubscriptionState.CLOSED
+            "REJECTED" -> entity.state = MessageSubscriptionState.REJECTED
+            "DELETED" -> entity.state = MessageSubscriptionState.DELETED
         }
 
         entity.timestamp = record.metadata.timestamp
@@ -469,27 +471,29 @@ class HazelcastImporter(
     }
 
     private fun createMessageSubscription(record: Schema.MessageSubscriptionRecord): MessageSubscription {
-        // TODO (saig0): message subscription doesn't have a key - https://github.com/zeebe-io/zeebe/issues/2805
-        val key = record.metadata.position
         return MessageSubscription(
-            key = key,
+            key = record.metadata.key,
             messageName = record.messageName,
             messageCorrelationKey = record.correlationKey,
-            workflowInstanceKey = record.processInstanceKey,
+            processInstanceKey = record.processInstanceKey,
             elementInstanceKey = record.elementInstanceKey,
             elementId = null,
-            workflowKey = null
+            processDefinitionKey = null
         );
     }
 
     private fun importMessageStartEventSubscriptionRecord(record: Schema.MessageStartEventSubscriptionRecord) {
         val entity = messageSubscriptionRepository
-            .findByWorkflowKeyAndMessageName(record.processDefinitionKey, record.messageName)
-            ?: (createMessageSubscription(record))
+            .findById(record.metadata.key)
+            .orElse(createMessageSubscription(record))
 
         when (record.metadata.intent) {
-            "OPENED" -> entity.state = MessageSubscriptionState.OPENED
-            "CLOSED" -> entity.state = MessageSubscriptionState.CLOSED
+            "CREATED" -> entity.state = MessageSubscriptionState.CREATED
+            "CORRELATED" -> {
+                entity.state = MessageSubscriptionState.CORRELATED
+                importMessageCorrelation(record)
+            }
+            "DELETED" -> entity.state = MessageSubscriptionState.DELETED
         }
 
         entity.timestamp = record.metadata.timestamp
@@ -498,20 +502,18 @@ class HazelcastImporter(
     }
 
     private fun createMessageSubscription(record: Schema.MessageStartEventSubscriptionRecord): MessageSubscription {
-        // TODO (saig0): message subscription doesn't have a key - https://github.com/zeebe-io/zeebe/issues/2805
-        val key = record.metadata.position
         return MessageSubscription(
-            key = key,
+            key = record.metadata.key,
             messageName = record.messageName,
-            workflowKey = record.processDefinitionKey,
+            processDefinitionKey = record.processDefinitionKey,
             elementId = record.startEventId,
             elementInstanceKey = null,
-            workflowInstanceKey = null,
+            processInstanceKey = null,
             messageCorrelationKey = null
         );
     }
 
-    private fun importWorkflowInstanceSubscriptionRecord(record: Schema.ProcessMessageSubscriptionRecord) {
+    private fun importProcessMessageSubscriptionRecord(record: Schema.ProcessMessageSubscriptionRecord) {
         when (record.metadata.intent) {
             "CORRELATED" -> importMessageCorrelation(record)
         }
@@ -527,6 +529,27 @@ class HazelcastImporter(
                     messageKey = record.messageKey,
                     messageName = record.messageName,
                     elementInstanceKey = record.elementInstanceKey,
+                    processInstanceKey = record.processInstanceKey,
+                    elementId = record.elementId,
+                    timestamp = record.metadata.timestamp
+                )
+            )
+
+        messageCorrelationRepository.save(entity)
+    }
+
+    private fun importMessageCorrelation(record: Schema.MessageStartEventSubscriptionRecord) {
+
+        val entity = messageCorrelationRepository
+            .findById(record.metadata.position)
+            .orElse(
+                MessageCorrelation(
+                    position = record.metadata.position,
+                    messageKey = record.messageKey,
+                    messageName = record.messageName,
+                    elementInstanceKey = null,
+                    processInstanceKey = record.processInstanceKey,
+                    elementId = record.startEventId,
                     timestamp = record.metadata.timestamp
                 )
             )

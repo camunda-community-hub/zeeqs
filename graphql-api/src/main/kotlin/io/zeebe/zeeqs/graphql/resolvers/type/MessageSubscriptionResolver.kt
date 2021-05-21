@@ -23,7 +23,7 @@ class MessageSubscriptionResolver(
     }
 
     fun workflowInstance(messageSubscription: MessageSubscription): WorkflowInstance? {
-        return messageSubscription.workflowInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
+        return messageSubscription.processInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
     }
 
     fun elementInstance(messageSubscription: MessageSubscription): ElementInstance? {
@@ -31,7 +31,7 @@ class MessageSubscriptionResolver(
     }
 
     fun workflow(messageSubscription: MessageSubscription): Process? {
-        return messageSubscription.workflowKey?.let { processRepository.findByIdOrNull(it) }
+        return messageSubscription.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
     }
 
     fun messageCorrelations(messageSubscription: MessageSubscription): List<MessageCorrelation> {
