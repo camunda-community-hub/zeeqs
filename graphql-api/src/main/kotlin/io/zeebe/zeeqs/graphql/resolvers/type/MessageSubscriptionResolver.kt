@@ -22,7 +22,7 @@ class MessageSubscriptionResolver(
         return messageSubscription.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun workflowInstance(messageSubscription: MessageSubscription): WorkflowInstance? {
+    fun workflowInstance(messageSubscription: MessageSubscription): ProcessIntance? {
         return messageSubscription.processInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
     }
 

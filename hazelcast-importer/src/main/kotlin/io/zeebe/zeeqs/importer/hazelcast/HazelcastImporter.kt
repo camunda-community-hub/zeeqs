@@ -15,7 +15,7 @@ import java.time.Duration
 class HazelcastImporter(
     val hazelcastConfigRepository: HazelcastConfigRepository,
     val processRepository: ProcessRepository,
-    val workflowInstanceRepository: WorkflowInstanceRepository,
+    val processInstanceRepository: WorkflowInstanceRepository,
     val elementInstanceRepository: ElementInstanceRepository,
     val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
     val variableRepository: VariableRepository,
@@ -74,7 +74,7 @@ class HazelcastImporter(
             }
             .addProcessInstanceListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                    ?.let(this::importWorkflowInstanceRecord)
+                    ?.let(this::importProcessInstanceRecord)
             }
             .addVariableListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
@@ -143,45 +143,45 @@ class HazelcastImporter(
         )
     }
 
-    private fun importWorkflowInstanceRecord(record: Schema.ProcessInstanceRecord) {
+    private fun importProcessInstanceRecord(record: Schema.ProcessInstanceRecord) {
         if (record.processInstanceKey == record.metadata.key) {
-            importWorkflowInstance(record)
+            importProcessInstance(record)
         }
 
         importElementInstance(record)
         importElementInstanceStateTransition(record)
     }
 
-    private fun importWorkflowInstance(record: Schema.ProcessInstanceRecord) {
-        val entity = workflowInstanceRepository
+    private fun importProcessInstance(record: Schema.ProcessInstanceRecord) {
+        val entity = processInstanceRepository
             .findById(record.processInstanceKey)
-            .orElse(createWorkflowInstance(record))
+            .orElse(createProcessInstance(record))
 
         when (record.metadata.intent) {
             "ELEMENT_ACTIVATED" -> {
                 entity.startTime = record.metadata.timestamp
-                entity.state = WorkflowInstanceState.ACTIVATED
+                entity.state = ProcessInstanceState.ACTIVATED
             }
             "ELEMENT_COMPLETED" -> {
                 entity.endTime = record.metadata.timestamp
-                entity.state = WorkflowInstanceState.COMPLETED
+                entity.state = ProcessInstanceState.COMPLETED
             }
             "ELEMENT_TERMINATED" -> {
                 entity.endTime = record.metadata.timestamp
-                entity.state = WorkflowInstanceState.TERMINATED
+                entity.state = ProcessInstanceState.TERMINATED
             }
         }
 
-        workflowInstanceRepository.save(entity)
+        processInstanceRepository.save(entity)
     }
 
-    private fun createWorkflowInstance(record: Schema.ProcessInstanceRecord): WorkflowInstance {
-        return WorkflowInstance(
+    private fun createProcessInstance(record: Schema.ProcessInstanceRecord): ProcessIntance {
+        return ProcessIntance(
             key = record.processInstanceKey,
             bpmnProcessId = record.bpmnProcessId,
             version = record.version,
-            workflowKey = record.processDefinitionKey,
-            parentWorkflowInstanceKey = record.parentProcessInstanceKey.takeIf { it > 0 },
+            processDefinitionKey = record.processDefinitionKey,
+            parentProcessInstanceKey = record.parentProcessInstanceKey.takeIf { it > 0 },
             parentElementInstanceKey = record.parentElementInstanceKey.takeIf { it > 0 }
         )
     }
@@ -225,6 +225,8 @@ class HazelcastImporter(
             "SERVICE_TASK" -> BpmnElementType.SERVICE_TASK
             "START_EVENT" -> BpmnElementType.START_EVENT
             "SUB_PROCESS" -> BpmnElementType.SUB_PROCESS
+            "EVENT_SUB_PROCESS" -> BpmnElementType.EVENT_SUB_PROCESS
+            "MULTI_INSTANCE_BODY" -> BpmnElementType.MULTI_INSTANCE_BODY
             "USER_TASK" -> BpmnElementType.USER_TASK
             else -> BpmnElementType.UNSPECIFIED
         }
@@ -233,8 +235,8 @@ class HazelcastImporter(
             key = record.metadata.key,
             elementId = record.elementId,
             bpmnElementType = bpmnElementType,
-            workflowInstanceKey = record.processInstanceKey,
-            workflowKey = record.processDefinitionKey,
+            processInstanceKey = record.processInstanceKey,
+            processDefinitionKey = record.processDefinitionKey,
             scopeKey = record.flowScopeKey.takeIf { it > 0 }
         )
     }
@@ -247,7 +249,6 @@ class HazelcastImporter(
             "ELEMENT_COMPLETED" -> ElementInstanceState.COMPLETED
             "ELEMENT_TERMINATING" -> ElementInstanceState.TERMINATING
             "ELEMENT_TERMINATED" -> ElementInstanceState.TERMINATED
-            "EVENT_OCCURRED" -> ElementInstanceState.EVENT_OCCURRED
             "SEQUENCE_FLOW_TAKEN" -> ElementInstanceState.TAKEN
             else -> ElementInstanceState.ACTIVATING
         }
@@ -293,7 +294,7 @@ class HazelcastImporter(
             key = record.metadata.key,
             name = record.name,
             value = record.value,
-            workflowInstanceKey = record.processInstanceKey,
+            processInstanceKey = record.processInstanceKey,
             scopeKey = record.scopeKey,
             timestamp = record.metadata.timestamp
         )
@@ -309,7 +310,7 @@ class HazelcastImporter(
                     variableKey = record.metadata.key,
                     name = record.name,
                     value = record.value,
-                    workflowInstanceKey = record.processInstanceKey,
+                    processInstanceKey = record.processInstanceKey,
                     scopeKey = record.scopeKey,
                     timestamp = record.metadata.timestamp
                 )
@@ -329,7 +330,6 @@ class HazelcastImporter(
                 entity.startTime = record.metadata.timestamp
             }
             "TIMED_OUT", "RETRIES_UPDATED" -> entity.state = JobState.ACTIVATABLE
-            "ACTIVATED" -> entity.state = JobState.ACTIVATED
             "FAILED" -> entity.state = JobState.FAILED
             "COMPLETED" -> {
                 entity.state = JobState.COMPLETED
@@ -356,7 +356,7 @@ class HazelcastImporter(
         return Job(
             key = record.metadata.key,
             jobType = record.type,
-            workflowInstanceKey = record.processInstanceKey,
+            processInstanceKey = record.processInstanceKey,
             elementInstanceKey = record.elementInstanceKey
         )
     }
@@ -385,7 +385,7 @@ class HazelcastImporter(
             key = record.metadata.key,
             errorType = record.errorType,
             errorMessage = record.errorMessage,
-            workflowInstanceKey = record.processInstanceKey,
+            processInstanceKey = record.processInstanceKey,
             elementInstanceKey = record.elementInstanceKey,
             jobKey = record.jobKey.takeIf { it > 0 }
         )
@@ -421,8 +421,8 @@ class HazelcastImporter(
             key = record.metadata.key,
             dueDate = record.dueDate,
             repetitions = record.repetitions,
-            workflowKey = record.processDefinitionKey.takeIf { it > 0 },
-            workflowInstanceKey = record.processInstanceKey.takeIf { it > 0 },
+            processDefinitionKey = record.processDefinitionKey.takeIf { it > 0 },
+            processInstanceKey = record.processInstanceKey.takeIf { it > 0 },
             elementInstanceKey = record.elementInstanceKey.takeIf { it > 0 }
         );
     }
@@ -434,7 +434,7 @@ class HazelcastImporter(
 
         when (record.metadata.intent) {
             "PUBLISHED" -> entity.state = MessageState.PUBLISHED
-            "DELETED" -> entity.state = MessageState.DELETED
+            "EXPIRED" -> entity.state = MessageState.EXPIRED
         }
 
         entity.timestamp = record.metadata.timestamp
@@ -565,7 +565,7 @@ class HazelcastImporter(
                 errorEventPosition = record.errorEventPosition,
                 exceptionMessage = record.exceptionMessage,
                 stacktrace = record.stacktrace,
-                workflowInstanceKey = record.processInstanceKey.takeIf { it > 0 }
+                processInstanceKey = record.processInstanceKey.takeIf { it > 0 }
             ))
 
         errorRepository.save(entity)

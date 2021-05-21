@@ -6,11 +6,11 @@ import javax.persistence.Lob
 
 @Entity
 class VariableUpdate(
-        @Id val position: Long,
-        val variableKey: Long,
-        val name: String,
-        @Lob val value: String,
-        val workflowInstanceKey: Long,
-        val scopeKey: Long,
-        val timestamp: Long
+    @Id val position: Long,
+    val variableKey: Long,
+    val name: String,
+    @Lob val value: String,
+    val processInstanceKey: Long,
+    val scopeKey: Long,
+    val timestamp: Long
 )

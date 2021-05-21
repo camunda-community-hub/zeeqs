@@ -7,16 +7,16 @@ import javax.persistence.EnumType
 
 @Entity
 class ElementInstance(
-        @Id val key: Long,
-        val elementId: String,
-        @Enumerated(EnumType.STRING)
+    @Id val key: Long,
+    val elementId: String,
+    @Enumerated(EnumType.STRING)
         val bpmnElementType: BpmnElementType,
-        val workflowInstanceKey: Long,
-        val workflowKey: Long,
-        val scopeKey: Long?
+    val processInstanceKey: Long,
+    val processDefinitionKey: Long,
+    val scopeKey: Long?
 ) {
 
-    
+
     var state: ElementInstanceState = ElementInstanceState.ACTIVATING
 
     var startTime: Long? = null

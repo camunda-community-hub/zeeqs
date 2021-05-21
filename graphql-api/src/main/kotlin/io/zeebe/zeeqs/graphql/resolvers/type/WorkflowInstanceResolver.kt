@@ -17,64 +17,64 @@ class WorkflowInstanceResolver(
     val elementInstanceRepository: ElementInstanceRepository,
     val timerRepository: TimerRepository,
     val messageSubscriptionRepository: MessageSubscriptionRepository
-) : GraphQLResolver<WorkflowInstance> {
+) : GraphQLResolver<ProcessIntance> {
 
-    fun startTime(workflowInstance: WorkflowInstance, zoneId: String): String? {
-        return workflowInstance.startTime?.let { timestampToString(it, zoneId) }
+    fun startTime(processIntance: ProcessIntance, zoneId: String): String? {
+        return processIntance.startTime?.let { timestampToString(it, zoneId) }
     }
 
-    fun endTime(workflowInstance: WorkflowInstance, zoneId: String): String? {
-        return workflowInstance.endTime?.let { timestampToString(it, zoneId) }
+    fun endTime(processIntance: ProcessIntance, zoneId: String): String? {
+        return processIntance.endTime?.let { timestampToString(it, zoneId) }
     }
 
-    fun variables(workflowInstance: WorkflowInstance): List<Variable> {
-        return variableRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    fun variables(processIntance: ProcessIntance): List<Variable> {
+        return variableRepository.findByWorkflowInstanceKey(processIntance.key)
     }
 
-    fun jobs(workflowInstance: WorkflowInstance, stateIn: List<JobState>, jobTypeIn: List<String>): List<Job> {
+    fun jobs(processIntance: ProcessIntance, stateIn: List<JobState>, jobTypeIn: List<String>): List<Job> {
         return if (jobTypeIn.isEmpty()) {
-            jobRepository.findByWorkflowInstanceKeyAndStateIn(workflowInstance.key, stateIn)
+            jobRepository.findByWorkflowInstanceKeyAndStateIn(processIntance.key, stateIn)
         } else {
             jobRepository.findByWorkflowInstanceKeyAndStateInAndJobTypeIn(
-                    workflowInstanceKey = workflowInstance.key,
+                    workflowInstanceKey = processIntance.key,
                     stateIn = stateIn,
                     jobTypeIn = jobTypeIn
             )
         }
     }
 
-    fun workflow(workflowInstance: WorkflowInstance): Process? {
-        return processRepository.findByIdOrNull(workflowInstance.workflowKey)
+    fun workflow(processIntance: ProcessIntance): Process? {
+        return processRepository.findByIdOrNull(processIntance.processDefinitionKey)
     }
 
-    fun incidents(workflowInstance: WorkflowInstance, stateIn: List<IncidentState>): List<Incident> {
+    fun incidents(processIntance: ProcessIntance, stateIn: List<IncidentState>): List<Incident> {
         return incidentRepository.findByWorkflowInstanceKeyAndStateIn(
-                workflowInstanceKey = workflowInstance.key,
+                workflowInstanceKey = processIntance.key,
                 stateIn = stateIn
         )
     }
 
-    fun parentElementInstance(workflowInstance: WorkflowInstance): ElementInstance? {
-        return workflowInstance.parentElementInstanceKey?.let { elementInstanceRepository.findByIdOrNull(it) }
+    fun parentElementInstance(processIntance: ProcessIntance): ElementInstance? {
+        return processIntance.parentElementInstanceKey?.let { elementInstanceRepository.findByIdOrNull(it) }
     }
 
-    fun childWorkflowInstances(workflowInstance: WorkflowInstance): List<WorkflowInstance> {
-        return workflowInstanceRepository.findByParentWorkflowInstanceKey(workflowInstance.key)
+    fun childWorkflowInstances(processIntance: ProcessIntance): List<ProcessIntance> {
+        return workflowInstanceRepository.findByParentWorkflowInstanceKey(processIntance.key)
     }
 
-    fun elementInstances(workflowInstance: WorkflowInstance, stateIn: List<ElementInstanceState>): List<ElementInstance> {
+    fun elementInstances(processIntance: ProcessIntance, stateIn: List<ElementInstanceState>): List<ElementInstance> {
         return elementInstanceRepository.findByWorkflowInstanceKeyAndStateIn(
-                workflowInstanceKey = workflowInstance.key,
+                workflowInstanceKey = processIntance.key,
                 stateIn = stateIn
         )
     }
 
-    fun timers(workflowInstance: WorkflowInstance): List<Timer> {
-        return timerRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    fun timers(processIntance: ProcessIntance): List<Timer> {
+        return timerRepository.findByWorkflowInstanceKey(processIntance.key)
     }
 
-    fun messageSubscriptions(workflowInstance: WorkflowInstance): List<MessageSubscription> {
-        return messageSubscriptionRepository.findByWorkflowInstanceKey(workflowInstance.key)
+    fun messageSubscriptions(processIntance: ProcessIntance): List<MessageSubscription> {
+        return messageSubscriptionRepository.findByWorkflowInstanceKey(processIntance.key)
     }
 
 }

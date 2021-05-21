@@ -8,12 +8,12 @@ import javax.persistence.Lob
 
 @Entity
 class Incident(
-        @Id val key: Long,
-        val errorType: String,
-        @Lob val errorMessage: String,
-        val workflowInstanceKey: Long,
-        val elementInstanceKey: Long,
-        val jobKey: Long?
+    @Id val key: Long,
+    val errorType: String,
+    @Lob val errorMessage: String,
+    val processInstanceKey: Long,
+    val elementInstanceKey: Long,
+    val jobKey: Long?
 ) {
 
     @Enumerated(EnumType.STRING)

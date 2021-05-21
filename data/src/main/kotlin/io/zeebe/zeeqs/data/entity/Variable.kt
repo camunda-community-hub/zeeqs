@@ -6,10 +6,10 @@ import javax.persistence.Lob
 
 @Entity
 class Variable(
-        @Id val key: Long,
-        val name: String,
-        val workflowInstanceKey: Long,
-        val scopeKey: Long,
-        @Lob var value: String,
-        var timestamp: Long
+    @Id val key: Long,
+    val name: String,
+    val processInstanceKey: Long,
+    val scopeKey: Long,
+    @Lob var value: String,
+    var timestamp: Long
 )

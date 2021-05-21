@@ -6,19 +6,17 @@ import javax.persistence.EnumType
 import javax.persistence.Id
 
 @Entity
-class Timer(
+data class ProcessIntance(
     @Id val key: Long,
-    val dueDate: Long,
-    var repetitions: Int,
-    val processInstanceKey: Long?,
-    val elementInstanceKey: Long?,
-    val processDefinitionKey: Long?
-) {
+    val bpmnProcessId: String,
+    val version: Int,
+    val processDefinitionKey: Long,
+    val parentProcessInstanceKey: Long?,
+    val parentElementInstanceKey: Long?) {
 
     @Enumerated(EnumType.STRING)
-    var state: TimerState = TimerState.CREATED
+    var state: ProcessInstanceState = ProcessInstanceState.ACTIVATED
 
     var startTime: Long? = null
     var endTime: Long? = null
-
 }

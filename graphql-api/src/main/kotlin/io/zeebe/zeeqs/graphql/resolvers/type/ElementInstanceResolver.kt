@@ -27,8 +27,8 @@ class ElementInstanceResolver(
         return elementInstance.endTime?.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun workflowInstance(elementInstance: ElementInstance): WorkflowInstance? {
-        return workflowInstanceRepository.findByIdOrNull(elementInstance.workflowInstanceKey)
+    fun workflowInstance(elementInstance: ElementInstance): ProcessIntance? {
+        return workflowInstanceRepository.findByIdOrNull(elementInstance.processInstanceKey)
     }
 
     fun incidents(elementInstance: ElementInstance): List<Incident> {
@@ -45,7 +45,7 @@ class ElementInstanceResolver(
 
     fun elementName(elementInstance: ElementInstance): String? {
         return processService
-                .getBpmnElementInfo(elementInstance.workflowKey)
+                .getBpmnElementInfo(elementInstance.processDefinitionKey)
                 ?.get(elementInstance.elementId)
                 ?.elementName
     }

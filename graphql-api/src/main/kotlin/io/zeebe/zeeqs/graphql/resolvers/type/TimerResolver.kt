@@ -4,7 +4,7 @@ import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Timer
 import io.zeebe.zeeqs.data.entity.Process
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
+import io.zeebe.zeeqs.data.entity.ProcessIntance
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
@@ -31,11 +31,11 @@ class TimerResolver(
     }
 
     fun workflow(timer: Timer): Process? {
-        return timer.workflowKey?.let { processRepository.findByIdOrNull(it) }
+        return timer.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
     }
 
-    fun workflowInstance(timer: Timer): WorkflowInstance? {
-        return timer.workflowInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
+    fun workflowInstance(timer: Timer): ProcessIntance? {
+        return timer.processInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
     }
 
     fun elementInstance(timer: Timer): ElementInstance? {

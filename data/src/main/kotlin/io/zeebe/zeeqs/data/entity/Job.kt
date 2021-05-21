@@ -7,10 +7,10 @@ import javax.persistence.Id
 
 @Entity
 class Job(
-        @Id val key: Long,
-        val jobType: String,
-        val workflowInstanceKey: Long,
-        val elementInstanceKey: Long
+    @Id val key: Long,
+    val jobType: String,
+    val processInstanceKey: Long,
+    val elementInstanceKey: Long
 ) {
 
     @Enumerated(EnumType.STRING)

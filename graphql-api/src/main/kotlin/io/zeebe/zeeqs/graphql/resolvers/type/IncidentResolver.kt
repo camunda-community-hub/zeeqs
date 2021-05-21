@@ -4,7 +4,7 @@ import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Incident
 import io.zeebe.zeeqs.data.entity.Job
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
+import io.zeebe.zeeqs.data.entity.ProcessIntance
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.JobRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
@@ -27,8 +27,8 @@ class IncidentResolver(
         return incident.resolveTime?.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun workflowInstance(incident: Incident): WorkflowInstance? {
-        return workflowInstanceRepository.findByIdOrNull(incident.workflowInstanceKey)
+    fun workflowInstance(incident: Incident): ProcessIntance? {
+        return workflowInstanceRepository.findByIdOrNull(incident.processInstanceKey)
     }
 
     fun job(incident: Incident): Job? {

@@ -4,7 +4,7 @@ import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.MessageSubscription
 import io.zeebe.zeeqs.data.entity.Timer
 import io.zeebe.zeeqs.data.entity.Process
-import io.zeebe.zeeqs.data.entity.WorkflowInstanceState
+import io.zeebe.zeeqs.data.entity.ProcessInstanceState
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
@@ -19,7 +19,7 @@ class WorkflowResolver(
         val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<Process> {
 
-    fun workflowInstances(process: Process, perPage: Int, page: Int, stateIn: List<WorkflowInstanceState>): WorkflowInstanceConnection {
+    fun workflowInstances(process: Process, perPage: Int, page: Int, stateIn: List<ProcessInstanceState>): WorkflowInstanceConnection {
         return WorkflowInstanceConnection(
                 getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(process.key, stateIn, PageRequest.of(page, perPage)).toList() },
                 getCount = { workflowInstanceRepository.countByWorkflowKeyAndStateIn(process.key, stateIn) }
