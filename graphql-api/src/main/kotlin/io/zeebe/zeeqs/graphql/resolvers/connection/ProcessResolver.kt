@@ -7,22 +7,22 @@ import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.entity.ProcessInstanceState
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
-import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
+import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Component
-class WorkflowResolver(
-        val workflowInstanceRepository: WorkflowInstanceRepository,
-        val timerRepository: TimerRepository,
-        val messageSubscriptionRepository: MessageSubscriptionRepository
+class ProcessResolver(
+    val processInstanceRepository: ProcessInstanceRepository,
+    val timerRepository: TimerRepository,
+    val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<Process> {
 
-    fun workflowInstances(process: Process, perPage: Int, page: Int, stateIn: List<ProcessInstanceState>): WorkflowInstanceConnection {
-        return WorkflowInstanceConnection(
-                getItems = { workflowInstanceRepository.findByWorkflowKeyAndStateIn(process.key, stateIn, PageRequest.of(page, perPage)).toList() },
-                getCount = { workflowInstanceRepository.countByWorkflowKeyAndStateIn(process.key, stateIn) }
+    fun processInstances(process: Process, perPage: Int, page: Int, stateIn: List<ProcessInstanceState>): ProcessInstanceConnection {
+        return ProcessInstanceConnection(
+                getItems = { processInstanceRepository.findByProcessDefinitionKeyAndStateIn(process.key, stateIn, PageRequest.of(page, perPage)).toList() },
+                getCount = { processInstanceRepository.countByProcessDefinitionKeyAndStateIn(process.key, stateIn) }
         )
     }
 
@@ -31,11 +31,11 @@ class WorkflowResolver(
     }
 
     fun timers(process: Process): List<Timer> {
-        return timerRepository.findByWorkflowKey(process.key)
+        return timerRepository.findByProcessDefinitionKey(process.key)
     }
 
     fun messageSubscriptions(process: Process): List<MessageSubscription> {
-        return messageSubscriptionRepository.findByWorkflowKey(process.key)
+        return messageSubscriptionRepository.findByProcessDefinitionKey(process.key)
     }
 
 }

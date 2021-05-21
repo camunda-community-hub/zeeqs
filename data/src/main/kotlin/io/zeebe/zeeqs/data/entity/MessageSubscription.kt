@@ -8,6 +8,7 @@ import javax.persistence.Id
 @Entity
 class MessageSubscription(
     @Id val key: Long,
+    val position: Long,
     val messageName: String,
     val messageCorrelationKey: String?,
     val processInstanceKey: Long?,

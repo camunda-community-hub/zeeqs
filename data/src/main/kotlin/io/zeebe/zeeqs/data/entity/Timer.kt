@@ -8,6 +8,7 @@ import javax.persistence.Id
 @Entity
 class Timer(
     @Id val key: Long,
+    val position: Long,
     val dueDate: Long,
     var repetitions: Int,
     val processInstanceKey: Long?,

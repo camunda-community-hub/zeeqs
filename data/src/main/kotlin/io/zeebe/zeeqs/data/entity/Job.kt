@@ -8,6 +8,7 @@ import javax.persistence.Id
 @Entity
 class Job(
     @Id val key: Long,
+    val position: Long,
     val jobType: String,
     val processInstanceKey: Long,
     val elementInstanceKey: Long

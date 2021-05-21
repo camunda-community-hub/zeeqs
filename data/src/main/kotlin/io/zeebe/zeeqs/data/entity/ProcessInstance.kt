@@ -6,8 +6,9 @@ import javax.persistence.EnumType
 import javax.persistence.Id
 
 @Entity
-data class ProcessIntance(
+data class ProcessInstance(
     @Id val key: Long,
+    val position: Long,
     val bpmnProcessId: String,
     val version: Int,
     val processDefinitionKey: Long,

@@ -4,10 +4,10 @@ type MessageSubscription {
     messageName: String!
     messageCorrelationKey: String
 
-    workflowInstance: WorkflowInstance
+    processInstance: ProcessInstance
     elementInstance: ElementInstance
 
-    workflow: Workflow
+    process: Process
 
     state: MessageSubscriptionState
     timestamp(zoneId: String = "Z"): String
@@ -22,8 +22,8 @@ type MessageCorrelation {
 }
 
 enum MessageSubscriptionState {
-    OPENED
+    CREATED
     CORRELATED
-    CLOSED
+    DELETED
 }
 

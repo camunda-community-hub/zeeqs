@@ -15,7 +15,7 @@ import java.time.Duration
 class HazelcastImporter(
     val hazelcastConfigRepository: HazelcastConfigRepository,
     val processRepository: ProcessRepository,
-    val processInstanceRepository: WorkflowInstanceRepository,
+    val processInstanceRepository: ProcessInstanceRepository,
     val elementInstanceRepository: ElementInstanceRepository,
     val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
     val variableRepository: VariableRepository,
@@ -175,9 +175,10 @@ class HazelcastImporter(
         processInstanceRepository.save(entity)
     }
 
-    private fun createProcessInstance(record: Schema.ProcessInstanceRecord): ProcessIntance {
-        return ProcessIntance(
+    private fun createProcessInstance(record: Schema.ProcessInstanceRecord): ProcessInstance {
+        return ProcessInstance(
             key = record.processInstanceKey,
+            position = record.metadata.position,
             bpmnProcessId = record.bpmnProcessId,
             version = record.version,
             processDefinitionKey = record.processDefinitionKey,
@@ -233,6 +234,7 @@ class HazelcastImporter(
 
         return ElementInstance(
             key = record.metadata.key,
+            position = record.metadata.position,
             elementId = record.elementId,
             bpmnElementType = bpmnElementType,
             processInstanceKey = record.processInstanceKey,
@@ -292,6 +294,7 @@ class HazelcastImporter(
     private fun createVariable(record: Schema.VariableRecord): Variable {
         return Variable(
             key = record.metadata.key,
+            position = record.metadata.position,
             name = record.name,
             value = record.value,
             processInstanceKey = record.processInstanceKey,
@@ -355,6 +358,7 @@ class HazelcastImporter(
     private fun createJob(record: Schema.JobRecord): Job {
         return Job(
             key = record.metadata.key,
+            position = record.metadata.position,
             jobType = record.type,
             processInstanceKey = record.processInstanceKey,
             elementInstanceKey = record.elementInstanceKey
@@ -383,6 +387,7 @@ class HazelcastImporter(
     private fun createIncident(record: Schema.IncidentRecord): Incident {
         return Incident(
             key = record.metadata.key,
+            position = record.metadata.position,
             errorType = record.errorType,
             errorMessage = record.errorMessage,
             processInstanceKey = record.processInstanceKey,
@@ -419,6 +424,7 @@ class HazelcastImporter(
     private fun createTimer(record: Schema.TimerRecord): Timer {
         return Timer(
             key = record.metadata.key,
+            position = record.metadata.position,
             dueDate = record.dueDate,
             repetitions = record.repetitions,
             processDefinitionKey = record.processDefinitionKey.takeIf { it > 0 },
@@ -445,6 +451,7 @@ class HazelcastImporter(
     private fun createMessage(record: Schema.MessageRecord): Message {
         return Message(
             key = record.metadata.key,
+            position = record.metadata.position,
             name = record.name,
             correlationKey = record.correlationKey.takeIf { it.isNotEmpty() },
             messageId = record.messageId.takeIf { it.isNotEmpty() },
@@ -473,6 +480,7 @@ class HazelcastImporter(
     private fun createMessageSubscription(record: Schema.MessageSubscriptionRecord): MessageSubscription {
         return MessageSubscription(
             key = record.metadata.key,
+            position = record.metadata.position,
             messageName = record.messageName,
             messageCorrelationKey = record.correlationKey,
             processInstanceKey = record.processInstanceKey,
@@ -504,6 +512,7 @@ class HazelcastImporter(
     private fun createMessageSubscription(record: Schema.MessageStartEventSubscriptionRecord): MessageSubscription {
         return MessageSubscription(
             key = record.metadata.key,
+            position = record.metadata.position,
             messageName = record.messageName,
             processDefinitionKey = record.processDefinitionKey,
             elementId = record.startEventId,
@@ -531,6 +540,7 @@ class HazelcastImporter(
                     elementInstanceKey = record.elementInstanceKey,
                     processInstanceKey = record.processInstanceKey,
                     elementId = record.elementId,
+                    processDefinitionKey = null,
                     timestamp = record.metadata.timestamp
                 )
             )
@@ -550,6 +560,7 @@ class HazelcastImporter(
                     elementInstanceKey = null,
                     processInstanceKey = record.processInstanceKey,
                     elementId = record.startEventId,
+                    processDefinitionKey = record.processDefinitionKey,
                     timestamp = record.metadata.timestamp
                 )
             )

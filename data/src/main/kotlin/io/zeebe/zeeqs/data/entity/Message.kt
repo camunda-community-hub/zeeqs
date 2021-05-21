@@ -8,6 +8,7 @@ import javax.persistence.Id
 @Entity
 class Message(
         @Id val key: Long,
+        val position: Long,
         val name: String,
         val correlationKey: String?,
         val messageId: String?,

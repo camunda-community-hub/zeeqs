@@ -27,7 +27,7 @@ class ZeebeGraphqlTest(
     val serverPort = environment.get("local.server.port")
 
     @Test
-    fun `should query workflow`() {
+    fun `should query process`() {
         // given
         processRepository.save(
             Process(
@@ -42,13 +42,13 @@ class ZeebeGraphqlTest(
         );
 
         // when
-        val response = sendQuery("{workflows{nodes{key,bpmnProcessId,version}}}")
+        val response = sendQuery("{processes{nodes{key,bpmnProcessId,version}}}")
 
         // then
         assertThat(response.statusCode()).isEqualTo(200)
         assertThat(response.body()).isEqualToIgnoringWhitespace("""
             {"data":
-            {"workflows":
+            {"processes":
             {"nodes":[
             {"key":"1",
             "bpmnProcessId":"process", 

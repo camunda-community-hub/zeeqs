@@ -4,9 +4,9 @@ import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Timer
 import io.zeebe.zeeqs.data.entity.Process
-import io.zeebe.zeeqs.data.entity.ProcessIntance
+import io.zeebe.zeeqs.data.entity.ProcessInstance
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
-import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
+import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class TimerResolver(
     val processRepository: ProcessRepository,
-    val workflowInstanceRepository: WorkflowInstanceRepository,
+    val processInstanceRepository: ProcessInstanceRepository,
     val elementInstanceRepository: ElementInstanceRepository
 ) : GraphQLResolver<Timer> {
 
@@ -30,12 +30,12 @@ class TimerResolver(
         return timer.dueDate.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun workflow(timer: Timer): Process? {
+    fun process(timer: Timer): Process? {
         return timer.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
     }
 
-    fun workflowInstance(timer: Timer): ProcessIntance? {
-        return timer.processInstanceKey?.let { workflowInstanceRepository.findByIdOrNull(it) }
+    fun processInstance(timer: Timer): ProcessInstance? {
+        return timer.processInstanceKey?.let { processInstanceRepository.findByIdOrNull(it) }
     }
 
     fun elementInstance(timer: Timer): ElementInstance? {

@@ -4,10 +4,10 @@ type Timer {
     dueDate(zoneId: String = "Z"): String
     repetitions: Int
 
-    workflowInstance: WorkflowInstance
+    processInstance: ProcessInstance
     elementInstance: ElementInstance
 
-    workflow: Workflow
+    process: Process
 
     state: TimerState!
 

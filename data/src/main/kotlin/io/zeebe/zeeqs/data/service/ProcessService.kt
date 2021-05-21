@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component
 class ProcessService(val processRepository: ProcessRepository) {
 
     @Cacheable(cacheNames = ["bpmnElementInfo"])
-    fun getBpmnElementInfo(workflowKey: Long): Map<String, BpmnElementInfo>? {
-        return getBpmnModel(workflowKey)
+    fun getBpmnElementInfo(processDefinitionKey: Long): Map<String, BpmnElementInfo>? {
+        return getBpmnModel(processDefinitionKey)
                 ?.let { it.getModelElementsByType(FlowElement::class.java) }
                 ?.map {
                     Pair(it.id, BpmnElementInfo(
@@ -24,8 +24,8 @@ class ProcessService(val processRepository: ProcessRepository) {
                 ?.toMap()
     }
 
-    private fun getBpmnModel(workflowKey: Long): BpmnModelInstance? {
-        return processRepository.findByIdOrNull(workflowKey)
+    private fun getBpmnModel(processDefinitionKey: Long): BpmnModelInstance? {
+        return processRepository.findByIdOrNull(processDefinitionKey)
                 ?.bpmnXML
                 ?.byteInputStream()
                 ?.let { Bpmn.readModelFromStream(it) }

@@ -7,6 +7,7 @@ import javax.persistence.Lob
 @Entity
 class Variable(
     @Id val key: Long,
+    val position: Long,
     val name: String,
     val processInstanceKey: Long,
     val scopeKey: Long,

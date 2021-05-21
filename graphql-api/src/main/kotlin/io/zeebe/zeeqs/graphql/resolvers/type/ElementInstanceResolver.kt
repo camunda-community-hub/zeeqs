@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class ElementInstanceResolver(
     val elementInstanceRepository: ElementInstanceRepository,
-    val workflowInstanceRepository: WorkflowInstanceRepository,
+    val processInstanceRepository: ProcessInstanceRepository,
     val incidentRepository: IncidentRepository,
     val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
     val timerRepository: TimerRepository,
@@ -27,8 +27,8 @@ class ElementInstanceResolver(
         return elementInstance.endTime?.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun workflowInstance(elementInstance: ElementInstance): ProcessIntance? {
-        return workflowInstanceRepository.findByIdOrNull(elementInstance.processInstanceKey)
+    fun processInstance(elementInstance: ElementInstance): ProcessInstance? {
+        return processInstanceRepository.findByIdOrNull(elementInstance.processInstanceKey)
     }
 
     fun incidents(elementInstance: ElementInstance): List<Incident> {

@@ -9,7 +9,7 @@ type Incident {
     creationTime(zoneId: String = "Z"): String
     resolveTime(zoneId: String = "Z"): String
 
-    workflowInstance: WorkflowInstance
+    processInstance: ProcessInstance
     elementInstance: ElementInstance
 
     job: Job

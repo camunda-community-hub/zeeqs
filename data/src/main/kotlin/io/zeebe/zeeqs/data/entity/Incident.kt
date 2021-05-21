@@ -9,6 +9,7 @@ import javax.persistence.Lob
 @Entity
 class Incident(
     @Id val key: Long,
+    val position: Long,
     val errorType: String,
     @Lob val errorMessage: String,
     val processInstanceKey: Long,

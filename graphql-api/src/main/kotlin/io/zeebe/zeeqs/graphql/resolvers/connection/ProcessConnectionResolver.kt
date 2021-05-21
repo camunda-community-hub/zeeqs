@@ -5,13 +5,13 @@ import io.zeebe.zeeqs.data.entity.Process
 import org.springframework.stereotype.Component
 
 @Component
-class WorkflowConnectionResolver : GraphQLResolver<WorkflowConnection> {
+class ProcessConnectionResolver : GraphQLResolver<ProcessConnection> {
 
-    fun nodes(connection: WorkflowConnection): List<Process> {
+    fun nodes(connection: ProcessConnection): List<Process> {
         return connection.getItems()
     }
 
-    fun totalCount(connection: WorkflowConnection): Long {
+    fun totalCount(connection: ProcessConnection): Long {
         return connection.getCount()
     }
 

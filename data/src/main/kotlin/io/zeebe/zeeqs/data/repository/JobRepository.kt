@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository
 @Repository
 interface JobRepository : PagingAndSortingRepository<Job, Long> {
 
-    fun findByWorkflowInstanceKey(workflowInstanceKey: Long): List<Job>
+    fun findByProcessInstanceKey(processInstanceKey: Long): List<Job>
 
-    fun findByWorkflowInstanceKeyAndStateIn(workflowInstanceKey: Long, stateIn: List<JobState>): List<Job>
+    fun findByProcessInstanceKeyAndStateIn(processInstanceKey: Long, stateIn: List<JobState>): List<Job>
 
-    fun findByWorkflowInstanceKeyAndStateInAndJobTypeIn(workflowInstanceKey: Long, stateIn: List<JobState>, jobTypeIn: List<String>): List<Job>
+    fun findByProcessInstanceKeyAndStateInAndJobTypeIn(processInstanceKey: Long, stateIn: List<JobState>, jobTypeIn: List<String>): List<Job>
 
     fun findByStateIn(stateIn: List<JobState>, pageable: Pageable): List<Job>
 

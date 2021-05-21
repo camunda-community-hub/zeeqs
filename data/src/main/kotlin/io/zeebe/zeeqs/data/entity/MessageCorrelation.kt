@@ -11,5 +11,6 @@ class MessageCorrelation(
         val timestamp: Long,
         val processInstanceKey: Long,
         val elementInstanceKey: Long?,
-        val elementId: String?
+        val elementId: String?,
+        val processDefinitionKey: Long?
 )
