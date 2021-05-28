@@ -1,5 +1,7 @@
 package io.zeebe.zeeqs.importer.hazelcast
 
+import com.google.protobuf.Struct
+import com.google.protobuf.Value
 import com.hazelcast.client.HazelcastClient
 import com.hazelcast.client.config.ClientConfig
 import io.zeebe.exporter.proto.Schema
@@ -24,6 +26,7 @@ class HazelcastImporter(
     val incidentRepository: IncidentRepository,
     val timerRepository: TimerRepository,
     val messageRepository: MessageRepository,
+    val messageVariableRepository: MessageVariableRepository,
     val messageSubscriptionRepository: MessageSubscriptionRepository,
     val messageCorrelationRepository: MessageCorrelationRepository,
     val errorRepository: ErrorRepository
@@ -434,9 +437,17 @@ class HazelcastImporter(
     }
 
     private fun importMessageRecord(record: Schema.MessageRecord) {
+        importMessage(record)
+
+        if (record.metadata.intent == "PUBLISHED") {
+            importMessageVariables(record)
+        }
+    }
+
+    private fun importMessage(record: Schema.MessageRecord) {
         val entity = messageRepository
-            .findById(record.metadata.key)
-            .orElse(createMessage(record))
+                .findById(record.metadata.key)
+                .orElse(createMessage(record))
 
         when (record.metadata.intent) {
             "PUBLISHED" -> entity.state = MessageState.PUBLISHED
@@ -457,6 +468,43 @@ class HazelcastImporter(
             messageId = record.messageId.takeIf { it.isNotEmpty() },
             timeToLive = record.timeToLive
         );
+    }
+
+    private fun importMessageVariables(record: Schema.MessageRecord) {
+        val messageKey = record.metadata.key
+        val messagePosition = record.metadata.position
+
+        structToMap(record.variables).forEach{ (name,value) ->
+            val id = messageKey.toString() + name
+
+            val entity = messageVariableRepository
+                    .findById(id)
+                    .orElse(MessageVariable(
+                            id = id,
+                            name = name,
+                            value = value,
+                            messageKey = messageKey,
+                            position = messagePosition
+                    ))
+
+            messageVariableRepository.save(entity)
+        }
+    }
+
+    private fun structToMap(struct: Struct): Map<String, String> {
+        return struct.fieldsMap.mapValues { (_, value) -> valueToString(value) }
+    }
+
+    private fun valueToString(value: Value): String {
+        return when (value.kindCase) {
+            Value.KindCase.NULL_VALUE -> "null"
+            Value.KindCase.BOOL_VALUE -> value.boolValue.toString()
+            Value.KindCase.NUMBER_VALUE -> value.numberValue.toString()
+            Value.KindCase.STRING_VALUE -> "\"${value.stringValue}\""
+            Value.KindCase.LIST_VALUE -> value.listValue.valuesList.map { valueToString(it) }.joinToString(separator = ",", prefix = "[", postfix = "]")
+            Value.KindCase.STRUCT_VALUE -> value.structValue.fieldsMap.map { (key, value) -> "\"$key\":" + valueToString(value) }.joinToString(separator = ",", prefix = "{", postfix = "}")
+            else -> value.toString()
+        }
     }
 
     private fun importMessageSubscriptionRecord(record: Schema.MessageSubscriptionRecord) {
