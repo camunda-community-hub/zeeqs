@@ -9,5 +9,7 @@ interface MessageCorrelationRepository : PagingAndSortingRepository<MessageCorre
 
     fun findByMessageNameAndElementInstanceKey(messageName: String, elementInstanceKey: Long): List<MessageCorrelation>
 
+    fun findByMessageNameAndProcessDefinitionKey(messageName: String, processDefinitionKey: Long): List<MessageCorrelation>
+
     fun findByMessageKey(messageKey: Long): List<MessageCorrelation>
 }

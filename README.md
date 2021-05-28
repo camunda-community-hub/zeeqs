@@ -20,7 +20,7 @@ A query can be send via HTTP POST request and a JSON body containing the `query`
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  --data '{ "query": "{ workflows { nodes { key } } }" }' \
+  --data '{ "query": "{ processes { nodes { key } } }" }' \
   http://localhost:9000/graphql
 ```
 
@@ -30,14 +30,14 @@ http://localhost:9000/graphiql
 ### Queries
 
 The API provide the following queries:
-* workflows
-* workflowInstances
+* processes
+* processInstances
 * jobs
 * messages 
 * incidents
 * errors
  
-And additional queries to request a single object by its key (e.g. `workflow(key: "2251799813685249")`).
+And additional queries to request a single object by its key (e.g. `process(key: "2251799813685249")`).
 
 ### Pagination
 
@@ -47,7 +47,7 @@ In addition to the items, the query result contains also the total count of the 
 
 ```graphql
 {
-  workflows(perPage: 10, page: 0) {
+  processes(perPage: 10, page: 0) {
     totalCount
     nodes {
       key
@@ -62,7 +62,7 @@ Some queries allow to filter the result by passing arguments in the query.
 
 ```graphql
 {
-  workflowInstances(stateIn: [ACTIVATED]) {
+  processInstances(stateIn: [ACTIVATED]) {
     nodes {
       key
     }
@@ -72,17 +72,17 @@ Some queries allow to filter the result by passing arguments in the query.
 
 ### Examples
 
-Get workflows including their workflow instance count: 
+Get processes including their process instance count: 
 
 ```graphql
 {
-  workflows {
+  processes {
     totalCount
     nodes {
       key
       bpmnProcessId
       version
-      workflowInstances {
+      processInstances {
         totalCount
       }
     }
@@ -97,14 +97,14 @@ Get workflows including their workflow instance count:
 ```
 {
   "data": {
-    "workflows": {
+    "processes": {
       "totalCount": 3,
       "nodes": [
         {
           "key": "2251799813685249",
           "bpmnProcessId": "demo-process",
           "version": 1,
-          "workflowInstances": {
+          "processInstances": {
             "totalCount": 3
           }
         },
@@ -112,7 +112,7 @@ Get workflows including their workflow instance count:
           "key": "2251799813685251",
           "bpmnProcessId": "demo-2",
           "version": 1,
-          "workflowInstances": {
+          "processInstances": {
             "totalCount": 2
           }
         },
@@ -120,7 +120,7 @@ Get workflows including their workflow instance count:
           "key": "2251799813685269",
           "bpmnProcessId": "demo-3",
           "version": 1,
-          "workflowInstances": {
+          "processInstances": {
             "totalCount": 1
           }
         }
@@ -133,16 +133,16 @@ Get workflows including their workflow instance count:
   </p>
 </details>
 
-Get workflow instances that are active including their active element instances:
+Get process instances that are active including their active element instances:
 
 ```graphql
 {
-  workflowInstances(stateIn: [ACTIVATED]) {
+  processInstances(stateIn: [ACTIVATED]) {
     totalCount
     nodes {
       key
       state
-      workflow {
+      process {
         bpmnProcessId
       }
       elementInstances(stateIn: [ACTIVATED]) {
@@ -163,13 +163,13 @@ Get workflow instances that are active including their active element instances:
 ```
 {
   "data": {
-    "workflowInstances": {
+    "processInstances": {
       "totalCount": 6,
       "nodes": [
         {
           "key": "2251799813685261",
           "state": "ACTIVATED",
-          "workflow": {
+          "process": {
             "bpmnProcessId": "demo-process"
           },
           "elementInstances": [
@@ -190,7 +190,7 @@ Get workflow instances that are active including their active element instances:
         {
           "key": "2251799813685271",
           "state": "ACTIVATED",
-          "workflow": {
+          "process": {
             "bpmnProcessId": "demo-2"
           },
           "elementInstances": [
@@ -211,7 +211,7 @@ Get workflow instances that are active including their active element instances:
         {
           "key": "2251799813685277",
           "state": "ACTIVATED",
-          "workflow": {
+          "process": {
             "bpmnProcessId": "demo-2"
           },
           "elementInstances": [
@@ -232,7 +232,7 @@ Get workflow instances that are active including their active element instances:
         {
           "key": "2251799813685287",
           "state": "ACTIVATED",
-          "workflow": {
+          "process": {
             "bpmnProcessId": "demo-3"
           },
           "elementInstances": [
@@ -253,7 +253,7 @@ Get workflow instances that are active including their active element instances:
         {
           "key": "2251799813685304",
           "state": "ACTIVATED",
-          "workflow": {
+          "process": {
             "bpmnProcessId": "demo-process"
           },
           "elementInstances": [
@@ -274,7 +274,7 @@ Get workflow instances that are active including their active element instances:
         {
           "key": "2251799813685310",
           "state": "ACTIVATED",
-          "workflow": {
+          "process": {
             "bpmnProcessId": "demo-process"
           },
           "elementInstances": [
@@ -314,9 +314,9 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
       elementInstance {
         elementId
         elementName
-        workflowInstance {
+        processInstance {
           key
-          workflow {
+          process {
             key
             bpmnProcessId
           }
@@ -344,9 +344,9 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
           "elementInstance": {
             "elementId": "ServiceTask_19bf066",
             "elementName": "task 1",
-            "workflowInstance": {
+            "processInstance": {
               "key": "2251799813685277",
-              "workflow": {
+              "process": {
                 "key": "2251799813685251",
                 "bpmnProcessId": "demo-2"
               }
@@ -360,9 +360,9 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
           "elementInstance": {
             "elementId": "ServiceTask_0t5azxx",
             "elementName": "task 2",
-            "workflowInstance": {
+            "processInstance": {
               "key": "2251799813685287",
-              "workflow": {
+              "process": {
                 "key": "2251799813685269",
                 "bpmnProcessId": "demo-3"
               }
@@ -376,9 +376,9 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
           "elementInstance": {
             "elementId": "ServiceTask_0m7fzva",
             "elementName": "task 1",
-            "workflowInstance": {
+            "processInstance": {
               "key": "2251799813685310",
-              "workflow": {
+              "process": {
                 "key": "2251799813685249",
                 "bpmnProcessId": "demo-process"
               }
@@ -392,9 +392,9 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
           "elementInstance": {
             "elementId": "ServiceTask_0f8l2yf",
             "elementName": "task 3",
-            "workflowInstance": {
+            "processInstance": {
               "key": "2251799813685261",
-              "workflow": {
+              "process": {
                 "key": "2251799813685249",
                 "bpmnProcessId": "demo-process"
               }
@@ -408,9 +408,9 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
           "elementInstance": {
             "elementId": "ServiceTask_01flslu",
             "elementName": "task 2",
-            "workflowInstance": {
+            "processInstance": {
               "key": "2251799813685304",
-              "workflow": {
+              "process": {
                 "key": "2251799813685249",
                 "bpmnProcessId": "demo-process"
               }

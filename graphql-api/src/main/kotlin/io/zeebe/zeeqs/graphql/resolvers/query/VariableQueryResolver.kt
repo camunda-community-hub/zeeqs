@@ -10,8 +10,8 @@ class VariableQueryResolver(
         val variableRepository: VariableRepository
 ) : GraphQLQueryResolver {
 
-    fun getVariables(workflowInstanceKey: Long): List<Variable> {
-        return variableRepository.findByWorkflowInstanceKey(workflowInstanceKey);
+    fun getVariables(processInstanceKey: Long): List<Variable> {
+        return variableRepository.findByProcessInstanceKey(processInstanceKey);
     }
 
 }

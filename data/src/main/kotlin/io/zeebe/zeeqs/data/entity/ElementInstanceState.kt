@@ -10,6 +10,5 @@ enum class ElementInstanceState {
     TERMINATING,
     TERMINATED,
 
-    EVENT_OCCURRED,
     TAKEN
 }

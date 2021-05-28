@@ -5,7 +5,7 @@ type Error {
     exceptionMessage: String!
     stacktrace: String!
 
-    workflowInstance: WorkflowInstance
+    processInstance: ProcessInstance
 }
 
 type ErrorConnection {

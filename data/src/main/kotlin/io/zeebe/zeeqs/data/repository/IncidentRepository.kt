@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 interface IncidentRepository : PagingAndSortingRepository<Incident, Long> {
 
     @Transactional(readOnly = true)
-    fun findByWorkflowInstanceKey(workflowInstanceKey: Long): List<Incident>
+    fun findByProcessInstanceKey(processInstanceKey: Long): List<Incident>
 
     @Transactional(readOnly = true)
     fun findByJobKey(jobKey: Long): List<Incident>
@@ -22,5 +22,5 @@ interface IncidentRepository : PagingAndSortingRepository<Incident, Long> {
     fun countByStateIn(stateIn: List<IncidentState>): Long
 
     @Transactional(readOnly = true)
-    fun findByWorkflowInstanceKeyAndStateIn(workflowInstanceKey: Long, stateIn: List<IncidentState>): List<Incident>
+    fun findByProcessInstanceKeyAndStateIn(processInstanceKey: Long, stateIn: List<IncidentState>): List<Incident>
 }

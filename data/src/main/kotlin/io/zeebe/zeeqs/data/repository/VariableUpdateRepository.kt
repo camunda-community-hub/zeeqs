@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 interface VariableUpdateRepository : PagingAndSortingRepository<VariableUpdate, Long> {
 
     @Transactional(readOnly = true)
-    fun findByWorkflowInstanceKey(workflowInstanceKey: Long): List<VariableUpdate>
+    fun findByProcessInstanceKey(processInstanceKey: Long): List<VariableUpdate>
 
     @Transactional(readOnly = true)
     fun findByVariableKey(variableKey: Long): List<VariableUpdate>

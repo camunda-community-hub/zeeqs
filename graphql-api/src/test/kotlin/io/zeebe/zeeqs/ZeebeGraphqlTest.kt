@@ -1,7 +1,7 @@
 package io.zeebe.zeeqs
 
-import io.zeebe.zeeqs.data.entity.Workflow
-import io.zeebe.zeeqs.data.repository.WorkflowRepository
+import io.zeebe.zeeqs.data.entity.Process
+import io.zeebe.zeeqs.data.repository.ProcessRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,32 +22,36 @@ import java.time.Instant
 @TestConfiguration
 class ZeebeGraphqlTest(
         @Autowired val environment: Environment,
-        @Autowired val workflowRepository: WorkflowRepository) {
+        @Autowired val processRepository: ProcessRepository) {
 
     val serverPort = environment.get("local.server.port")
 
     @Test
-    fun `should query workflow`() {
+    fun `should query process`() {
         // given
-        workflowRepository.save(Workflow(
+        processRepository.save(
+            Process(
                 key = 1,
-                bpmnProcessId = "wf",
+                bpmnProcessId = "process",
                 version = 1,
                 bpmnXML = "<...>",
-                deployTime = Instant.now().toEpochMilli()
-        ));
+                deployTime = Instant.now().toEpochMilli(),
+                resourceName = "process.bpmn",
+                checksum = "checksum"
+            )
+        );
 
         // when
-        val response = sendQuery("{workflows{nodes{key,bpmnProcessId,version}}}")
+        val response = sendQuery("{processes{nodes{key,bpmnProcessId,version}}}")
 
         // then
         assertThat(response.statusCode()).isEqualTo(200)
         assertThat(response.body()).isEqualToIgnoringWhitespace("""
             {"data":
-            {"workflows":
+            {"processes":
             {"nodes":[
             {"key":"1",
-            "bpmnProcessId":"wf", 
+            "bpmnProcessId":"process", 
             "version":1}
             ]}}}""".trimIndent())
     }

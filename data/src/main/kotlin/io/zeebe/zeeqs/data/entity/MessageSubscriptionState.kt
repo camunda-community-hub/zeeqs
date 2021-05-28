@@ -1,7 +1,9 @@
 package io.zeebe.zeeqs.data.entity
 
 enum class MessageSubscriptionState {
-    OPENED,
+    CREATED,
+    CORRELATING,
     CORRELATED,
-    CLOSED
+    REJECTED,
+    DELETED
 }

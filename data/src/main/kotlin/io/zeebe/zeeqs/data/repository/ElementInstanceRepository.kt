@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ElementInstanceRepository : PagingAndSortingRepository<ElementInstance, Long> {
 
-    fun findByWorkflowInstanceKey(workflowInstanceKey: Long): List<ElementInstance>
+    fun findByProcessInstanceKey(processInstanceKey: Long): List<ElementInstance>
 
-    fun findByWorkflowInstanceKeyAndStateIn(workflowInstanceKey: Long, stateIn: List<ElementInstanceState>): List<ElementInstance>
+    fun findByProcessInstanceKeyAndStateIn(processInstanceKey: Long, stateIn: List<ElementInstanceState>): List<ElementInstance>
 }

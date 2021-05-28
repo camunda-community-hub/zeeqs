@@ -5,9 +5,11 @@ import javax.persistence.Id
 import javax.persistence.Lob
 
 @Entity
-data class Workflow(
+data class Process(
         @Id val key: Long,
         val bpmnProcessId: String,
         val version: Int,
         @Lob val bpmnXML: String,
-        val deployTime: Long)
+        val deployTime: Long,
+        val resourceName: String,
+        val checksum: String)

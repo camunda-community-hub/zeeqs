@@ -14,7 +14,7 @@ type Job {
     # the time when the job was removed (completed/error-thrown/canceled)
     endTime(zoneId: String = "Z"): String
 
-    workflowInstance: WorkflowInstance
+    processInstance: ProcessInstance
     elementInstance: ElementInstance
 
     incidents: [Incident!]
@@ -22,7 +22,6 @@ type Job {
 
 enum JobState {
     ACTIVATABLE
-    ACTIVATED
     FAILED
     COMPLETED
     CANCELED
@@ -40,7 +39,7 @@ extend type Query {
     jobs(
         perPage: Int = 10,
         page: Int = 0,
-        stateIn: [JobState!] = [ACTIVATABLE, ACTIVATED, FAILED, COMPLETED, CANCELED, ERROR_THROWN],
+        stateIn: [JobState!] = [ACTIVATABLE, FAILED, COMPLETED, CANCELED, ERROR_THROWN],
         jobTypeIn: [String!] = []
     ): JobConnection!
 }

@@ -10,16 +10,23 @@ type Message {
     timestamp(zoneId: String = "Z"): String
 
     messageCorrelations: [MessageCorrelation!]
+
+    variables: [MessageVariable!]
 }
 
 enum MessageState {
     PUBLISHED
-    DELETED
+    EXPIRED
 }
 
 type MessageConnection {
     totalCount: Int!
     nodes: [Message!]!
+}
+
+type MessageVariable {
+    name: String!
+    value: String!
 }
 
 extend type Query {

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TimerRepository : PagingAndSortingRepository<Timer, Long> {
 
-    fun findByWorkflowInstanceKey(workflowInstanceKey: Long): List<Timer>
+    fun findByProcessInstanceKey(processInstanceKey: Long): List<Timer>
 
-    fun findByWorkflowKey(workflowKey: Long): List<Timer>
+    fun findByProcessDefinitionKey(processDefinitionKey: Long): List<Timer>
 
     fun findByElementInstanceKey(elementInstanceKey: Long): List<Timer>
 

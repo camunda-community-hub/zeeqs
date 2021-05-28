@@ -7,16 +7,17 @@ import javax.persistence.Id
 
 @Entity
 class MessageSubscription(
-        @Id val key: Long,
-        val messageName: String,
-        val messageCorrelationKey: String?,
-        val workflowInstanceKey: Long?,
-        val elementInstanceKey: Long?,
-        val workflowKey: Long?,
-        val elementId: String?
+    @Id val key: Long,
+    val position: Long,
+    val messageName: String,
+    val messageCorrelationKey: String?,
+    val processInstanceKey: Long?,
+    val elementInstanceKey: Long?,
+    val processDefinitionKey: Long?,
+    val elementId: String?
 ) {
 
     @Enumerated(EnumType.STRING)
-    var state: MessageSubscriptionState = MessageSubscriptionState.OPENED
+    var state: MessageSubscriptionState = MessageSubscriptionState.CREATED
     var timestamp: Long = -1
 }

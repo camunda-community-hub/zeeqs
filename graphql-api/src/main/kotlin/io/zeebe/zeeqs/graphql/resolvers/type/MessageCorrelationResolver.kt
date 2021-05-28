@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class MessageCorrelationResolver(
-        val messageSubscriptionRepository: MessageSubscriptionRepository,
-        val messageRepository: MessageRepository
+    val messageSubscriptionRepository: MessageSubscriptionRepository,
+    val messageRepository: MessageRepository
 ) : GraphQLResolver<MessageCorrelation> {
 
     fun timestamp(messageCorrelation: MessageCorrelation, zoneId: String): String? {
@@ -21,10 +21,19 @@ class MessageCorrelationResolver(
     }
 
     fun messageSubscription(messageCorrelation: MessageCorrelation): MessageSubscription? {
-        return messageSubscriptionRepository.findByElementInstanceKeyAndMessageName(
-                elementInstanceKey = messageCorrelation.elementInstanceKey,
-                messageName = messageCorrelation.messageName
-        )
+        return messageCorrelation.elementInstanceKey
+            ?.let {
+                messageSubscriptionRepository.findByElementInstanceKeyAndMessageName(
+                    elementInstanceKey = it,
+                    messageName = messageCorrelation.messageName
+                )
+            }
+            ?: messageCorrelation.processDefinitionKey?.let {
+                messageSubscriptionRepository.findByProcessDefinitionKeyAndMessageName(
+                    processDefinitionKey = it,
+                    messageName = messageCorrelation.messageName
+                )
+            }
     }
 
     fun message(messageCorrelation: MessageCorrelation): Message? {

@@ -4,19 +4,19 @@ import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Incident
 import io.zeebe.zeeqs.data.entity.Job
-import io.zeebe.zeeqs.data.entity.WorkflowInstance
+import io.zeebe.zeeqs.data.entity.ProcessInstance
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.IncidentRepository
-import io.zeebe.zeeqs.data.repository.WorkflowInstanceRepository
+import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
 class JobResolver(
-        val workflowInstanceRepository: WorkflowInstanceRepository,
-        val incidentRepository: IncidentRepository,
-        val elementInstanceRepository: ElementInstanceRepository
+    val processInstanceRepository: ProcessInstanceRepository,
+    val incidentRepository: IncidentRepository,
+    val elementInstanceRepository: ElementInstanceRepository
 ) : GraphQLResolver<Job> {
 
     fun timestamp(job: Job, zoneId: String): String? {
@@ -31,8 +31,8 @@ class JobResolver(
         return job.endTime?.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
-    fun workflowInstance(job: Job): WorkflowInstance? {
-        return workflowInstanceRepository.findByIdOrNull(job.workflowInstanceKey)
+    fun processInstance(job: Job): ProcessInstance? {
+        return processInstanceRepository.findByIdOrNull(job.processInstanceKey)
     }
 
     fun incidents(job: Job): List<Incident> {

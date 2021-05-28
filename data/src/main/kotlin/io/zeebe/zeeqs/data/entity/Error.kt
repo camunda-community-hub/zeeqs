@@ -9,5 +9,5 @@ class Error(@Id val position: Long,
             val errorEventPosition: Long,
             @Lob val exceptionMessage: String,
             @Lob val stacktrace:String,
-            val workflowInstanceKey: Long?
+            val processInstanceKey: Long?
             )

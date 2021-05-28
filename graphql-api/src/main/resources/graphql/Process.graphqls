@@ -1,0 +1,35 @@
+type Process {
+    # the unique key of the process
+    key: ID!
+    # the BPMN process id (i.e. the technical name of the process)
+    bpmnProcessId: String!
+    # the deployed version of the process based on the BPMN process id
+    version: Int!
+    # the time when the process was deployed
+    deployTime(zoneId: String = "Z"): String!
+    # the BPMN XML of the process
+    bpmnXML: String!
+    # the created instances of the process
+    processInstances(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [ProcessInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]): ProcessInstanceConnection!
+    # the scheduled timers of the timer start events of the process
+    timers: [Timer!]
+    # the opened message subscriptions of the message start events of the process
+    messageSubscriptions: [MessageSubscription!]
+}
+
+type ProcessConnection {
+    totalCount: Int!
+    nodes: [Process!]!
+}
+
+extend type Query {
+    # find the process with the given key
+    process(key: ID!): Process
+    # find all processes
+    processes(
+        perPage: Int = 10,
+        page: Int = 0,): ProcessConnection!
+}
