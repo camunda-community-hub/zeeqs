@@ -305,7 +305,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -355,9 +355,9 @@
   </repositories>
 
   <scm>
-    <url>https://github.com/zeebe-io/zeeqs</url>
-    <connection>scm:git:git@github.com:zeebe-io/zeeqs.git</connection>
-    <developerConnection>scm:git:git@github.com:zeebe-io/zeeqs.git</developerConnection>
+    <url>https://github.com/camunda-community-hub/zeeqs</url>
+    <connection>scm:git:git@github.com:camunda-community-hub/zeeqs.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda-community-hub/zeeqs.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
