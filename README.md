@@ -433,10 +433,10 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
 The docker image for the ZeeQS application is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeeqs).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeeqs:2.0.0-snapshot
+docker pull ghcr.io/camunda-community-hub/zeeqs:2.0.0
 ```
  
-* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
+* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 1.0.0)  
 * forward the Hazelcast port to the docker container (default: `5701`)
 * configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
 
@@ -448,7 +448,7 @@ cd docker
 docker-compose up
 ```
 
-* the GraphQL endpoint is available under the port `9000:`
+* the GraphQL endpoint is available under the port `9000`
 
 ### Manual
     
@@ -522,7 +522,7 @@ networks:
 services:
   zeebe:
     container_name: zeebe_broker
-    image: camunda/zeebe:0.23.0
+    image: camunda/zeebe:1.0.0
     environment:
       - ZEEBE_LOG_LEVEL=debug
     ports:
@@ -537,7 +537,7 @@ services:
       
   zeeqs:
     container_name: zeeqs
-    image: camunda/zeeqs:latest
+    image: ghcr.io/camunda-community-hub/zeeqs:2.0.0
     environment:
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
       - spring.datasource.url=jdbc:postgresql://db:5432/postgres
