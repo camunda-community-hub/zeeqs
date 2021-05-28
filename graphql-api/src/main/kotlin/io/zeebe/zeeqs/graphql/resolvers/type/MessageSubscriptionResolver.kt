@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class MessageSubscriptionResolver(
-    val processInstanceRepository: ProcessInstanceRepository,
-    val elementInstanceRepository: ElementInstanceRepository,
-    val processRepository: ProcessRepository,
-    val messageCorrelationRepository: MessageCorrelationRepository
+        val processInstanceRepository: ProcessInstanceRepository,
+        val elementInstanceRepository: ElementInstanceRepository,
+        val processRepository: ProcessRepository,
+        val messageCorrelationRepository: MessageCorrelationRepository
 ) : GraphQLResolver<MessageSubscription> {
 
     fun timestamp(messageSubscription: MessageSubscription, zoneId: String): String? {
@@ -32,6 +32,10 @@ class MessageSubscriptionResolver(
 
     fun process(messageSubscription: MessageSubscription): Process? {
         return messageSubscription.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
+                ?: messageSubscription.processInstanceKey?.let {
+                    processInstanceRepository.findByIdOrNull(it)
+                            ?.processDefinitionKey.let { processRepository.findByIdOrNull(it) }
+                }
     }
 
     fun messageCorrelations(messageSubscription: MessageSubscription): List<MessageCorrelation> {
@@ -40,6 +44,12 @@ class MessageSubscriptionResolver(
                     messageCorrelationRepository.findByMessageNameAndElementInstanceKey(
                             messageName = messageSubscription.messageName,
                             elementInstanceKey = it)
+                }
+                ?: messageSubscription.processDefinitionKey?.let {
+                    messageCorrelationRepository.findByMessageNameAndProcessDefinitionKey(
+                            messageName = messageSubscription.messageName,
+                            processDefinitionKey = it
+                    )
                 }
                 ?: emptyList()
     }

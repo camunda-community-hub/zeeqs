@@ -1,4 +1,4 @@
-package io.zeebe.zeeqs.graphql.resolvers.connection
+package io.zeebe.zeeqs.graphql.resolvers.type
 
 import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.MessageSubscription
@@ -8,7 +8,7 @@ import io.zeebe.zeeqs.data.entity.ProcessInstanceState
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
-import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
+import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
