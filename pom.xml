@@ -25,7 +25,7 @@
   </modules>
 
   <properties>
-    <kotlin.version>1.5.20</kotlin.version>
+    <kotlin.version>1.5.21</kotlin.version>
 
     <zeebe.version>1.1.0</zeebe.version>
 
