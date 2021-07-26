@@ -27,7 +27,7 @@
   <properties>
     <kotlin.version>1.5.20</kotlin.version>
 
-    <zeebe.version>1.1.0</zeebe.version>
+    <zeebe.version>1.1.1</zeebe.version>
 
     <spring.boot.version>2.5.3</spring.boot.version>
 
