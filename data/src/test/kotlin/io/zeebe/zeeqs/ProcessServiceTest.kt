@@ -16,7 +16,7 @@ import java.time.Instant
 
 @SpringBootTest
 @TestConfiguration
-class ProcessServiceTest(
+abstract class ProcessServiceTest(
     @Autowired val processService: ProcessService,
     @Autowired val processRepository: ProcessRepository
 ) {
@@ -43,7 +43,7 @@ class ProcessServiceTest(
                 resourceName = "process.bpmn",
                 checksum = "checksum"
             )
-        );
+        )
 
         // when
         val info = processService.getBpmnElementInfo(processDefinitionKey)
