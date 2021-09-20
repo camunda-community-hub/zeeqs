@@ -43,7 +43,7 @@ class ProcessServiceTest(
                 resourceName = "process.bpmn",
                 checksum = "checksum"
             )
-        );
+        )
 
         // when
         val info = processService.getBpmnElementInfo(processDefinitionKey)

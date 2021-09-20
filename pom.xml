@@ -132,6 +132,11 @@
         <artifactId>junit-jupiter</artifactId>
         <version>${test-container.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${test-container.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.awaitility</groupId>
