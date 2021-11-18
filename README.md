@@ -37,7 +37,7 @@ The API provide the following queries:
 * incidents
 * errors
  
-And additional queries to request a single object by its key (e.g. `process(key: "2251799813685249")`).
+And additional queries to request a single object by its key (e.g. `process(key: 2251799813685249)`).
 
 ### Pagination
 
@@ -415,6 +415,63 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
                 "bpmnProcessId": "demo-process"
               }
             }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+  </p>
+</details>
+
+Get jobs from a specific process instance
+
+```graphql
+{ 
+  processInstance(key: 2251799814310503) { 
+    state 
+    jobs { 
+      key 
+      jobType 
+      elementInstance { 
+        elementId 
+      } 
+    } 
+  } 
+}
+```
+
+<details>
+  <summary>Query Response</summary>
+  <p>
+
+```
+{ 
+  "data": {
+    "processInstance": {
+      "state": "COMPLETED",
+      "jobs": [
+        {
+          "key": "2251799814310522",
+          "jobType": "DMN",
+          "elementInstance": {
+            "elementId": "demo-1"
+          }
+        },
+        {
+          "key": "2251799814310525",
+          "jobType": "DMN",
+          "elementInstance": {
+            "elementId": "demo-2"
+          }
+        },
+        {
+          "key": "2251799814310527",
+          "jobType": "demo-3",
+          "elementInstance": {
+            "elementId": "demo-3"
           }
         }
       ]
