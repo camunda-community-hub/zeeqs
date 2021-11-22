@@ -36,7 +36,7 @@
     <version.hazelcast>5.0</version.hazelcast>
 
     <version.graphql>8.1.1</version.graphql>
-    <version.graphql.tools>6.3.0</version.graphql.tools>
+    <version.graphql.tools>12.0.1</version.graphql.tools>
 
     <zeebe-test-container.version>3.1.0</zeebe-test-container.version>
     <test-container.version>1.16.2</test-container.version>
