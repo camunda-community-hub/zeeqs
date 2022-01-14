@@ -426,6 +426,63 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
   </p>
 </details>
 
+Get jobs from a specific process instance
+
+```graphql
+{ 
+  processInstance(key: "2251799814310503") { 
+    state 
+    jobs { 
+      key 
+      jobType 
+      elementInstance { 
+        elementId 
+      } 
+    } 
+  } 
+}
+```
+
+<details>
+  <summary>Query Response</summary>
+  <p>
+
+```
+{ 
+  "data": {
+    "processInstance": {
+      "state": "COMPLETED",
+      "jobs": [
+        {
+          "key": "2251799814310522",
+          "jobType": "DMN",
+          "elementInstance": {
+            "elementId": "demo-1"
+          }
+        },
+        {
+          "key": "2251799814310525",
+          "jobType": "DMN",
+          "elementInstance": {
+            "elementId": "demo-2"
+          }
+        },
+        {
+          "key": "2251799814310527",
+          "jobType": "demo-3",
+          "elementInstance": {
+            "elementId": "demo-3"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+  </p>
+</details>
+
 ## Install
 
 ### Docker
