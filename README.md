@@ -37,7 +37,7 @@ The API provide the following queries:
 * incidents
 * errors
  
-And additional queries to request a single object by its key (e.g. `process(key: 2251799813685249)`).
+And additional queries to request a single object by its key (e.g. `process(key: "2251799813685249")`).
 
 ### Pagination
 
@@ -430,7 +430,7 @@ Get jobs from a specific process instance
 
 ```graphql
 { 
-  processInstance(key: 2251799814310503) { 
+  processInstance(key: "2251799814310503") { 
     state 
     jobs { 
       key 
