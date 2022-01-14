@@ -490,7 +490,7 @@ Get jobs from a specific process instance
 The docker image for the ZeeQS application is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeeqs).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeeqs:2.0.0
+docker pull ghcr.io/camunda-community-hub/zeeqs:2.1.0
 ```
  
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= 1.0.0)  
@@ -541,7 +541,7 @@ zeebe:
 spring:
 
   datasource:
-    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:zeeqs;DB_CLOSE_DELAY=-1
     username: sa
     password:
     driverClassName: org.h2.Driver
@@ -566,10 +566,6 @@ Using a different database, for example, PostgreSQL:
 - spring.datasource.driverClassName=org.postgresql.Driver
 - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
-
-* add the database driver JAR to the classpath 
-  * using docker, the JAR should be mounted to the `/app/libs/` folder (e.g. `/app/libs/postgresql-42.2.12.jar`)
-
 
 <details>
   <summary>Full docker-compose.yml with PostgreSQL</summary>
@@ -608,8 +604,6 @@ services:
       - spring.datasource.password=zeebe
       - spring.datasource.driverClassName=org.postgresql.Driver
       - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-    volumes:
-      - ./lib/postgresql-42.2.12.jar:/app/libs/postgresql-42.2.12.jar
     ports:
       - "9000:9000"
     depends_on:
