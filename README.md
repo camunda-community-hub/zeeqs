@@ -440,6 +440,12 @@ docker pull ghcr.io/camunda-community-hub/zeeqs:2.0.0
 * forward the Hazelcast port to the docker container (default: `5701`)
 * configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
 
+If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
+
+```
+docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:2.1.0
+```
+
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the ZeeQS application. 
 
 ```
