@@ -42,4 +42,13 @@ class TimerResolver(
         return timer.elementInstanceKey?.let { elementInstanceRepository.findByIdOrNull(it) }
     }
 
+    fun element(timer: Timer): BpmnElement? {
+        return timer.processDefinitionKey?.let {
+            BpmnElement(
+                    processDefinitionKey = it,
+                    elementId = timer.elementId
+            )
+        }
+    }
+
 }

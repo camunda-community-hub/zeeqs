@@ -3,6 +3,7 @@ package io.zeebe.zeeqs.data.resolvers
 import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
+import io.zeebe.zeeqs.graphql.resolvers.type.BpmnElement
 import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
@@ -10,13 +11,13 @@ import org.springframework.stereotype.Component
 
 @Component
 class ElementInstanceResolver(
-    val elementInstanceRepository: ElementInstanceRepository,
-    val processInstanceRepository: ProcessInstanceRepository,
-    val incidentRepository: IncidentRepository,
-    val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
-    val timerRepository: TimerRepository,
-    val processService: ProcessService,
-    val messageSubscriptionRepository: MessageSubscriptionRepository
+        val elementInstanceRepository: ElementInstanceRepository,
+        val processInstanceRepository: ProcessInstanceRepository,
+        val incidentRepository: IncidentRepository,
+        val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
+        val timerRepository: TimerRepository,
+        val processService: ProcessService,
+        val messageSubscriptionRepository: MessageSubscriptionRepository
 ) : GraphQLResolver<ElementInstance> {
 
     fun startTime(elementInstance: ElementInstance, zoneId: String): String? {
@@ -56,6 +57,14 @@ class ElementInstanceResolver(
 
     fun messageSubscriptions(elementInstance: ElementInstance): List<MessageSubscription> {
         return messageSubscriptionRepository.findByElementInstanceKey(elementInstance.key)
+    }
+
+    fun element(elementInstance: ElementInstance): BpmnElement {
+        return BpmnElement(
+                processDefinitionKey = elementInstance.processDefinitionKey,
+                elementId = elementInstance.elementId,
+                elementType = elementInstance.bpmnElementType
+        )
     }
 
 }
