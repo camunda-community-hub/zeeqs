@@ -215,13 +215,14 @@ class HazelcastImporter(
 
     private fun createElementInstance(record: Schema.ProcessInstanceRecord): ElementInstance {
         val bpmnElementType = when (record.bpmnElementType) {
-
+            "UNSPECIFIED" -> BpmnElementType.UNSPECIFIED
             "BOUNDARY_EVENT" -> BpmnElementType.BOUNDARY_EVENT
             "CALL_ACTIVITY" -> BpmnElementType.CALL_ACTIVITY
             "END_EVENT" -> BpmnElementType.END_EVENT
             "EVENT_BASED_GATEWAY" -> BpmnElementType.EVENT_BASED_GATEWAY
             "EXCLUSIVE_GATEWAY" -> BpmnElementType.EXCLUSIVE_GATEWAY
             "INTERMEDIATE_CATCH_EVENT" -> BpmnElementType.INTERMEDIATE_CATCH_EVENT
+            "INTERMEDIATE_THROW_EVENT" -> BpmnElementType.INTERMEDIATE_THROW_EVENT
             "PARALLEL_GATEWAY" -> BpmnElementType.PARALLEL_GATEWAY
             "PROCESS" -> BpmnElementType.PROCESS
             "RECEIVE_TASK" -> BpmnElementType.RECEIVE_TASK
@@ -232,7 +233,11 @@ class HazelcastImporter(
             "EVENT_SUB_PROCESS" -> BpmnElementType.EVENT_SUB_PROCESS
             "MULTI_INSTANCE_BODY" -> BpmnElementType.MULTI_INSTANCE_BODY
             "USER_TASK" -> BpmnElementType.USER_TASK
-            else -> BpmnElementType.UNSPECIFIED
+            "MANUAL_TASK" -> BpmnElementType.MANUAL_TASK
+            "BUSINESS_RULE_TASK" -> BpmnElementType.BUSINESS_RULE_TASK
+            "SCRIPT_TASK" -> BpmnElementType.SCRIPT_TASK
+            "SEND_TASK" -> BpmnElementType.SEND_TASK
+            else -> BpmnElementType.UNKNOWN
         }
 
         return ElementInstance(
