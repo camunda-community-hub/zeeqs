@@ -435,6 +435,7 @@ class HazelcastImporter(
             position = record.metadata.position,
             dueDate = record.dueDate,
             repetitions = record.repetitions,
+            elementId = record.targetElementId,
             processDefinitionKey = record.processDefinitionKey.takeIf { it > 0 },
             processInstanceKey = record.processInstanceKey.takeIf { it > 0 },
             elementInstanceKey = record.elementInstanceKey.takeIf { it > 0 }
