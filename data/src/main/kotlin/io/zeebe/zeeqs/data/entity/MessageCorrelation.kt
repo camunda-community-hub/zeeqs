@@ -5,7 +5,7 @@ import javax.persistence.Id
 
 @Entity
 class MessageCorrelation(
-        @Id val position: Long,
+        @Id val partitionIdWithPosition: String,
         val messageKey: Long,
         val messageName: String,
         val timestamp: Long,

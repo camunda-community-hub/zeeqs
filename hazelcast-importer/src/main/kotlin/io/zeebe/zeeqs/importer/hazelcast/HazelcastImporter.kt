@@ -11,6 +11,7 @@ import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
 import java.time.Duration
+import javax.persistence.Id
 
 
 @Component
@@ -125,6 +126,9 @@ class HazelcastImporter(
     fun stop() {
         zeebeHazelcast?.close()
     }
+
+    private fun getPartitionIdWithPosition(metadata: Schema.RecordMetadata) =
+            "${metadata.partitionId}-${metadata.position}"
 
     private fun importProcess(process: Schema.ProcessRecord) {
         val entity = processRepository
@@ -272,7 +276,7 @@ class HazelcastImporter(
             .findById(record.metadata.position)
             .orElse(
                 ElementInstanceStateTransition(
-                    position = record.metadata.position,
+                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
                     elementInstanceKey = record.metadata.key,
                     timestamp = record.metadata.timestamp,
                     state = state
@@ -317,7 +321,7 @@ class HazelcastImporter(
             .findById(record.metadata.position)
             .orElse(
                 VariableUpdate(
-                    position = record.metadata.position,
+                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
                     variableKey = record.metadata.key,
                     name = record.name,
                     value = record.value,
@@ -588,7 +592,7 @@ class HazelcastImporter(
             .findById(record.metadata.position)
             .orElse(
                 MessageCorrelation(
-                    position = record.metadata.position,
+                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
                     messageKey = record.messageKey,
                     messageName = record.messageName,
                     elementInstanceKey = record.elementInstanceKey,
@@ -608,7 +612,7 @@ class HazelcastImporter(
             .findById(record.metadata.position)
             .orElse(
                 MessageCorrelation(
-                    position = record.metadata.position,
+                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
                     messageKey = record.messageKey,
                     messageName = record.messageName,
                     elementInstanceKey = null,
