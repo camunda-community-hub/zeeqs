@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface VariableUpdateRepository : PagingAndSortingRepository<VariableUpdate, Long> {
+interface VariableUpdateRepository : PagingAndSortingRepository<VariableUpdate, String> {
 
     @Transactional(readOnly = true)
     fun findByProcessInstanceKey(processInstanceKey: Long): List<VariableUpdate>

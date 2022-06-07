@@ -272,11 +272,12 @@ class HazelcastImporter(
 
         val state = getElementInstanceState(record)
 
+        val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = elementInstanceStateTransitionRepository
-            .findById(record.metadata.position)
+            .findById(partitionIdWithPosition)
             .orElse(
                 ElementInstanceStateTransition(
-                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
+                    partitionIdWithPosition = partitionIdWithPosition,
                     elementInstanceKey = record.metadata.key,
                     timestamp = record.metadata.timestamp,
                     state = state
@@ -317,11 +318,12 @@ class HazelcastImporter(
 
     private fun importVariableUpdate(record: Schema.VariableRecord) {
 
+        val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = variableUpdateRepository
-            .findById(record.metadata.position)
+            .findById(partitionIdWithPosition)
             .orElse(
                 VariableUpdate(
-                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
+                    partitionIdWithPosition = partitionIdWithPosition,
                     variableKey = record.metadata.key,
                     name = record.name,
                     value = record.value,
@@ -588,11 +590,12 @@ class HazelcastImporter(
 
     private fun importMessageCorrelation(record: Schema.ProcessMessageSubscriptionRecord) {
 
+        val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = messageCorrelationRepository
-            .findById(record.metadata.position)
+            .findById(partitionIdWithPosition)
             .orElse(
                 MessageCorrelation(
-                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
+                    partitionIdWithPosition = partitionIdWithPosition,
                     messageKey = record.messageKey,
                     messageName = record.messageName,
                     elementInstanceKey = record.elementInstanceKey,
@@ -608,11 +611,12 @@ class HazelcastImporter(
 
     private fun importMessageCorrelation(record: Schema.MessageStartEventSubscriptionRecord) {
 
+        val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = messageCorrelationRepository
-            .findById(record.metadata.position)
+            .findById(partitionIdWithPosition)
             .orElse(
                 MessageCorrelation(
-                    partitionIdWithPosition = getPartitionIdWithPosition(record.metadata),
+                    partitionIdWithPosition = partitionIdWithPosition,
                     messageKey = record.messageKey,
                     messageName = record.messageName,
                     elementInstanceKey = null,
