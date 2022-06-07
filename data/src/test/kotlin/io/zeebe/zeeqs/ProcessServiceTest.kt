@@ -1,6 +1,7 @@
 package io.zeebe.zeeqs
 
 import io.camunda.zeebe.model.bpmn.Bpmn
+import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
@@ -51,9 +52,9 @@ class ProcessServiceTest(
         // then
         assertThat(info)
                 .isNotNull()
-                .contains(entry("s", BpmnElementInfo("s", "start")))
-                .contains(entry("t", BpmnElementInfo("t", "task")))
-                .contains(entry("e", BpmnElementInfo("e", null)))
+                .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT)))
+                .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK)))
+                .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT)))
     }
 
     @Test
