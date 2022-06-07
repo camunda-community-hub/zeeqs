@@ -48,3 +48,8 @@ enum ElementInstanceState {
     TAKEN
 }
 
+type ElementInstanceConnection {
+    totalCount: Int!
+    nodes: [ElementInstance!]!
+}
+

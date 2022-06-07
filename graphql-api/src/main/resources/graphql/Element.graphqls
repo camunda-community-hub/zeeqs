@@ -9,6 +9,11 @@ type BpmnElement {
 
     # the process that contains the BPMN element
     process: Process
+    # the instances of the BPMN element
+    elementInstances(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [ElementInstanceState] = [ACTIVATING, ACTIVATED, COMPLETING, COMPLETED, TERMINATING, TERMINATED, TAKEN]): ElementInstanceConnection!
 }
 
 # The type of a BPMN element.
