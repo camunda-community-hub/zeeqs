@@ -21,6 +21,8 @@ type MessageCorrelation {
     messageSubscription: MessageSubscription
     message: Message
     timestamp(zoneId: String = "Z"): String
+    # the process instance that belong to the message subscription
+    processInstance: ProcessInstance
 }
 
 enum MessageSubscriptionState {
