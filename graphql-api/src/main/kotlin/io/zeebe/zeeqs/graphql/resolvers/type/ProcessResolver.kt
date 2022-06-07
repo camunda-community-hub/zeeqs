@@ -8,6 +8,7 @@ import io.zeebe.zeeqs.data.entity.ProcessInstanceState
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
+import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Component
 class ProcessResolver(
     val processInstanceRepository: ProcessInstanceRepository,
     val timerRepository: TimerRepository,
-    val messageSubscriptionRepository: MessageSubscriptionRepository
+    val messageSubscriptionRepository: MessageSubscriptionRepository,
+    val processService: ProcessService
 ) : GraphQLResolver<Process> {
 
     fun processInstances(process: Process, perPage: Int, page: Int, stateIn: List<ProcessInstanceState>): ProcessInstanceConnection {
@@ -36,6 +38,20 @@ class ProcessResolver(
 
     fun messageSubscriptions(process: Process): List<MessageSubscription> {
         return messageSubscriptionRepository.findByProcessDefinitionKey(process.key)
+    }
+
+    fun elements(process: Process): List<BpmnElement> {
+        return processService
+                .getBpmnElementInfo(process.key)
+                ?.values
+                ?.map {
+                    BpmnElement(
+                            processDefinitionKey = process.key,
+                            elementId = it.elementId,
+                            elementType = it.elementType
+                    )
+                }
+                ?: emptyList()
     }
 
 }
