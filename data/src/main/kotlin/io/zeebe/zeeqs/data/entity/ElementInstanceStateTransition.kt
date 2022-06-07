@@ -7,7 +7,7 @@ import javax.persistence.EnumType
 
 @Entity
 class ElementInstanceStateTransition(
-        @Id val position: Long,
+        @Id val partitionIdWithPosition: String,
         val elementInstanceKey: Long,
         @Enumerated(EnumType.STRING)
         val state: ElementInstanceState,

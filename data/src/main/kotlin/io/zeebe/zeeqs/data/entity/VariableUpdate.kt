@@ -6,7 +6,7 @@ import javax.persistence.Lob
 
 @Entity
 class VariableUpdate(
-    @Id val position: Long,
+    @Id val partitionIdWithPosition: String,
     val variableKey: Long,
     val name: String,
     @Lob val value: String,
