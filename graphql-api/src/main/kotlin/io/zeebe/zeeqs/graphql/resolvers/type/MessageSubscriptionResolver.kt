@@ -6,6 +6,7 @@ import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.MessageCorrelationRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
+import io.zeebe.zeeqs.graphql.resolvers.type.BpmnElement
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -52,6 +53,17 @@ class MessageSubscriptionResolver(
                     )
                 }
                 ?: emptyList()
+    }
+
+    fun element(messageSubscription: MessageSubscription): BpmnElement? {
+        return messageSubscription.processDefinitionKey?.let { processDefinitionKey ->
+            messageSubscription.elementId?.let { elementId ->
+                BpmnElement(
+                        processDefinitionKey = processDefinitionKey,
+                        elementId = elementId
+                )
+            }
+        }
     }
 
 }

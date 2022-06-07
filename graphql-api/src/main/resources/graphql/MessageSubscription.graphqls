@@ -13,6 +13,8 @@ type MessageSubscription {
     timestamp(zoneId: String = "Z"): String
 
     messageCorrelations: [MessageCorrelation!]
+    # the BPMN element that belong to the message subscription
+    element: BpmnElement
 }
 
 type MessageCorrelation {

@@ -12,11 +12,11 @@ import javax.annotation.PostConstruct
 @SpringBootApplication
 @EnableCaching
 @EnableConfigurationProperties(HazelcastProperties::class)
-class ZeeqlApplication(
+class ZeeqsApplication(
         val hazelcastProperties: HazelcastProperties,
         val hazelcastImporter: HazelcastImporter
 ) {
-    val logger = LoggerFactory.getLogger(ZeeqlApplication::class.java)
+    val logger = LoggerFactory.getLogger(ZeeqsApplication::class.java)
 
     @PostConstruct
     fun init() {
@@ -27,5 +27,5 @@ class ZeeqlApplication(
 }
 
 fun main(args: Array<String>) {
-    runApplication<ZeeqlApplication>(*args)
+    runApplication<ZeeqsApplication>(*args)
 }
