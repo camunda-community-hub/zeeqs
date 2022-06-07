@@ -5,7 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ElementInstanceStateTransitionRepository : PagingAndSortingRepository<ElementInstanceStateTransition, Long> {
+interface ElementInstanceStateTransitionRepository : PagingAndSortingRepository<ElementInstanceStateTransition, String> {
 
     fun findByElementInstanceKey(elementInstanceKey: Long): List<ElementInstanceStateTransition>
 }

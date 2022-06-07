@@ -5,7 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MessageCorrelationRepository : PagingAndSortingRepository<MessageCorrelation, Long> {
+interface MessageCorrelationRepository : PagingAndSortingRepository<MessageCorrelation, String> {
 
     fun findByMessageNameAndElementInstanceKey(messageName: String, elementInstanceKey: Long): List<MessageCorrelation>
 

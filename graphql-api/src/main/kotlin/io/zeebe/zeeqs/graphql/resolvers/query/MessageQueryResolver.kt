@@ -2,6 +2,7 @@ package io.zeebe.zeeqs.data.resolvers
 
 import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Message
+import io.zeebe.zeeqs.data.entity.MessageState
 import io.zeebe.zeeqs.data.repository.MessageRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.MessageConnection
 import org.springframework.data.domain.PageRequest
@@ -13,10 +14,19 @@ class MessageQueryResolver(
         val messageRepository: MessageRepository
 ) : GraphQLQueryResolver {
 
-    fun messages(perPage: Int, page: Int): MessageConnection {
+    fun messages(perPage: Int, page: Int, stateIn: List<MessageState>): MessageConnection {
         return MessageConnection(
-                getItems = { messageRepository.findAll(PageRequest.of(page, perPage)).toList() },
-                getCount = { messageRepository.count() }
+                getItems = {
+                    messageRepository.findByStateIn(
+                            stateIn = stateIn,
+                            pageable = PageRequest.of(page, perPage)
+                    )
+                },
+                getCount = {
+                    messageRepository.countByStateIn(
+                            stateIn = stateIn
+                    )
+                }
         )
     }
 

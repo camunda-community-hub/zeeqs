@@ -34,5 +34,7 @@ extend type Query {
 
     messages(
         perPage: Int = 10,
-        page: Int = 0): MessageConnection!
+        page: Int = 0,
+        stateIn: [MessageState] = [PUBLISHED, EXPIRED]
+    ): MessageConnection!
 }
