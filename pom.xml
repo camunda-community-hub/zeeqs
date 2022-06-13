@@ -31,7 +31,7 @@
 
     <spring.boot.version>2.6.7</spring.boot.version>
 
-    <hazelcast.exporter.version>1.1.0</hazelcast.exporter.version>
+    <hazelcast.exporter.version>1.2.0</hazelcast.exporter.version>
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
     <version.hazelcast>5.1.1</version.hazelcast>
 
