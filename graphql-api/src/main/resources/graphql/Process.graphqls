@@ -20,6 +20,8 @@ type Process {
     messageSubscriptions: [MessageSubscription!]
     # all BPMN elements of the process
     elements: [BpmnElement!]
+    # BPMN element of the process by its id
+    element(elementId: String): BpmnElement
 }
 
 type ProcessConnection {
