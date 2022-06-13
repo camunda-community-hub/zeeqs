@@ -26,8 +26,11 @@ type MessageCorrelation {
 }
 
 enum MessageSubscriptionState {
+    CREATING
     CREATED
+    CORRELATING
     CORRELATED
+    REJECTED
     DELETED
 }
 
