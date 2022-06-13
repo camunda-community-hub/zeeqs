@@ -99,10 +99,6 @@ class HazelcastImporter(
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
                     ?.let(this::importMessageRecord)
             }
-            .addMessageSubscriptionListener {
-                it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                    ?.let(this::importMessageSubscriptionRecord)
-            }
             .addMessageStartEventSubscriptionListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
                     ?.let(this::importMessageStartEventSubscriptionRecord)
@@ -519,37 +515,6 @@ class HazelcastImporter(
         }
     }
 
-    private fun importMessageSubscriptionRecord(record: Schema.MessageSubscriptionRecord) {
-        val entity = messageSubscriptionRepository
-            .findById(record.metadata.key)
-            .orElse(createMessageSubscription(record))
-
-        when (record.metadata.intent) {
-            "CREATED" -> entity.state = MessageSubscriptionState.CREATED
-            "CORRELATING" -> entity.state = MessageSubscriptionState.CORRELATING
-            "CORRELATED" -> entity.state = MessageSubscriptionState.CORRELATED
-            "REJECTED" -> entity.state = MessageSubscriptionState.REJECTED
-            "DELETED" -> entity.state = MessageSubscriptionState.DELETED
-        }
-
-        entity.timestamp = record.metadata.timestamp
-
-        messageSubscriptionRepository.save(entity)
-    }
-
-    private fun createMessageSubscription(record: Schema.MessageSubscriptionRecord): MessageSubscription {
-        return MessageSubscription(
-            key = record.metadata.key,
-            position = record.metadata.position,
-            messageName = record.messageName,
-            messageCorrelationKey = record.correlationKey,
-            processInstanceKey = record.processInstanceKey,
-            elementInstanceKey = record.elementInstanceKey,
-            elementId = null,
-            processDefinitionKey = null
-        );
-    }
-
     private fun importMessageStartEventSubscriptionRecord(record: Schema.MessageStartEventSubscriptionRecord) {
         val entity = messageSubscriptionRepository
             .findById(record.metadata.key)
@@ -583,9 +548,39 @@ class HazelcastImporter(
     }
 
     private fun importProcessMessageSubscriptionRecord(record: Schema.ProcessMessageSubscriptionRecord) {
+        val entity = messageSubscriptionRepository
+                .findById(record.metadata.key)
+                .orElse(createMessageSubscription(record))
+
         when (record.metadata.intent) {
-            "CORRELATED" -> importMessageCorrelation(record)
+            "CREATING" -> entity.state = MessageSubscriptionState.CREATING
+            "CREATED" -> entity.state = MessageSubscriptionState.CREATED
+            "CORRELATING" -> entity.state = MessageSubscriptionState.CORRELATING
+            "CORRELATED" -> {
+                entity.state = MessageSubscriptionState.CORRELATED
+
+                importMessageCorrelation(record)
+            }
+            "REJECTED" -> entity.state = MessageSubscriptionState.REJECTED
+            "DELETED" -> entity.state = MessageSubscriptionState.DELETED
         }
+
+        entity.timestamp = record.metadata.timestamp
+
+        messageSubscriptionRepository.save(entity)
+    }
+
+    private fun createMessageSubscription(record: Schema.ProcessMessageSubscriptionRecord): MessageSubscription {
+        return MessageSubscription(
+                key = record.metadata.key,
+                position = record.metadata.position,
+                messageName = record.messageName,
+                messageCorrelationKey = record.correlationKey,
+                processInstanceKey = record.processInstanceKey,
+                elementInstanceKey = record.elementInstanceKey,
+                elementId = record.elementId,
+                processDefinitionKey = null
+        );
     }
 
     private fun importMessageCorrelation(record: Schema.ProcessMessageSubscriptionRecord) {
