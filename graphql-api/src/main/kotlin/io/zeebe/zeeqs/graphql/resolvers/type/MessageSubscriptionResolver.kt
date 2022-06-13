@@ -56,7 +56,12 @@ class MessageSubscriptionResolver(
     }
 
     fun element(messageSubscription: MessageSubscription): BpmnElement? {
-        return messageSubscription.processDefinitionKey?.let { processDefinitionKey ->
+        val processDefinitionKeyOfSubscription = messageSubscription.processDefinitionKey
+                ?: processInstanceRepository
+                        .findByIdOrNull(messageSubscription.processInstanceKey)
+                        ?.processDefinitionKey
+
+        return processDefinitionKeyOfSubscription?.let { processDefinitionKey ->
             messageSubscription.elementId?.let { elementId ->
                 BpmnElement(
                         processDefinitionKey = processDefinitionKey,
