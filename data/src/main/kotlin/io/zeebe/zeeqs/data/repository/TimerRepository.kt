@@ -9,7 +9,7 @@ interface TimerRepository : PagingAndSortingRepository<Timer, Long> {
 
     fun findByProcessInstanceKey(processInstanceKey: Long): List<Timer>
 
-    fun findByProcessDefinitionKey(processDefinitionKey: Long): List<Timer>
+    fun findByProcessDefinitionKeyAndElementInstanceKeyIsNull(processDefinitionKey: Long): List<Timer>
 
     fun findByElementInstanceKey(elementInstanceKey: Long): List<Timer>
 
