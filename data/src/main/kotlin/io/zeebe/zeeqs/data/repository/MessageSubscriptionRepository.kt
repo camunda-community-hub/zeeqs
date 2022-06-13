@@ -11,7 +11,7 @@ interface MessageSubscriptionRepository : PagingAndSortingRepository<MessageSubs
 
     fun findByElementInstanceKey(elementInstanceKey: Long): List<MessageSubscription>
 
-    fun findByProcessDefinitionKey(processDefinitionKey: Long): List<MessageSubscription>
+    fun findByProcessDefinitionKeyAndElementInstanceKeyIsNull(processDefinitionKey: Long): List<MessageSubscription>
 
     fun findByElementInstanceKeyAndMessageName(elementInstanceKey: Long, messageName: String): MessageSubscription?
 

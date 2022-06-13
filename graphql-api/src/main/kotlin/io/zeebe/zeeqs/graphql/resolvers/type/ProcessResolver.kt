@@ -33,11 +33,11 @@ class ProcessResolver(
     }
 
     fun timers(process: Process): List<Timer> {
-        return timerRepository.findByProcessDefinitionKey(process.key)
+        return timerRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(process.key)
     }
 
     fun messageSubscriptions(process: Process): List<MessageSubscription> {
-        return messageSubscriptionRepository.findByProcessDefinitionKey(process.key)
+        return messageSubscriptionRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(process.key)
     }
 
     fun elements(process: Process): List<BpmnElement> {
