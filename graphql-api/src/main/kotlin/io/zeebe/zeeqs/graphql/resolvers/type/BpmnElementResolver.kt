@@ -5,6 +5,8 @@ import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
+import io.zeebe.zeeqs.data.service.BpmnElementMetadata
+import io.zeebe.zeeqs.data.service.MessageSubscriptionDefinition
 import io.zeebe.zeeqs.graphql.resolvers.type.BpmnElement
 import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ElementInstanceConnection
@@ -27,6 +29,10 @@ class BpmnElementResolver(
         return element.elementType
                 ?: findElementInfo(element)?.elementType
                 ?: BpmnElementType.UNKNOWN
+    }
+
+    fun metadata(element: BpmnElement): BpmnElementMetadata? {
+        return findElementInfo(element)?.metadata
     }
 
     fun process(element: BpmnElement): Process? {

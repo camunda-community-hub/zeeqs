@@ -7,6 +7,9 @@ type BpmnElement {
     # the type of the BPMN element
     bpmnElementType: BpmnElementType!
 
+    # the metadata of the BPMN element
+    metadata: BpmnElementMetadata!
+
     # the process that contains the BPMN element
     process: Process
     # the instances of the BPMN element
@@ -42,4 +45,28 @@ enum BpmnElementType {
     BUSINESS_RULE_TASK
     SCRIPT_TASK
     SEND_TASK
+}
+
+# Additional metadata that are defined statically on the BPMN element.
+type BpmnElementMetadata {
+    # the job type if the element is implemented as a job worker
+    jobType: String
+    # the condition expression if the element is a sequence flow with condition
+    conditionExpression: String
+    # the definition of the timer if the element is a timer catch event
+    timerDefinition: String
+    # the error code if the element is an error catch event
+    errorCode: String
+    # the id of the process that is called if the element is a call activity
+    calledProcessId: String
+    # the definition of the message subscription if the element is a message catch event
+    messageSubscriptionDefinition: MessageSubscriptionDefinition
+}
+
+# The definition of a message subscription from a BPMN element.
+type MessageSubscriptionDefinition {
+    # the name of the message
+    messageName: String
+    # the correlation key of a message
+    messageCorrelationKey: String
 }

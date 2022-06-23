@@ -5,6 +5,7 @@ import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
+import io.zeebe.zeeqs.data.service.BpmnElementMetadata
 import io.zeebe.zeeqs.data.service.ProcessService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
@@ -52,9 +53,9 @@ class ProcessServiceTest(
         // then
         assertThat(info)
                 .isNotNull()
-                .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT)))
-                .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK)))
-                .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT)))
+                .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT, BpmnElementMetadata())))
+                .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK, BpmnElementMetadata(jobType = "test"))))
+                .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT, BpmnElementMetadata())))
     }
 
     @Test

@@ -3,11 +3,18 @@ package io.zeebe.zeeqs.data.service
 import io.camunda.zeebe.model.bpmn.Bpmn
 import io.camunda.zeebe.model.bpmn.BpmnModelInstance
 import io.camunda.zeebe.model.bpmn.impl.BpmnModelConstants
+import io.camunda.zeebe.model.bpmn.instance.CatchEvent
+import io.camunda.zeebe.model.bpmn.instance.ErrorEventDefinition
 import io.camunda.zeebe.model.bpmn.instance.FlowElement
+import io.camunda.zeebe.model.bpmn.instance.MessageEventDefinition
+import io.camunda.zeebe.model.bpmn.instance.SequenceFlow
 import io.camunda.zeebe.model.bpmn.instance.SubProcess
+import io.camunda.zeebe.model.bpmn.instance.TimerEventDefinition
+import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeCalledElement
+import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeSubscription
+import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition
 import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.repository.ProcessRepository
-import org.camunda.bpm.model.xml.type.ModelElementType
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -19,11 +26,12 @@ class ProcessService(val processRepository: ProcessRepository) {
     fun getBpmnElementInfo(processDefinitionKey: Long): Map<String, BpmnElementInfo>? {
         return getBpmnModel(processDefinitionKey)
                 ?.let { it.getModelElementsByType(FlowElement::class.java) }
-                ?.map {
-                    Pair(it.id, BpmnElementInfo(
-                            elementId = it.id,
-                            elementName = it.name,
-                            elementType = getBpmnElementType(it)
+                ?.map { flowElement ->
+                    Pair(flowElement.id, BpmnElementInfo(
+                            elementId = flowElement.id,
+                            elementName = flowElement.name,
+                            elementType = getBpmnElementType(flowElement),
+                            metadata = getMetadata(flowElement)
                     ))
                 }
                 ?.toMap()
@@ -71,4 +79,50 @@ class ProcessService(val processRepository: ProcessRepository) {
             } else {
                 BpmnElementType.UNKNOWN
             }
+
+    private fun getMetadata(element: FlowElement): BpmnElementMetadata {
+        return BpmnElementMetadata(
+                jobType = element
+                        .getSingleExtensionElement(ZeebeTaskDefinition::class.java)
+                        ?.type,
+                conditionExpression = when (element) {
+                    is SequenceFlow -> element.conditionExpression?.textContent
+                    else -> null
+                },
+                timerDefinition = when (element) {
+                    is CatchEvent -> element.eventDefinitions
+                            ?.filterIsInstance(TimerEventDefinition::class.java)
+                            ?.firstOrNull()
+                            ?.let { it.timeCycle ?: it.timeDate ?: it.timeDuration }
+                            ?.textContent
+                    else -> null
+                },
+                errorCode = when (element) {
+                    is CatchEvent -> element.eventDefinitions
+                            ?.filterIsInstance(ErrorEventDefinition::class.java)
+                            ?.firstOrNull()
+                            ?.error
+                            ?.errorCode
+                    else -> null
+                },
+                calledProcessId = element
+                        .getSingleExtensionElement(ZeebeCalledElement::class.java)
+                        ?.processId,
+                messageSubscriptionDefinition = when (element) {
+                    is CatchEvent -> element.eventDefinitions
+                            ?.filterIsInstance(MessageEventDefinition::class.java)
+                            ?.firstOrNull()
+                            ?.message
+                            ?.let {
+                                MessageSubscriptionDefinition(
+                                        messageName = it.name,
+                                        messageCorrelationKey = it
+                                                .getSingleExtensionElement(ZeebeSubscription::class.java)
+                                                ?.correlationKey
+                                )
+                            }
+                    else -> null
+                }
+        )
+    }
 }
