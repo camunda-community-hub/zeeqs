@@ -142,7 +142,7 @@ class HazelcastImporter(
             bpmnXML = process.resource.toStringUtf8(),
             deployTime = process.metadata.timestamp,
             resourceName = process.resourceName,
-            checksum = process.checksum
+            checksum = process.checksum.toStringUtf8()
         )
     }
 
