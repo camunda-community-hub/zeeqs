@@ -12,4 +12,4 @@ data class Process(
         @Lob val bpmnXML: String,
         val deployTime: Long,
         val resourceName: String,
-        val checksum: String)
+        @Lob val checksum: String)
