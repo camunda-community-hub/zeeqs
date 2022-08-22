@@ -491,7 +491,7 @@ Get jobs from a specific process instance
 The docker image for the ZeeQS application is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeeqs).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeeqs:2.1.0
+docker pull ghcr.io/camunda-community-hub/zeeqs:2.3.1
 ```
  
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= 1.0.0)  
@@ -501,7 +501,7 @@ docker pull ghcr.io/camunda-community-hub/zeeqs:2.1.0
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
 ```
-docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:2.1.0
+docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:2.3.1
 ```
 
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the ZeeQS application. 
@@ -509,10 +509,16 @@ For a local setup, the repository contains a [docker-compose file](docker/docker
 ```
 mvn clean install -DskipTests
 cd docker
-docker-compose up
+docker-compose --profile in-memory up
 ```
 
 * the GraphQL endpoint is available under the port `9000`
+
+To use PostgreSQL instead of the in-memory database, use the profile `postgres`.
+
+```
+docker-compose --profile postgres up
+```
 
 ### Manual
     
