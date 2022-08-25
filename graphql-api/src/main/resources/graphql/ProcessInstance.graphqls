@@ -34,6 +34,8 @@ type ProcessInstance {
     timers: [Timer!]
     # the opened message subscriptions related to the process instance (e.g. message catch events)
     messageSubscriptions: [MessageSubscription!]
+    # the occurred error related to the process instance
+    error: Error
 }
 
 enum ProcessInstanceState {

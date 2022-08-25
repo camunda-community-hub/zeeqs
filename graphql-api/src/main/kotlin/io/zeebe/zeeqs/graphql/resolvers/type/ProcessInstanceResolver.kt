@@ -16,7 +16,8 @@ class ProcessInstanceResolver(
     val incidentRepository: IncidentRepository,
     val elementInstanceRepository: ElementInstanceRepository,
     val timerRepository: TimerRepository,
-    val messageSubscriptionRepository: MessageSubscriptionRepository
+    val messageSubscriptionRepository: MessageSubscriptionRepository,
+    val errorRepository: ErrorRepository
 ) : GraphQLResolver<ProcessInstance> {
 
     fun startTime(processInstance: ProcessInstance, zoneId: String): String? {
@@ -75,6 +76,10 @@ class ProcessInstanceResolver(
 
     fun messageSubscriptions(processInstance: ProcessInstance): List<MessageSubscription> {
         return messageSubscriptionRepository.findByProcessInstanceKey(processInstance.key)
+    }
+
+    fun error(processInstance: ProcessInstance): Error? {
+        return errorRepository.findByProcessInstanceKey(processInstance.key)
     }
 
 }

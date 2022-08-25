@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ErrorRepository: PagingAndSortingRepository<Error, Long> {
+
+    fun findByProcessInstanceKey(processInstanceKey: Long): Error?
+
 }
