@@ -22,12 +22,12 @@ services:
 
   zeeqs-in-memory:
     container_name: zeeqs-in-memory
-    image: ghcr.io/camunda-community-hub/zeeqs:2.3.1
+    image: ghcr.io/camunda-community-hub/zeeqs:2.4.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
     ports:
-      - "8082:8082"
+      - "9000:9000"
     depends_on:
       - zeebe
     networks:
@@ -37,7 +37,7 @@ services:
 
   zeeqs-postgres:
     container_name: zeeqs-postgres
-    image: ghcr.io/camunda-community-hub/zeeqs:2.3.1
+    image: ghcr.io/camunda-community-hub/zeeqs:2.4.0
     environment:
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
       - spring.datasource.url=jdbc:postgresql://postgres-zeeqs:5432/postgres
