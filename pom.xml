@@ -52,6 +52,7 @@
     <!-- disable jdk8 javadoc checks on release build -->
     <additionalparam>-Xdoclint:none</additionalparam>
 
+    <jib-maven-plugin.version>3.3.0</jib-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -300,6 +301,22 @@
       </plugin>
 
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>${jib-maven-plugin.version}</version>
+          <configuration>
+            <to>
+              <image>ghcr.io/camunda-community-hub/zeeqs</image>
+              <tags>${project.version}</tags>
+            </to>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <profiles>
