@@ -102,7 +102,7 @@ pipeline {
         container('maven') {
           configFileProvider([configFile(fileId: 'maven-nexus-settings-zeebe', variable: 'MAVEN_SETTINGS_XML')]) {
               sshagent(['camunda-jenkins-github-ssh']) {
-                  sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION} -Djib.to.auth.username=${DOCKER_HUB_USR} -Djib.to.auth.password=${DOCKER_HUB_PSW}'
+                  sh 'mvn -pl app jib:build -Djib.to.tags=latest,${RELEASE_VERSION} -Djib.to.auth.username=${DOCKER_HUB_USR} -Djib.to.auth.password=${DOCKER_HUB_PSW} -P-jib-local,jib-multiplatform'
              }
           }
         }

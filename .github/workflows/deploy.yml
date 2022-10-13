@@ -36,7 +36,7 @@ jobs:
       uses: camunda-community-hub/community-action-maven-release@a9e964bf56978eef9bca81551cecceebb246a8e5 # pin@v1
       with:
         release-version: ${{ github.event.release.tag_name }}
-        release-profile: community-action-maven-release
+        release-profile: community-action-maven-release,-jib-local,jib-multiplatform
         nexus-usr: ${{ secrets.NEXUS_USR }}
         nexus-psw: ${{ secrets.NEXUS_PSW }}
         maven-usr: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_USR }}
