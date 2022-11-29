@@ -6,5 +6,7 @@ data class BpmnElementMetadata(
         val timerDefinition: String? = null,
         val errorCode: String? = null,
         val calledProcessId: String? = null,
-        val messageSubscriptionDefinition: MessageSubscriptionDefinition? = null
+        val messageSubscriptionDefinition: MessageSubscriptionDefinition? = null,
+        val assignee : String? = null,
+        val candidateGroups : String? = null
 )

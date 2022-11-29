@@ -32,6 +32,8 @@ class ProcessServiceTest(
                 .startEvent("s").name("start")
                 .serviceTask("t").name("task")
                 .zeebeJobType("test")
+                .userTask("u").name("userTask")
+                .zeebeAssignee("user1").zeebeCandidateGroups("group1")
                 .endEvent("e").name("")
                 .done()
 
@@ -55,6 +57,7 @@ class ProcessServiceTest(
                 .isNotNull()
                 .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT, BpmnElementMetadata())))
                 .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK, BpmnElementMetadata(jobType = "test"))))
+                .contains(entry("u", BpmnElementInfo("u", "userTask", BpmnElementType.USER_TASK, BpmnElementMetadata(assignee = "user1", candidateGroups = "group1"))))
                 .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT, BpmnElementMetadata())))
     }
 
