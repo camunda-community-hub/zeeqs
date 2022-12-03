@@ -90,6 +90,7 @@ class ProcessService(val processRepository: ProcessRepository) {
                             ?.firstOrNull()
                             ?.let { it.timeCycle ?: it.timeDate ?: it.timeDuration }
                             ?.textContent
+
                     else -> null
                 },
                 errorCode = when (element) {
@@ -98,6 +99,7 @@ class ProcessService(val processRepository: ProcessRepository) {
                             ?.firstOrNull()
                             ?.error
                             ?.errorCode
+
                     else -> null
                 },
                 calledProcessId = element
@@ -116,14 +118,17 @@ class ProcessService(val processRepository: ProcessRepository) {
                                                 ?.correlationKey
                                 )
                             }
+
                     else -> null
                 },
-                assignee = element
+                userTaskAssignmentDefinition = element
                         .getSingleExtensionElement(ZeebeAssignmentDefinition::class.java)
-                        ?.assignee,
-                candidateGroups = element
-                        .getSingleExtensionElement(ZeebeAssignmentDefinition::class.java)
-                        ?.candidateGroups
+                        ?.let {
+                            UserTaskAssignmentDefinition(
+                                    assignee = it.assignee,
+                                    candidateGroups = it.candidateGroups
+                            )
+                        }
         )
     }
 }
