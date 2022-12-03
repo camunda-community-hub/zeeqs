@@ -7,6 +7,7 @@ import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
 import io.zeebe.zeeqs.data.service.BpmnElementMetadata
 import io.zeebe.zeeqs.data.service.ProcessService
+import io.zeebe.zeeqs.data.service.UserTaskAssignmentDefinition
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test
@@ -19,8 +20,8 @@ import java.time.Instant
 @SpringBootTest
 @TestConfiguration
 class ProcessServiceTest(
-    @Autowired val processService: ProcessService,
-    @Autowired val processRepository: ProcessRepository
+        @Autowired val processService: ProcessService,
+        @Autowired val processRepository: ProcessRepository
 ) {
 
     @Test
@@ -38,15 +39,15 @@ class ProcessServiceTest(
                 .done()
 
         processRepository.save(
-            Process(
-                key = processDefinitionKey,
-                bpmnProcessId = "process",
-                version = 1,
-                bpmnXML = Bpmn.convertToString(bpmn),
-                deployTime = Instant.now().toEpochMilli(),
-                resourceName = "process.bpmn",
-                checksum = "checksum"
-            )
+                Process(
+                        key = processDefinitionKey,
+                        bpmnProcessId = "process",
+                        version = 1,
+                        bpmnXML = Bpmn.convertToString(bpmn),
+                        deployTime = Instant.now().toEpochMilli(),
+                        resourceName = "process.bpmn",
+                        checksum = "checksum"
+                )
         )
 
         // when
@@ -57,7 +58,9 @@ class ProcessServiceTest(
                 .isNotNull()
                 .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT, BpmnElementMetadata())))
                 .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK, BpmnElementMetadata(jobType = "test"))))
-                .contains(entry("u", BpmnElementInfo("u", "userTask", BpmnElementType.USER_TASK, BpmnElementMetadata(assignee = "user1", candidateGroups = "group1"))))
+                .contains(entry("u", BpmnElementInfo("u", "userTask", BpmnElementType.USER_TASK, BpmnElementMetadata(
+                        userTaskAssignmentDefinition = UserTaskAssignmentDefinition(assignee = "user1", candidateGroups = "group1"))))
+                )
                 .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT, BpmnElementMetadata())))
     }
 
