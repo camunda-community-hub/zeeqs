@@ -3,13 +3,8 @@ package io.zeebe.zeeqs.data.service
 import io.camunda.zeebe.model.bpmn.Bpmn
 import io.camunda.zeebe.model.bpmn.BpmnModelInstance
 import io.camunda.zeebe.model.bpmn.impl.BpmnModelConstants
-import io.camunda.zeebe.model.bpmn.instance.CatchEvent
-import io.camunda.zeebe.model.bpmn.instance.ErrorEventDefinition
-import io.camunda.zeebe.model.bpmn.instance.FlowElement
-import io.camunda.zeebe.model.bpmn.instance.MessageEventDefinition
-import io.camunda.zeebe.model.bpmn.instance.SequenceFlow
-import io.camunda.zeebe.model.bpmn.instance.SubProcess
-import io.camunda.zeebe.model.bpmn.instance.TimerEventDefinition
+import io.camunda.zeebe.model.bpmn.instance.*
+import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeAssignmentDefinition
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeCalledElement
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeSubscription
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition
@@ -122,7 +117,13 @@ class ProcessService(val processRepository: ProcessRepository) {
                                 )
                             }
                     else -> null
-                }
+                },
+                assignee = element
+                        .getSingleExtensionElement(ZeebeAssignmentDefinition::class.java)
+                        ?.assignee,
+                candidateGroups = element
+                        .getSingleExtensionElement(ZeebeAssignmentDefinition::class.java)
+                        ?.candidateGroups
         )
     }
 }
