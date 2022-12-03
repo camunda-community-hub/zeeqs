@@ -237,6 +237,7 @@ class HazelcastImporter(
             "BUSINESS_RULE_TASK" -> BpmnElementType.BUSINESS_RULE_TASK
             "SCRIPT_TASK" -> BpmnElementType.SCRIPT_TASK
             "SEND_TASK" -> BpmnElementType.SEND_TASK
+            "INCLUSIVE_GATEWAY" -> BpmnElementType.INCLUSIVE_GATEWAY
             else -> BpmnElementType.UNKNOWN
         }
 

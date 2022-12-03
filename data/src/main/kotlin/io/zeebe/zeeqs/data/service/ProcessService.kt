@@ -60,6 +60,7 @@ class ProcessService(val processRepository: ProcessRepository) {
             BpmnModelConstants.BPMN_ELEMENT_RECEIVE_TASK -> BpmnElementType.RECEIVE_TASK
             BpmnModelConstants.BPMN_ELEMENT_BUSINESS_RULE_TASK -> BpmnElementType.BUSINESS_RULE_TASK
             BpmnModelConstants.BPMN_ELEMENT_SCRIPT_TASK -> BpmnElementType.SCRIPT_TASK
+            BpmnModelConstants.BPMN_ELEMENT_INCLUSIVE_GATEWAY -> BpmnElementType.INCLUSIVE_GATEWAY
             else -> BpmnElementType.UNKNOWN
         }
     }

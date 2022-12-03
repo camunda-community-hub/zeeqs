@@ -45,6 +45,7 @@ enum BpmnElementType {
     BUSINESS_RULE_TASK
     SCRIPT_TASK
     SEND_TASK
+    INCLUSIVE_GATEWAY
 }
 
 # Additional metadata that are defined statically on the BPMN element.
