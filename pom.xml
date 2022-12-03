@@ -13,7 +13,7 @@
 
   <groupId>io.zeebe.zeeqs</groupId>
   <artifactId>zeeqs-root</artifactId>
-  <version>2.4.1-SNAPSHOT</version>
+  <version>2.5.0</version>
   <name>ZeeQS - Root</name>
   <description>Query API for aggregated Zeebe data</description>
 
