@@ -419,6 +419,7 @@ class HazelcastImporter(
             "TRIGGERED" -> {
                 entity.state = TimerState.TRIGGERED
                 entity.endTime = record.metadata.timestamp
+                entity.processInstanceKey = record.processInstanceKey
             }
             "CANCELED" -> {
                 entity.state = TimerState.CANCELED

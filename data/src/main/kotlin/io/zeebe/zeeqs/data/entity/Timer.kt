@@ -12,7 +12,7 @@ class Timer(
     val dueDate: Long,
     var repetitions: Int,
     val elementId: String,
-    val processInstanceKey: Long?,
+    var processInstanceKey: Long?,
     val elementInstanceKey: Long?,
     val processDefinitionKey: Long?
 ) {
