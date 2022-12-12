@@ -1,0 +1,58 @@
+type UserTask {
+    # The key of the user task. Since a user task is represented in Zeebe as a regular job, the key is the same as the job key.
+    key: ID!
+
+    # The assignee of the user task.
+    assignee: String
+    # The candidate groups of the user task.
+    candidateGroups: String
+    # The form of the user task.
+    form: UserTaskForm
+
+    # The current state of the user task.
+    state: UserTaskState!
+
+    # The time of the last update.
+    timestamp(zoneId: String = "Z"): String!
+
+    # The time when the user task was created.
+    startTime(zoneId: String = "Z"): String
+    # The time when the user task was removed (completed/canceled).
+    endTime(zoneId: String = "Z"): String
+
+    # The process instance the user task belongs to.
+    processInstance: ProcessInstance
+    # The element instance the user task belongs to.
+    elementInstance: ElementInstance
+}
+
+# The state of a user task.
+enum UserTaskState {
+    CREATED
+    COMPLETED
+    CANCELED
+}
+
+# The connection to user tasks.
+type UserTaskConnection {
+    totalCount: Int!
+    nodes: [UserTask!]!
+}
+
+# The form of a user task.
+type UserTaskForm {
+    # The key of the form.
+    key: String!
+    # The resource of the form. In case of a Camunda form, the resource is the JSON definition of the form.
+    resource: String
+}
+
+extend type Query {
+    userTask(key: ID!): UserTask
+
+    userTasks(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [UserTaskState!] = [CREATED, COMPLETED, CANCELED]
+    ): UserTaskConnection!
+}
