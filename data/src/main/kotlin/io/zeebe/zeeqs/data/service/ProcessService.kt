@@ -4,10 +4,7 @@ import io.camunda.zeebe.model.bpmn.Bpmn
 import io.camunda.zeebe.model.bpmn.BpmnModelInstance
 import io.camunda.zeebe.model.bpmn.impl.BpmnModelConstants
 import io.camunda.zeebe.model.bpmn.instance.*
-import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeAssignmentDefinition
-import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeCalledElement
-import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeSubscription
-import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition
+import io.camunda.zeebe.model.bpmn.instance.zeebe.*
 import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import org.springframework.cache.annotation.Cacheable
@@ -132,4 +129,13 @@ class ProcessService(val processRepository: ProcessRepository) {
                         }
         )
     }
+
+    @Cacheable(cacheNames = ["userTaskForm"])
+    fun getForm(processDefinitionKey: Long, formKey: String): String? {
+        return getBpmnModel(processDefinitionKey)
+                ?.getModelElementsByType(ZeebeUserTaskForm::class.java)
+                ?.firstOrNull { it.id == formKey }
+                ?.textContent
+    }
+
 }

@@ -4,6 +4,7 @@ import com.google.protobuf.Struct
 import com.google.protobuf.Value
 import com.hazelcast.client.HazelcastClient
 import com.hazelcast.client.config.ClientConfig
+import io.camunda.zeebe.protocol.Protocol
 import io.zeebe.exporter.proto.Schema
 import io.zeebe.exporter.proto.Schema.RecordMetadata.RecordType
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
@@ -11,8 +12,9 @@ import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
 import java.time.Duration
-import javax.persistence.Id
 
+
+private const val CAMUNDA_FORM_KEY_PREFIX = "camunda-forms:bpmn:"
 
 @Component
 class HazelcastImporter(
@@ -24,6 +26,7 @@ class HazelcastImporter(
     val variableRepository: VariableRepository,
     val variableUpdateRepository: VariableUpdateRepository,
     val jobRepository: JobRepository,
+    val userTaskRepository: UserTaskRepository,
     val incidentRepository: IncidentRepository,
     val timerRepository: TimerRepository,
     val messageRepository: MessageRepository,
@@ -334,25 +337,38 @@ class HazelcastImporter(
     }
 
     private fun importJobRecord(record: Schema.JobRecord) {
+        if (isJobForUserTask(record)){
+            importUserTask(record)
+        } else {
+            importJobForWorker(record)
+        }
+    }
+
+    private fun isJobForUserTask(record: Schema.JobRecord) = record.type == Protocol.USER_TASK_JOB_TYPE
+
+    private fun importJobForWorker(record: Schema.JobRecord) {
         val entity = jobRepository
-            .findById(record.metadata.key)
-            .orElse(createJob(record))
+                .findById(record.metadata.key)
+                .orElse(createJob(record))
 
         when (record.metadata.intent) {
             "CREATED" -> {
                 entity.state = JobState.ACTIVATABLE
                 entity.startTime = record.metadata.timestamp
             }
+
             "TIMED_OUT", "RETRIES_UPDATED" -> entity.state = JobState.ACTIVATABLE
             "FAILED" -> entity.state = JobState.FAILED
             "COMPLETED" -> {
                 entity.state = JobState.COMPLETED
                 entity.endTime = record.metadata.timestamp
             }
+
             "CANCELED" -> {
                 entity.state = JobState.CANCELED
                 entity.endTime = record.metadata.timestamp
             }
+
             "ERROR_THROWN" -> {
                 entity.state = JobState.ERROR_THROWN
                 entity.endTime = record.metadata.timestamp
@@ -373,6 +389,49 @@ class HazelcastImporter(
             jobType = record.type,
             processInstanceKey = record.processInstanceKey,
             elementInstanceKey = record.elementInstanceKey
+        )
+    }
+
+    private fun importUserTask(record: Schema.JobRecord) {
+        val entity = userTaskRepository
+                .findById(record.metadata.key)
+                .orElse(createUserTask(record))
+
+        when (record.metadata.intent) {
+            "CREATED" -> {
+                entity.startTime = record.metadata.timestamp
+            }
+            "COMPLETED" -> {
+                entity.state = UserTaskState.COMPLETED
+                entity.endTime = record.metadata.timestamp
+            }
+            "CANCELED" -> {
+                entity.state = UserTaskState.CANCELED
+                entity.endTime = record.metadata.timestamp
+            }
+        }
+
+        entity.timestamp = record.metadata.timestamp
+
+        userTaskRepository.save(entity)
+    }
+
+    private fun createUserTask(record: Schema.JobRecord): UserTask {
+        val customHeaders = record.customHeaders.fieldsMap
+        val assignee = customHeaders[Protocol.USER_TASK_ASSIGNEE_HEADER_NAME]?.stringValue
+        val candidateGroups = customHeaders[Protocol.USER_TASK_CANDIDATE_GROUPS_HEADER_NAME]?.stringValue
+        val formKey = customHeaders[Protocol.USER_TASK_FORM_KEY_HEADER_NAME]?.stringValue
+        val isCamundaForm = formKey?.startsWith(CAMUNDA_FORM_KEY_PREFIX) ?: false
+        return UserTask(
+                key = record.metadata.key,
+                position = record.metadata.position,
+                processInstanceKey = record.processInstanceKey,
+                processDefinitionKey = record.processDefinitionKey,
+                elementInstanceKey = record.elementInstanceKey,
+                assignee = assignee,
+                candidateGroups = candidateGroups,
+                formKey = formKey?.replace(CAMUNDA_FORM_KEY_PREFIX, ""),
+                isCamundaForm = isCamundaForm
         )
     }
 
