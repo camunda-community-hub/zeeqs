@@ -18,9 +18,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import java.time.Instant
+import javax.transaction.Transactional
 
 @SpringBootTest
 @TestConfiguration
+@Transactional
 class ProcessServiceTest(
         @Autowired val processService: ProcessService,
         @Autowired val processRepository: ProcessRepository
@@ -147,9 +149,5 @@ class ProcessServiceTest(
             assertThat(form).isNull()
         }
     }
-
-
-    @SpringBootApplication
-    class TestConfiguration
 
 }

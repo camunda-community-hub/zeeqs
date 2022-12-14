@@ -15,9 +15,11 @@ import java.util.stream.LongStream
 
 import org.assertj.core.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
+import javax.transaction.Transactional
 
 @SpringBootTest
 @TestConfiguration
+@Transactional
 class VariableServiceTest(
         @Autowired val variableService: VariableService,
         @Autowired val variableRepository: VariableRepository,
@@ -220,8 +222,5 @@ class VariableServiceTest(
                 scopeKey = scopeKey
         ))
     }
-
-    @SpringBootApplication
-    class TestConfiguration
 
 }
