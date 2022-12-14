@@ -14,7 +14,11 @@ type ProcessInstance {
     # the process the instance is created of
     process: Process
     # the created variables related to the process instance
-    variables: [Variable!]
+    variables(
+        # If true, it returns only the global variables of the process instance.
+        # If false, it includes the local variables from the containing scopes.
+        globalOnly: Boolean = false
+    ): [Variable!]
     # the created jobs related to the process instance
     jobs(
         stateIn: [JobState!] = [ACTIVATABLE, FAILED, COMPLETED, CANCELED, ERROR_THROWN]

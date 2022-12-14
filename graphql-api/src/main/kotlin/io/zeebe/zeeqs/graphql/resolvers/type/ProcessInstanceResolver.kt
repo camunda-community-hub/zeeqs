@@ -3,6 +3,7 @@ package io.zeebe.zeeqs.data.resolvers
 import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
+import io.zeebe.zeeqs.data.service.VariableService
 import io.zeebe.zeeqs.graphql.resolvers.connection.UserTaskConnection
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension.timestampToString
 import org.springframework.data.domain.PageRequest
@@ -31,8 +32,12 @@ class ProcessInstanceResolver(
         return processInstance.endTime?.let { timestampToString(it, zoneId) }
     }
 
-    fun variables(processInstance: ProcessInstance): List<Variable> {
-        return variableRepository.findByProcessInstanceKey(processInstance.key)
+    fun variables(processInstance: ProcessInstance, globalOnly: Boolean): List<Variable> {
+        return if (globalOnly) {
+            variableRepository.findByScopeKey(scopeKey = processInstance.key)
+        } else {
+            variableRepository.findByProcessInstanceKey(processInstanceKey = processInstance.key)
+        }
     }
 
     fun jobs(processInstance: ProcessInstance, stateIn: List<JobState>, jobTypeIn: List<String>): List<Job> {
