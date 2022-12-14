@@ -6,7 +6,7 @@ import javax.persistence.EnumType
 import javax.persistence.Id
 
 @Entity
-class Job(
+data class Job(
     @Id val key: Long,
     val position: Long,
     val jobType: String,

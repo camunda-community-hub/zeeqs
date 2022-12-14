@@ -3,21 +3,24 @@ package io.zeebe.zeeqs.data.resolvers
 import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
+import io.zeebe.zeeqs.graphql.resolvers.connection.UserTaskConnection
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension.timestampToString
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
 class ProcessInstanceResolver(
-    val processInstanceRepository: ProcessInstanceRepository,
-    val variableRepository: VariableRepository,
-    val processRepository: ProcessRepository,
-    val jobRepository: JobRepository,
-    val incidentRepository: IncidentRepository,
-    val elementInstanceRepository: ElementInstanceRepository,
-    val timerRepository: TimerRepository,
-    val messageSubscriptionRepository: MessageSubscriptionRepository,
-    val errorRepository: ErrorRepository
+        val processInstanceRepository: ProcessInstanceRepository,
+        val variableRepository: VariableRepository,
+        val processRepository: ProcessRepository,
+        val jobRepository: JobRepository,
+        val userTaskRepository: UserTaskRepository,
+        val incidentRepository: IncidentRepository,
+        val elementInstanceRepository: ElementInstanceRepository,
+        val timerRepository: TimerRepository,
+        val messageSubscriptionRepository: MessageSubscriptionRepository,
+        val errorRepository: ErrorRepository
 ) : GraphQLResolver<ProcessInstance> {
 
     fun startTime(processInstance: ProcessInstance, zoneId: String): String? {
@@ -42,6 +45,23 @@ class ProcessInstanceResolver(
                     jobTypeIn = jobTypeIn
             )
         }
+    }
+
+    fun userTasks(processInstance: ProcessInstance, perPage: Int, page: Int, stateIn: List<UserTaskState>): UserTaskConnection {
+        return UserTaskConnection(
+                getItems = {
+                    userTaskRepository.findByProcessInstanceKeyAndStateIn(
+                            processInstanceKey = processInstance.key,
+                            stateIn = stateIn,
+                            pageable = PageRequest.of(page, perPage))
+                },
+                getCount = {
+                    userTaskRepository.countByProcessInstanceKeyAndStateIn(
+                            processInstanceKey = processInstance.key,
+                            stateIn = stateIn
+                    )
+                }
+        )
     }
 
     fun process(processInstance: ProcessInstance): Process? {

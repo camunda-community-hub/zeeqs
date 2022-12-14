@@ -1,8 +1,8 @@
 package io.zeebe.zeeqs
 
 import io.camunda.zeebe.client.ZeebeClient
-import io.zeebe.containers.ZeebeContainer
 import io.camunda.zeebe.model.bpmn.Bpmn
+import io.zeebe.containers.ZeebeContainer
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
@@ -15,50 +15,41 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.MountableFile
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.time.Duration
-import java.time.Instant
 
 @SpringBootTest
 @Testcontainers
-class HazelcastImporterTest(
+class HazelcastImporterProcessTest(
         @Autowired val importer: HazelcastImporter,
         @Autowired val processRepository: ProcessRepository) {
 
-    val exporterJarPath: Path = Paths.get("../target/exporter/zeebe-hazelcast-exporter.jar")
-    val containerPath = "/usr/local/zeebe/exporter/zeebe-hazelcast-exporter.jar"
+    private val hazelcastPort = 5701
 
-    val hazelcastPort = 5701
+    private lateinit var zeebeClient: ZeebeClient
 
     @Container
-    var zeebe = ZeebeContainer()
-        .withEnv("ZEEBE_BROKER_EXPORTERS_HAZELCAST_CLASSNAME", "io.zeebe.hazelcast.exporter.HazelcastExporter")
-        .withEnv("ZEEBE_BROKER_EXPORTERS_HAZELCAST_JARPATH", "exporter/zeebe-hazelcast-exporter.jar")
-        .withCopyFileToContainer(MountableFile.forHostPath(exporterJarPath), containerPath)
-        .withAdditionalExposedPort(hazelcastPort)
+    var zeebe = ZeebeContainer(ZeebeTestcontainerUtil.ZEEBE_DOCKER_IMAGE)
+            .withAdditionalExposedPort(hazelcastPort)
 
     @BeforeEach
-    fun init() {
-        assertThat(exporterJarPath).exists()
-    }
-
-    @Test
-    fun `should import process`() {
-        // given
+    fun `start importer`() {
         val port = zeebe.getMappedPort(hazelcastPort)
         val hazelcastProperties = HazelcastProperties(
                 "localhost:$port", "PT10S", "zeebe")
         importer.start(hazelcastProperties)
+    }
 
-        val client = ZeebeClient.newClientBuilder()
+    @BeforeEach
+    fun `create Zeebe client`() {
+        zeebeClient = ZeebeClient.newClientBuilder()
                 .gatewayAddress(zeebe.externalGatewayAddress)
                 .usePlaintext()
                 .build()
+    }
 
+    @Test
+    fun `should import process`() {
         // when
-        client.newDeployCommand()
+        zeebeClient.newDeployCommand()
                 .addProcessModel(
                         Bpmn.createExecutableProcess("process")
                                 .startEvent()
@@ -69,7 +60,7 @@ class HazelcastImporterTest(
                 .send()
                 .join()
 
-        // verify
+        // then
         await.untilAsserted { assertThat(processRepository.findAll()).hasSize(1) }
 
         val process = processRepository.findAll().toList()[0]
@@ -80,13 +71,6 @@ class HazelcastImporterTest(
         assertThat(process.bpmnXML).isNotEmpty()
         assertThat(process.resourceName).isEqualTo("process.bpmn")
         assertThat(process.checksum).isNotEmpty()
-    }
-
-    private fun waitUntilProcessIsImported() {
-        val timeout = Instant.now().plus(Duration.ofSeconds(10))
-        while (processRepository.count() < 1 && Instant.now().isBefore(timeout)) {
-            Thread.sleep(10)
-        }
     }
 
     @SpringBootApplication

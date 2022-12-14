@@ -20,6 +20,12 @@ type ProcessInstance {
         stateIn: [JobState!] = [ACTIVATABLE, FAILED, COMPLETED, CANCELED, ERROR_THROWN]
         jobTypeIn: [String!] = []
     ): [Job!]
+    # the created user tasks related to the process instance
+    userTasks(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [UserTaskState!] = [CREATED, COMPLETED, CANCELED]
+    ): UserTaskConnection
     # the created incidents related to the process instance
     incidents(
         stateIn: [IncidentState] = [CREATED, RESOLVED]
