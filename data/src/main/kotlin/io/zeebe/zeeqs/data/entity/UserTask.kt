@@ -14,8 +14,7 @@ data class UserTask(
         val elementInstanceKey: Long,
         val assignee: String?,
         val candidateGroups: String?,
-        val formKey: String?,
-        val isCamundaForm: Boolean
+        val formKey: String?
 ) {
     @Enumerated(EnumType.STRING)
     var state: UserTaskState = UserTaskState.CREATED

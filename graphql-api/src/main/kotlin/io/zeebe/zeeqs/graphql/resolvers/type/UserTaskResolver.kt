@@ -4,9 +4,9 @@ import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.ProcessInstance
 import io.zeebe.zeeqs.data.entity.UserTask
+import io.zeebe.zeeqs.data.service.UserTaskForm
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
-import io.zeebe.zeeqs.data.repository.UserTaskRepository
 import io.zeebe.zeeqs.data.service.ProcessService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -42,14 +42,10 @@ class UserTaskResolver(
         return userTask.formKey?.let { formKey ->
             UserTaskForm(
                     key = formKey,
-                    resource = formKey
-                            .takeIf { userTask.isCamundaForm }
-                            ?.let {
-                                processService.getForm(
-                                        processDefinitionKey = userTask.processDefinitionKey,
-                                        formKey = formKey
-                                )
-                            }
+                    resource = processService.getForm(
+                            processDefinitionKey = userTask.processDefinitionKey,
+                            formKey = formKey
+                    )
             )
         }
     }

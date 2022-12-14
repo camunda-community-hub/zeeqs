@@ -13,9 +13,6 @@ import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
 import java.time.Duration
 
-
-private const val CAMUNDA_FORM_KEY_PREFIX = "camunda-forms:bpmn:"
-
 @Component
 class HazelcastImporter(
     val hazelcastConfigRepository: HazelcastConfigRepository,
@@ -421,7 +418,6 @@ class HazelcastImporter(
         val assignee = customHeaders[Protocol.USER_TASK_ASSIGNEE_HEADER_NAME]?.stringValue
         val candidateGroups = customHeaders[Protocol.USER_TASK_CANDIDATE_GROUPS_HEADER_NAME]?.stringValue
         val formKey = customHeaders[Protocol.USER_TASK_FORM_KEY_HEADER_NAME]?.stringValue
-        val isCamundaForm = formKey?.startsWith(CAMUNDA_FORM_KEY_PREFIX) ?: false
         return UserTask(
                 key = record.metadata.key,
                 position = record.metadata.position,
@@ -430,8 +426,7 @@ class HazelcastImporter(
                 elementInstanceKey = record.elementInstanceKey,
                 assignee = assignee,
                 candidateGroups = candidateGroups,
-                formKey = formKey?.replace(CAMUNDA_FORM_KEY_PREFIX, ""),
-                isCamundaForm = isCamundaForm
+                formKey = formKey
         )
     }
 

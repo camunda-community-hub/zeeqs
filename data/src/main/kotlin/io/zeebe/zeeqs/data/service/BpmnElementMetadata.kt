@@ -7,5 +7,6 @@ data class BpmnElementMetadata(
         val errorCode: String? = null,
         val calledProcessId: String? = null,
         val messageSubscriptionDefinition: MessageSubscriptionDefinition? = null,
-        val userTaskAssignmentDefinition: UserTaskAssignmentDefinition? = null
+        val userTaskAssignmentDefinition: UserTaskAssignmentDefinition? = null,
+        val userTaskForm: UserTaskForm? = null
 )

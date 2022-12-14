@@ -19,7 +19,10 @@ type Process {
     # the opened message subscriptions of the message start events of the process
     messageSubscriptions: [MessageSubscription!]
     # all BPMN elements of the process
-    elements: [BpmnElement!]
+    elements(
+        # Filter the BPMN elements by the given types. If empty, return all elements.
+        elementTypeIn: [BpmnElementType!] = []
+    ): [BpmnElement!]
     # BPMN element of the process by its id
     element(elementId: String): BpmnElement
 }

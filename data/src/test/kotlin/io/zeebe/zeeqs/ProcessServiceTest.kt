@@ -1,13 +1,11 @@
 package io.zeebe.zeeqs
 
 import io.camunda.zeebe.model.bpmn.Bpmn
+import io.camunda.zeebe.model.bpmn.BpmnModelInstance
 import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ProcessRepository
-import io.zeebe.zeeqs.data.service.BpmnElementInfo
-import io.zeebe.zeeqs.data.service.BpmnElementMetadata
-import io.zeebe.zeeqs.data.service.ProcessService
-import io.zeebe.zeeqs.data.service.UserTaskAssignmentDefinition
+import io.zeebe.zeeqs.data.service.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.BeforeEach
@@ -36,25 +34,16 @@ class ProcessServiceTest(
             // given
             val processDefinitionKey = 1L
 
-            val bpmn = Bpmn.createExecutableProcess("process")
-                    .startEvent("s").name("start")
-                    .serviceTask("t").name("task")
-                    .zeebeJobType("test")
-                    .userTask("u").name("userTask")
-                    .zeebeAssignee("user1").zeebeCandidateGroups("group1")
-                    .endEvent("e").name("")
-                    .done()
-
-            processRepository.save(
-                    Process(
-                            key = processDefinitionKey,
-                            bpmnProcessId = "process",
-                            version = 1,
-                            bpmnXML = Bpmn.convertToString(bpmn),
-                            deployTime = Instant.now().toEpochMilli(),
-                            resourceName = "process.bpmn",
-                            checksum = "checksum"
-                    )
+            createProcess(
+                    processDefinitionKey = processDefinitionKey,
+                    bpmn = Bpmn.createExecutableProcess("process")
+                            .startEvent("s").name("start")
+                            .serviceTask("t").name("task")
+                            .zeebeJobType("test")
+                            .userTask("u").name("userTask")
+                            .zeebeAssignee("user1").zeebeCandidateGroups("group1")
+                            .endEvent("e").name("")
+                            .done()
             )
 
             // when
@@ -69,6 +58,41 @@ class ProcessServiceTest(
                             userTaskAssignmentDefinition = UserTaskAssignmentDefinition(assignee = "user1", candidateGroups = "group1"))))
                     )
                     .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT, BpmnElementMetadata())))
+        }
+
+        @Test
+        fun `should return user task form`() {
+            // given
+            val processDefinitionKey = 1L
+
+            createProcess(
+                    processDefinitionKey = processDefinitionKey,
+                    bpmn = Bpmn.createExecutableProcess("process")
+                            .startEvent()
+                            .userTask("user_task_A").name("A")
+                            .zeebeUserTaskForm("form_A", """{"x":1}""")
+                            .done()
+            )
+
+            // when
+            val info = processService.getBpmnElementInfo(processDefinitionKey)!!
+
+            // then
+            assertThat(info["user_task_A"])
+                    .isNotNull()
+                    .isEqualTo(
+                            BpmnElementInfo(
+                                    elementId = "user_task_A",
+                                    elementName = "A",
+                                    elementType = BpmnElementType.USER_TASK,
+                                    metadata = BpmnElementMetadata(
+                                            userTaskForm = UserTaskForm(
+                                                    key = "camunda-forms:bpmn:form_A",
+                                                    resource = """{"x":1}"""
+                                            )
+                                    )
+                            )
+                    )
         }
 
         @Test
@@ -94,24 +118,14 @@ class ProcessServiceTest(
 
         @BeforeEach
         fun `store process`() {
-            val bpmn = Bpmn.createExecutableProcess("process")
-                    .startEvent()
-                    .userTask("A")
-                    .zeebeUserTaskForm(formKey, userForm)
-                    .endEvent()
-                    .done()
-
-            processRepository.save(
-                    Process(
-                            key = processDefinitionKey,
-                            bpmnProcessId = "process",
-                            version = 1,
-                            bpmnXML = Bpmn.convertToString(bpmn),
-                            deployTime = Instant.now().toEpochMilli(),
-                            resourceName = "process.bpmn",
-                            checksum = "checksum"
-                    )
-            )
+            createProcess(
+                    processDefinitionKey = 1L,
+                    bpmn = Bpmn.createExecutableProcess("process")
+                            .startEvent()
+                            .userTask("A")
+                            .zeebeUserTaskForm(formKey, userForm)
+                            .endEvent()
+                            .done())
         }
 
         @Test
@@ -148,6 +162,20 @@ class ProcessServiceTest(
             // then
             assertThat(form).isNull()
         }
+    }
+
+    private fun createProcess(processDefinitionKey: Long, bpmn: BpmnModelInstance?) {
+        processRepository.save(
+                Process(
+                        key = processDefinitionKey,
+                        bpmnProcessId = "process",
+                        version = 1,
+                        bpmnXML = Bpmn.convertToString(bpmn),
+                        deployTime = Instant.now().toEpochMilli(),
+                        resourceName = "process.bpmn",
+                        checksum = "checksum"
+                )
+        )
     }
 
 }

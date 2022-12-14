@@ -22,14 +22,25 @@ class ZeebeGraphqlProcessTest(
 
     private val graphqlAssertions = GraphqlAssertions(port = port)
 
+    private val processDefinitionKey = 10L
+
     @BeforeEach
     fun `deploy process`() {
+        val process = Bpmn.createExecutableProcess("process")
+                .startEvent("start")
+                .sequenceFlowId("to-task")
+                .serviceTask("service-task")
+                .zeebeJobType("test")
+                .sequenceFlowId("to-end")
+                .endEvent("end")
+                .done();
+
         processRepository.save(
                 Process(
-                        key = 1,
+                        key = processDefinitionKey,
                         bpmnProcessId = "process",
                         version = 1,
-                        bpmnXML = "<...>",
+                        bpmnXML = Bpmn.convertToString(process),
                         deployTime = Instant.now().toEpochMilli(),
                         resourceName = "process.bpmn",
                         checksum = "checksum"
@@ -58,9 +69,79 @@ class ZeebeGraphqlProcessTest(
                         "processes": {
                           "nodes": [
                             {
-                              "key": "1",
+                              "key": "$processDefinitionKey",
                               "bpmnProcessId": "process",
                               "version": 1
+                            }
+                          ]
+                        }
+                      }
+                    }                
+                    """
+        )
+    }
+
+    @Test
+    fun `should get elements of process`() {
+        // when/then
+        graphqlAssertions.assertQuery(
+                query = """
+                    {
+                      process(key: $processDefinitionKey) {
+                        elements {
+                          elementId
+                        }
+                      }
+                    }
+                    """,
+                expectedResponseBody = """
+                    {
+                      "data": {
+                        "process": {
+                          "elements": [
+                            {
+                              "elementId": "to-task"
+                            },
+                            {
+                              "elementId": "to-end"
+                            },
+                            {
+                              "elementId": "end"
+                            },
+                            {
+                              "elementId": "service-task"
+                            },
+                            {
+                              "elementId": "start"
+                            }
+                          ]
+                        }
+                      }
+                    }                
+                    """
+        )
+    }
+
+    @Test
+    fun `should filter elements of process by their type`() {
+        // when/then
+        graphqlAssertions.assertQuery(
+                query = """
+                    {
+                      process(key: $processDefinitionKey) {
+                        elements(elementTypeIn: [SERVICE_TASK]) {
+                          elementId
+                        }
+                      }
+                    }
+                    """,
+                expectedResponseBody = """
+                    {
+                      "data": {
+                        "process": {
+                          "elements": [                            
+                            {
+                              "elementId": "service-task"
                             }
                           ]
                         }
