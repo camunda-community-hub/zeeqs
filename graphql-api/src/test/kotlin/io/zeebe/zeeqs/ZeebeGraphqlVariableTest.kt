@@ -146,7 +146,7 @@ class ZeebeGraphqlVariableTest(
     }
 
     @Test
-    fun `should get all variables with shadowing`() {
+    fun `should get all variables of element instance with shadowing`() {
         // when/then
         graphqlAssertions.assertQuery(
                 query = """
@@ -193,7 +193,7 @@ class ZeebeGraphqlVariableTest(
     }
 
     @Test
-    fun `should get all variables`() {
+    fun `should get all variables of element instance`() {
         // when/then
         graphqlAssertions.assertQuery(
                 query = """
@@ -235,6 +235,70 @@ class ZeebeGraphqlVariableTest(
                                   "value": "local"
                                 }
                               ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                    """)
+    }
+
+    @Test
+    fun `should get all variables of process instance`() {
+        // when/then
+        graphqlAssertions.assertQuery(
+                query = """
+                    {
+                      processInstance(key: $processInstanceKey) {
+                        variables {
+                          name
+                          value
+                        }
+                      }
+                    } 
+                    """,
+                expectedResponseBody = """
+                    {
+                      "data": {
+                        "processInstance": {
+                          "variables": [
+                            {
+                              "name": "x",
+                              "value": "global"
+                            },
+                            {
+                              "name": "x",
+                              "value": "local"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                    """)
+    }
+
+    @Test
+    fun `should get all global variables`() {
+        // when/then
+        graphqlAssertions.assertQuery(
+                query = """
+                    {
+                      processInstance(key: $processInstanceKey) {
+                        variables(globalOnly: true) {
+                          name
+                          value
+                        }
+                      }
+                    } 
+                    """,
+                expectedResponseBody = """
+                    {
+                      "data": {
+                        "processInstance": {
+                          "variables": [
+                            {
+                              "name": "x",
+                              "value": "global"
                             }
                           ]
                         }
