@@ -1,10 +1,7 @@
 package io.zeebe.zeeqs.graphql.resolvers.type
 
 import graphql.kickstart.tools.GraphQLResolver
-import io.zeebe.zeeqs.data.entity.MessageSubscription
-import io.zeebe.zeeqs.data.entity.Timer
-import io.zeebe.zeeqs.data.entity.Process
-import io.zeebe.zeeqs.data.entity.ProcessInstanceState
+import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
@@ -41,10 +38,11 @@ class ProcessResolver(
         return messageSubscriptionRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(process.key)
     }
 
-    fun elements(process: Process): List<BpmnElement> {
+    fun elements(process: Process, elementTypeIn: List<BpmnElementType>): List<BpmnElement> {
         return processService
                 .getBpmnElementInfo(process.key)
                 ?.values
+                ?.filter { elementTypeIn.isEmpty() || elementTypeIn.contains(it.elementType) }
                 ?.map { asBpmnElement(process, it) }
                 ?: emptyList()
     }
