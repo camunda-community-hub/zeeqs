@@ -124,8 +124,7 @@ class HazelcastImporterJobTest(
         assertThat(userTask.endTime).isNull()
         assertThat(userTask.assignee).isEqualTo("test")
         assertThat(userTask.candidateGroups).isEqualTo("""["test-group"]""")
-        assertThat(userTask.formKey).isEqualTo("form_A")
-        assertThat(userTask.isCamundaForm).isTrue()
+        assertThat(userTask.formKey).isEqualTo("camunda-forms:bpmn:form_A")
     }
 
     @SpringBootApplication

@@ -1,4 +1,4 @@
-package io.zeebe.zeeqs.graphql.resolvers.type
+package io.zeebe.zeeqs.data.service
 
 data class UserTaskForm(
         val key: String,

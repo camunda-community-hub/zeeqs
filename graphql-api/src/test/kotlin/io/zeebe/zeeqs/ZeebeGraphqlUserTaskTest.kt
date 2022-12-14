@@ -84,8 +84,7 @@ class ZeebeGraphqlUserTaskTest(
                         elementInstanceKey = 1L,
                         assignee = "test",
                         candidateGroups = "[\"test-group\"]",
-                        formKey = formKey,
-                        isCamundaForm = true
+                        formKey = formKey
                 )
         )
     }

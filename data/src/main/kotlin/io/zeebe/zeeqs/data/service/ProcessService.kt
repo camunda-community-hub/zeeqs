@@ -7,9 +7,12 @@ import io.camunda.zeebe.model.bpmn.instance.*
 import io.camunda.zeebe.model.bpmn.instance.zeebe.*
 import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.repository.ProcessRepository
+import org.camunda.bpm.model.xml.ModelInstance
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
+
+private const val CAMUNDA_FORM_KEY_PREFIX = "camunda-forms:bpmn:"
 
 @Component
 class ProcessService(val processRepository: ProcessRepository) {
@@ -126,6 +129,18 @@ class ProcessService(val processRepository: ProcessRepository) {
                                     assignee = it.assignee,
                                     candidateGroups = it.candidateGroups
                             )
+                        },
+                userTaskForm = element
+                        .getSingleExtensionElement(ZeebeFormDefinition::class.java)
+                        ?.formKey
+                        ?.let { formKey ->
+                            UserTaskForm(
+                                    key = formKey,
+                                    resource = getForm(
+                                            model = element.modelInstance,
+                                            formKey = formKey
+                                    )
+                            )
                         }
         )
     }
@@ -133,8 +148,14 @@ class ProcessService(val processRepository: ProcessRepository) {
     @Cacheable(cacheNames = ["userTaskForm"])
     fun getForm(processDefinitionKey: Long, formKey: String): String? {
         return getBpmnModel(processDefinitionKey)
-                ?.getModelElementsByType(ZeebeUserTaskForm::class.java)
-                ?.firstOrNull { it.id == formKey }
+                ?.let { getForm(model = it, formKey = formKey) }
+    }
+
+    private fun getForm(model: ModelInstance, formKey: String): String? {
+        val normalizedFormKey = formKey.replace(CAMUNDA_FORM_KEY_PREFIX, "")
+
+        return model.getModelElementsByType(ZeebeUserTaskForm::class.java)
+                ?.firstOrNull { it.id == normalizedFormKey }
                 ?.textContent
     }
 

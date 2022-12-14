@@ -62,8 +62,10 @@ type BpmnElementMetadata {
     calledProcessId: String
     # the definition of the message subscription if the element is a message catch event
     messageSubscriptionDefinition: MessageSubscriptionDefinition
-    # the assignment definition if the element is an user task
+    # the assignment definition if the element is a user task
     userTaskAssignmentDefinition: UserTaskAssignmentDefinition
+    # the user form if the element is a user task
+    userTaskForm: UserTaskForm
 }
 
 # The definition of a message subscription from a BPMN element.
