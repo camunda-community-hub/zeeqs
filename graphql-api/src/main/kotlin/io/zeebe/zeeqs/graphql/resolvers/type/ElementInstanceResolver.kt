@@ -5,6 +5,7 @@ import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
 import io.zeebe.zeeqs.graphql.resolvers.type.BpmnElement
 import io.zeebe.zeeqs.data.service.ProcessService
+import io.zeebe.zeeqs.data.service.VariableService
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -17,7 +18,8 @@ class ElementInstanceResolver(
         val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
         val timerRepository: TimerRepository,
         val processService: ProcessService,
-        val messageSubscriptionRepository: MessageSubscriptionRepository
+        val messageSubscriptionRepository: MessageSubscriptionRepository,
+        val variableService: VariableService
 ) : GraphQLResolver<ElementInstance> {
 
     fun startTime(elementInstance: ElementInstance, zoneId: String): String? {
@@ -64,6 +66,14 @@ class ElementInstanceResolver(
                 processDefinitionKey = elementInstance.processDefinitionKey,
                 elementId = elementInstance.elementId,
                 elementType = elementInstance.bpmnElementType
+        )
+    }
+
+    fun variables(elementInstance: ElementInstance, localOnly: Boolean, shadowing: Boolean): List<Variable> {
+        return variableService.getVariables(
+                elementInstanceKey = elementInstance.key,
+                localOnly = localOnly,
+                shadowing = shadowing
         )
     }
 
