@@ -1,40 +1,47 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.type
 
-import graphql.kickstart.tools.GraphQLResolver
-import io.zeebe.zeeqs.data.entity.*
+import io.zeebe.zeeqs.data.entity.BpmnElementType
+import io.zeebe.zeeqs.data.entity.ElementInstanceState
+import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
 import io.zeebe.zeeqs.data.service.BpmnElementMetadata
-import io.zeebe.zeeqs.data.service.MessageSubscriptionDefinition
-import io.zeebe.zeeqs.graphql.resolvers.type.BpmnElement
 import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ElementInstanceConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class BpmnElementResolver(
         val processRepository: ProcessRepository,
         val processService: ProcessService,
         val elementInstanceRepository: ElementInstanceRepository
-) : GraphQLResolver<BpmnElement> {
+) {
 
+    @SchemaMapping(typeName = "BpmnElement", field = "elementName")
     fun elementName(element: BpmnElement): String? {
         return findElementInfo(element)?.elementName
     }
 
+    @SchemaMapping(typeName = "BpmnElement", field = "bpmnElementType")
     fun bpmnElementType(element: BpmnElement): BpmnElementType {
         return element.elementType
                 ?: findElementInfo(element)?.elementType
                 ?: BpmnElementType.UNKNOWN
     }
 
-    fun metadata(element: BpmnElement): BpmnElementMetadata? {
-        return findElementInfo(element)?.metadata
+    @SchemaMapping(typeName = "BpmnElement", field = "metadata")
+    fun metadata(element: BpmnElement): BpmnElementMetadata {
+        return findElementInfo(element)
+                ?.metadata
+                ?: BpmnElementMetadata()
     }
 
+    @SchemaMapping(typeName = "BpmnElement", field = "process")
     fun process(element: BpmnElement): Process? {
         return processRepository.findByIdOrNull(element.processDefinitionKey)
     }
@@ -45,11 +52,12 @@ class BpmnElementResolver(
                 ?.get(element.elementId)
     }
 
+    @SchemaMapping(typeName = "BpmnElement", field = "elementInstances")
     fun elementInstances(
             element: BpmnElement,
-            perPage: Int,
-            page: Int,
-            stateIn: List<ElementInstanceState>
+            @Argument perPage: Int,
+            @Argument page: Int,
+            @Argument stateIn: List<ElementInstanceState>
     ): ElementInstanceConnection {
         return ElementInstanceConnection(
                 getItems = {

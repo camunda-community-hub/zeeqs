@@ -1,23 +1,25 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.query
 
-import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Incident
 import io.zeebe.zeeqs.data.entity.IncidentState
 import io.zeebe.zeeqs.data.repository.IncidentRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.IncidentConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class IncidentQueryResolver(
         val incidentRepository: IncidentRepository
-) : GraphQLQueryResolver {
+) {
 
+    @QueryMapping
     fun incidents(
-            perPage: Int,
-            page: Int,
-            stateIn: List<IncidentState>
+            @Argument perPage: Int,
+            @Argument page: Int,
+            @Argument stateIn: List<IncidentState>
     ): IncidentConnection {
 
         return IncidentConnection(
@@ -31,7 +33,8 @@ class IncidentQueryResolver(
         )
     }
 
-    fun incident(key: Long): Incident? {
+    @QueryMapping
+    fun incident(@Argument key: Long): Incident? {
         return incidentRepository.findByIdOrNull(key)
     }
 

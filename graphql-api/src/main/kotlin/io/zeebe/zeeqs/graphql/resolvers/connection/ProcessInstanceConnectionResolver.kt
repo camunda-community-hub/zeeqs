@@ -1,16 +1,18 @@
 package io.zeebe.zeeqs.graphql.resolvers.connection
 
-import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ProcessInstance
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 
-@Component
-class ProcessInstanceConnectionResolver : GraphQLResolver<ProcessInstanceConnection> {
+@Controller
+class ProcessInstanceConnectionResolver {
 
+    @SchemaMapping(typeName = "ProcessInstanceConnection", field = "nodes")
     fun nodes(connection: ProcessInstanceConnection): List<ProcessInstance> {
         return connection.getItems()
     }
 
+    @SchemaMapping(typeName = "ProcessInstanceConnection", field = "totalCount")
     fun totalCount(connection: ProcessInstanceConnection): Long {
         return connection.getCount()
     }

@@ -1,34 +1,40 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.type
 
-import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.Message
 import io.zeebe.zeeqs.data.entity.MessageCorrelation
-import io.zeebe.zeeqs.data.entity.MessageSubscription
 import io.zeebe.zeeqs.data.entity.MessageVariable
 import io.zeebe.zeeqs.data.repository.MessageCorrelationRepository
 import io.zeebe.zeeqs.data.repository.MessageVariableRepository
-import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 import java.time.Duration
 
-@Component
+@Controller
 class MessageResolver(
         val messageCorrelationRepository: MessageCorrelationRepository,
         val messageVariableRepository: MessageVariableRepository
-) : GraphQLResolver<Message> {
+) {
 
-    fun timestamp(message: Message, zoneId: String): String? {
+    @SchemaMapping(typeName = "Message", field = "timestamp")
+    fun timestamp(
+            message: Message,
+            @Argument zoneId: String
+    ): String? {
         return message.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
+    @SchemaMapping(typeName = "Message", field = "timeToLive")
     fun timeToLive(message: Message): String? {
         return message.timeToLive.let { Duration.ofMillis(it).toString() }
     }
 
+    @SchemaMapping(typeName = "Message", field = "messageCorrelations")
     fun messageCorrelations(message: Message): List<MessageCorrelation> {
         return messageCorrelationRepository.findByMessageKey(message.key)
     }
 
+    @SchemaMapping(typeName = "Message", field = "variables")
     fun variables(message: Message): List<MessageVariable> {
         return messageVariableRepository.findByMessageKey(messageKey = message.key)
     }
