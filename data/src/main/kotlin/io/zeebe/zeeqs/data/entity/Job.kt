@@ -1,17 +1,14 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.Enumerated
-import javax.persistence.EnumType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class Job(
-    @Id val key: Long,
-    val position: Long,
-    val jobType: String,
-    val processInstanceKey: Long,
-    val elementInstanceKey: Long
+        @Id @Column(name = "key_") val key: Long,
+        val position: Long,
+        val jobType: String,
+        val processInstanceKey: Long,
+        val elementInstanceKey: Long
 ) {
 
     @Enumerated(EnumType.STRING)

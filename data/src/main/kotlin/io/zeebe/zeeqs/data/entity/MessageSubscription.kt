@@ -1,20 +1,17 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.Enumerated
-import javax.persistence.EnumType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class MessageSubscription(
-    @Id val key: Long,
-    val position: Long,
-    val messageName: String,
-    val messageCorrelationKey: String?,
-    val processInstanceKey: Long?,
-    val elementInstanceKey: Long?,
-    val processDefinitionKey: Long?,
-    val elementId: String?
+        @Id @Column(name = "key_") val key: Long,
+        val position: Long,
+        val messageName: String,
+        val messageCorrelationKey: String?,
+        val processInstanceKey: Long?,
+        val elementInstanceKey: Long?,
+        val processDefinitionKey: Long?,
+        val elementId: String?
 ) {
 
     @Enumerated(EnumType.STRING)
