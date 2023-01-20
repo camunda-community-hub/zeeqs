@@ -1,13 +1,10 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.Enumerated
-import javax.persistence.EnumType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Message(
-        @Id val key: Long,
+        @Id @Column(name = "key_") val key: Long,
         val position: Long,
         val name: String,
         val correlationKey: String?,
