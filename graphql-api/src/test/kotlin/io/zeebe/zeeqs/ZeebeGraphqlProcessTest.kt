@@ -2,9 +2,7 @@ package io.zeebe.zeeqs
 
 import io.camunda.zeebe.model.bpmn.Bpmn
 import io.zeebe.zeeqs.data.entity.Process
-import io.zeebe.zeeqs.data.entity.UserTask
 import io.zeebe.zeeqs.data.repository.ProcessRepository
-import io.zeebe.zeeqs.data.repository.UserTaskRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
