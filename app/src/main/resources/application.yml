@@ -24,3 +24,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create
+
+
+  # enable GraphiQL inspection tool by default
+  graphql:
+    graphiql:
+      enabled: true

@@ -1,14 +1,18 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.type
 
-import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.VariableUpdate
-import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 
-@Component
-class VariableUpdateResolver : GraphQLResolver<VariableUpdate> {
+@Controller
+class VariableUpdateResolver {
 
-    fun timestamp(variableUpdate: VariableUpdate, zoneId: String): String? {
+    @SchemaMapping(typeName = "VariableUpdate", field = "timestamp")
+    fun timestamp(
+            variableUpdate: VariableUpdate,
+            @Argument zoneId: String
+    ): String? {
         return variableUpdate.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 

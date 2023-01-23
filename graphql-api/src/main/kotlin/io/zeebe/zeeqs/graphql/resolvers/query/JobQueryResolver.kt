@@ -1,24 +1,26 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.query
 
-import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Job
 import io.zeebe.zeeqs.data.entity.JobState
 import io.zeebe.zeeqs.data.repository.JobRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.JobConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class JobQueryResolver(
         val jobRepository: JobRepository
-) : GraphQLQueryResolver {
+) {
 
+    @QueryMapping
     fun jobs(
-            perPage: Int,
-            page: Int,
-            stateIn: List<JobState>,
-            jobTypeIn: List<String>): JobConnection {
+            @Argument perPage: Int,
+            @Argument page: Int,
+            @Argument stateIn: List<JobState>,
+            @Argument jobTypeIn: List<String>): JobConnection {
 
         if (jobTypeIn.isEmpty()) {
             return JobConnection(
@@ -43,7 +45,8 @@ class JobQueryResolver(
         }
     }
 
-    fun job(key: Long): Job? {
+    @QueryMapping
+    fun job(@Argument key: Long): Job? {
         return jobRepository.findByIdOrNull(key)
     }
 

@@ -1,36 +1,42 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.type
 
-import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.MessageCorrelationRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
-import io.zeebe.zeeqs.graphql.resolvers.type.BpmnElement
-import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class MessageSubscriptionResolver(
         val processInstanceRepository: ProcessInstanceRepository,
         val elementInstanceRepository: ElementInstanceRepository,
         val processRepository: ProcessRepository,
         val messageCorrelationRepository: MessageCorrelationRepository
-) : GraphQLResolver<MessageSubscription> {
+) {
 
-    fun timestamp(messageSubscription: MessageSubscription, zoneId: String): String? {
+    @SchemaMapping(typeName = "MessageSubscription", field = "timestamp")
+    fun timestamp(
+            messageSubscription: MessageSubscription,
+            @Argument zoneId: String
+    ): String? {
         return messageSubscription.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
+    @SchemaMapping(typeName = "MessageSubscription", field = "processInstance")
     fun processInstance(messageSubscription: MessageSubscription): ProcessInstance? {
         return messageSubscription.processInstanceKey?.let { processInstanceRepository.findByIdOrNull(it) }
     }
 
+    @SchemaMapping(typeName = "MessageSubscription", field = "elementInstance")
     fun elementInstance(messageSubscription: MessageSubscription): ElementInstance? {
         return messageSubscription.elementInstanceKey?.let { elementInstanceRepository.findByIdOrNull(it) }
     }
 
+    @SchemaMapping(typeName = "MessageSubscription", field = "process")
     fun process(messageSubscription: MessageSubscription): Process? {
         return messageSubscription.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
                 ?: messageSubscription.processInstanceKey?.let {
@@ -39,6 +45,7 @@ class MessageSubscriptionResolver(
                 }
     }
 
+    @SchemaMapping(typeName = "MessageSubscription", field = "messageCorrelations")
     fun messageCorrelations(messageSubscription: MessageSubscription): List<MessageCorrelation> {
         return messageSubscription.elementInstanceKey
                 ?.let {
@@ -55,6 +62,7 @@ class MessageSubscriptionResolver(
                 ?: emptyList()
     }
 
+    @SchemaMapping(typeName = "MessageSubscription", field = "element")
     fun element(messageSubscription: MessageSubscription): BpmnElement? {
         val processDefinitionKeyOfSubscription = messageSubscription.processDefinitionKey
                 ?: processInstanceRepository

@@ -1,20 +1,17 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.Enumerated
-import javax.persistence.EnumType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Timer(
-    @Id val key: Long,
-    val position: Long,
-    val dueDate: Long,
-    var repetitions: Int,
-    val elementId: String,
-    var processInstanceKey: Long?,
-    val elementInstanceKey: Long?,
-    val processDefinitionKey: Long?
+        @Id @Column(name = "key_") val key: Long,
+        val position: Long,
+        val dueDate: Long,
+        var repetitions: Int,
+        val elementId: String,
+        var processInstanceKey: Long?,
+        val elementInstanceKey: Long?,
+        val processDefinitionKey: Long?
 ) {
 
     @Enumerated(EnumType.STRING)

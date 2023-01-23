@@ -1,27 +1,34 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.query
 
-import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.ProcessInstance
 import io.zeebe.zeeqs.data.entity.ProcessInstanceState
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class ProcessInstanceQueryResolver(
         val processInstanceRepository: ProcessInstanceRepository
-) : GraphQLQueryResolver {
+) {
 
-    fun processInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>): ProcessInstanceConnection {
+    @QueryMapping
+    fun processInstances(
+            @Argument perPage: Int,
+            @Argument page: Int,
+            @Argument stateIn: List<ProcessInstanceState>
+    ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
                 getItems = { processInstanceRepository.findByStateIn(stateIn, PageRequest.of(page, perPage)).toList() },
                 getCount = { processInstanceRepository.countByStateIn(stateIn) }
         )
     }
 
-    fun processInstance(key: Long): ProcessInstance? {
+    @QueryMapping
+    fun processInstance(@Argument key: Long): ProcessInstance? {
         return processInstanceRepository.findByIdOrNull(key)
     }
 

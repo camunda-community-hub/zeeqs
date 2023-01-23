@@ -1,20 +1,16 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.Enumerated
-import javax.persistence.EnumType
-import javax.persistence.Id
-import javax.persistence.Lob
+import javax.persistence.*
 
 @Entity
 class Incident(
-    @Id val key: Long,
-    val position: Long,
-    val errorType: String,
-    @Lob val errorMessage: String,
-    val processInstanceKey: Long,
-    val elementInstanceKey: Long,
-    val jobKey: Long?
+        @Id @Column(name = "key_") val key: Long,
+        val position: Long,
+        val errorType: String,
+        @Lob val errorMessage: String,
+        val processInstanceKey: Long,
+        val elementInstanceKey: Long,
+        val jobKey: Long?
 ) {
 
     @Enumerated(EnumType.STRING)

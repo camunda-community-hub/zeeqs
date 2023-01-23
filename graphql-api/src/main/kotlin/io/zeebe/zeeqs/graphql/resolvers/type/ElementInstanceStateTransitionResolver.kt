@@ -1,14 +1,18 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.type
 
-import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.ElementInstanceStateTransition
-import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 
-@Component
-class ElementInstanceStateTransitionResolver : GraphQLResolver<ElementInstanceStateTransition> {
+@Controller
+class ElementInstanceStateTransitionResolver {
 
-    fun timestamp(elementInstanceStateTransition: ElementInstanceStateTransition, zoneId: String): String? {
+    @SchemaMapping(typeName = "ElementInstanceStateTransition", field = "timestamp")
+    fun timestamp(
+            elementInstanceStateTransition: ElementInstanceStateTransition,
+            @Argument zoneId: String
+    ): String? {
         return elementInstanceStateTransition.timestamp.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 

@@ -1,44 +1,61 @@
 package io.zeebe.zeeqs.graphql.resolvers.type
 
-import graphql.kickstart.tools.GraphQLResolver
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
-import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
+import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
 import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
 import org.springframework.data.domain.PageRequest
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class ProcessResolver(
         val processInstanceRepository: ProcessInstanceRepository,
         val timerRepository: TimerRepository,
         val messageSubscriptionRepository: MessageSubscriptionRepository,
         val processService: ProcessService
-) : GraphQLResolver<Process> {
+) {
 
-    fun processInstances(process: Process, perPage: Int, page: Int, stateIn: List<ProcessInstanceState>): ProcessInstanceConnection {
+    @SchemaMapping(typeName = "Process", field = "processInstances")
+    fun processInstances(
+            process: Process,
+            @Argument perPage: Int,
+            @Argument page: Int,
+            @Argument stateIn: List<ProcessInstanceState>
+    ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
                 getItems = { processInstanceRepository.findByProcessDefinitionKeyAndStateIn(process.key, stateIn, PageRequest.of(page, perPage)).toList() },
                 getCount = { processInstanceRepository.countByProcessDefinitionKeyAndStateIn(process.key, stateIn) }
         )
     }
 
-    fun deployTime(process: Process, zoneId: String): String? {
+    @SchemaMapping(typeName = "Process", field = "deployTime")
+    fun deployTime(
+            process: Process,
+            @Argument zoneId: String
+    ): String? {
         return process.deployTime.let { ResolverExtension.timestampToString(it, zoneId) }
     }
 
+    @SchemaMapping(typeName = "Process", field = "timers")
     fun timers(process: Process): List<Timer> {
         return timerRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(process.key)
     }
 
+    @SchemaMapping(typeName = "Process", field = "messageSubscriptions")
     fun messageSubscriptions(process: Process): List<MessageSubscription> {
         return messageSubscriptionRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(process.key)
     }
 
-    fun elements(process: Process, elementTypeIn: List<BpmnElementType>): List<BpmnElement> {
+    @SchemaMapping(typeName = "Process", field = "elements")
+    fun elements(
+            process: Process,
+            @Argument elementTypeIn: List<BpmnElementType>
+    ): List<BpmnElement> {
         return processService
                 .getBpmnElementInfo(process.key)
                 ?.values
@@ -54,7 +71,11 @@ class ProcessResolver(
                     elementType = it.elementType
             )
 
-    fun element(process: Process, elementId: String): BpmnElement? {
+    @SchemaMapping(typeName = "Process", field = "element")
+    fun element(
+            process: Process,
+            @Argument elementId: String
+    ): BpmnElement? {
         return processService
                 .getBpmnElementInfo(process.key)
                 ?.get(elementId)

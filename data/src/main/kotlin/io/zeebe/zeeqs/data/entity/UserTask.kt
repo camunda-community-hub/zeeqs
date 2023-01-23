@@ -1,13 +1,10 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class UserTask(
-        @Id val key: Long,
+        @Id @Column(name = "key_") val key: Long,
         val position: Long,
         val processInstanceKey: Long,
         val processDefinitionKey: Long,

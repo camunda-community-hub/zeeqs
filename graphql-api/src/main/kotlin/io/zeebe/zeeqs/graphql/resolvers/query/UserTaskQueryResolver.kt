@@ -1,23 +1,26 @@
 package io.zeebe.zeeqs.graphql.resolvers.query
 
-import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.UserTask
 import io.zeebe.zeeqs.data.entity.UserTaskState
 import io.zeebe.zeeqs.data.repository.UserTaskRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.UserTaskConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class UserTaskQueryResolver(
         val userTaskRepository: UserTaskRepository
-) : GraphQLQueryResolver {
+) {
 
+    @QueryMapping
     fun userTasks(
-            perPage: Int,
-            page: Int,
-            stateIn: List<UserTaskState>): UserTaskConnection {
+            @Argument perPage: Int,
+            @Argument page: Int,
+            @Argument stateIn: List<UserTaskState>
+    ): UserTaskConnection {
 
         return UserTaskConnection(
                 getItems = {
@@ -34,7 +37,8 @@ class UserTaskQueryResolver(
         )
     }
 
-    fun userTask(key: Long): UserTask? {
+    @QueryMapping
+    fun userTask(@Argument key: Long): UserTask? {
         return userTaskRepository.findByIdOrNull(key)
     }
 

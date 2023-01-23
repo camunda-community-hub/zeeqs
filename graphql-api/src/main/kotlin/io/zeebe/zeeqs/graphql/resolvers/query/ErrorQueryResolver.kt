@@ -1,19 +1,21 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.query
 
-import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.repository.ErrorRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.ErrorConnection
 import org.springframework.data.domain.PageRequest
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class ErrorQueryResolver(
         val errorRepository: ErrorRepository
-) : GraphQLQueryResolver {
+) {
 
+    @QueryMapping
     fun errors(
-            perPage: Int,
-            page: Int
+            @Argument perPage: Int,
+            @Argument page: Int
     ): ErrorConnection {
 
         return ErrorConnection(

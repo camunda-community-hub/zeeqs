@@ -1,26 +1,32 @@
-package io.zeebe.zeeqs.data.resolvers
+package io.zeebe.zeeqs.graphql.resolvers.query
 
-import graphql.kickstart.tools.GraphQLQueryResolver
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
 
-@Component
+@Controller
 class ProcessQueryResolver(
         val processRepository: ProcessRepository
-) : GraphQLQueryResolver {
+) {
 
-    fun processes(perPage: Int, page: Int): ProcessConnection {
+    @QueryMapping
+    fun processes(
+            @Argument perPage: Int,
+            @Argument page: Int
+    ): ProcessConnection {
         return ProcessConnection(
                 getItems = { processRepository.findAll(PageRequest.of(page, perPage)).toList() },
                 getCount = { processRepository.count() }
         )
     }
 
-    fun getProcess(key: Long): Process? {
+    @QueryMapping
+    fun process(@Argument key: Long): Process? {
         return processRepository.findByIdOrNull(key)
     }
 
