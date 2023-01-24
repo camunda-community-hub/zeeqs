@@ -69,4 +69,39 @@ type Query {
         page: Int = 0,
         stateIn: [ProcessInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]
     ): ProcessInstanceConnection!
+
+}
+
+type Subscription {
+    # Subscribe to updates of process instances (e.g. process instance created, variable set, job completed).
+    processInstanceUpdates(
+        # Limit the updates by the given filter.
+        filter: ProcessInstanceUpdateFilter = null): ProcessInstanceUpdate!
+}
+
+# A filter to limit the process instance updates.
+input ProcessInstanceUpdateFilter {
+    # Limit the updates to instances of the given process.
+    processKey: ID
+    # Limit the updates to the given process instance.
+    processInstanceKey: ID
+    # Limit the updates to the given types.
+    updateTypeIn: [ProcessInstanceUpdateType!]
+}
+
+# An update of a process instance.
+type ProcessInstanceUpdate {
+    # The updated process instance.
+    processInstance: ProcessInstance
+    # The type of the update.
+    updateType: ProcessInstanceUpdateType!
+}
+
+# The type of a process instance update.
+enum ProcessInstanceUpdateType {
+    PROCESS_INSTANCE_STATE
+    ELEMENT_INSTANCE
+    VARIABLE
+    INCIDENT
+    JOB
 }

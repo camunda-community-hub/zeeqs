@@ -40,3 +40,8 @@ extend type Query {
         perPage: Int = 10,
         page: Int = 0,): ProcessConnection!
 }
+
+extend type Subscription {
+    # Subscribe to updates of processes (i.e. new process deployed).
+    processUpdates: Process!
+}
