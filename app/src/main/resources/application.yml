@@ -25,8 +25,10 @@ spring:
     hibernate:
       ddl-auto: create
 
-
-  # enable GraphiQL inspection tool by default
   graphql:
+    websocket:
+      path: /graphql
+
+    # enable GraphiQL inspection tool by default
     graphiql:
       enabled: true
