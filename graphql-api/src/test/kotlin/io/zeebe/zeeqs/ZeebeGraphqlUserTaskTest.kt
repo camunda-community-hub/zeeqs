@@ -7,34 +7,22 @@ import io.zeebe.zeeqs.data.entity.UserTask
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.repository.UserTaskRepository
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.web.server.LocalServerPort
-import org.springframework.core.env.Environment
-import org.springframework.core.env.get
-import java.net.URI
-import java.net.URLEncoder
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.nio.charset.StandardCharsets
+import org.springframework.graphql.test.tester.GraphQlTester
 import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestConfiguration
 class ZeebeGraphqlUserTaskTest(
-        @LocalServerPort private val port: Int,
+        @Autowired private val graphQlTester: GraphQlTester,
         @Autowired val processRepository: ProcessRepository,
         @Autowired val processInstanceRepository: ProcessInstanceRepository,
         @Autowired val userTaskRepository: UserTaskRepository) {
-
-    private val graphqlAssertions = GraphqlAssertions(port = port)
 
     private val processDefinitionKey = 10L
     private val processInstanceKey = 20L
@@ -92,8 +80,7 @@ class ZeebeGraphqlUserTaskTest(
     @Test
     fun `should query user task`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       userTasks {
                         nodes {
@@ -107,33 +94,28 @@ class ZeebeGraphqlUserTaskTest(
                         }
                       }
                     } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "userTasks": {
-                          "nodes": [
-                            {
-                              "key": "$userTaskKey",
-                              "assignee": "test",
-                              "candidateGroups": "[\"test-group\"]",
-                              "form": {
-                                "key": "$formKey",
-                                "resource": "{\"x\":1}"
-                              }
-                            }
-                          ]
+                    """)
+                .execute()
+                .path("userTasks.nodes")
+                .matchesJson("""
+                    [
+                        {
+                          "key": "$userTaskKey",
+                          "assignee": "test",
+                          "candidateGroups": "[\"test-group\"]",
+                          "form": {
+                            "key": "$formKey",
+                            "resource": "{\"x\":1}"
+                          }
                         }
-                      }
-                    }
+                    ]              
                     """)
     }
 
     @Test
     fun `should query user tasks of process instance`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       processInstance(key: $processInstanceKey) {
                         userTasks {
@@ -143,25 +125,19 @@ class ZeebeGraphqlUserTaskTest(
                         }
                       }
                     } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processInstance": {
-                          "userTasks": {
-                            "nodes": [
-                              {
-                                "key": "$userTaskKey"
-                              }
-                            ]
-                          }
-                        }
+                    """)
+                .execute()
+                .path("processInstance.userTasks.nodes")
+                .matchesJson("""
+                    [
+                      {
+                        "key": "$userTaskKey"
                       }
-                    }
+                    ]             
                     """)
     }
 
     @SpringBootApplication
-    class TestConfiguration
+    class TestConfig
 
 }

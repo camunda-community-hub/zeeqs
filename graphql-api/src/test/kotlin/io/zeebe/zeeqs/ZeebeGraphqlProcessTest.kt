@@ -9,16 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.graphql.test.tester.GraphQlTester
 import java.time.Instant
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestConfiguration
 class ZeebeGraphqlProcessTest(
-        @LocalServerPort private val port: Int,
-        @Autowired val processRepository: ProcessRepository) {
-
-    private val graphqlAssertions = GraphqlAssertions(port = port)
+        @Autowired private val graphQlTester: GraphQlTester,
+        @Autowired private val processRepository: ProcessRepository) {
 
     private val processDefinitionKey = 10L
 
@@ -49,8 +48,7 @@ class ZeebeGraphqlProcessTest(
     @Test
     fun `should query process`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       processes {
                         nodes {
@@ -60,30 +58,24 @@ class ZeebeGraphqlProcessTest(
                         }
                       }
                     }
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processes": {
-                          "nodes": [
-                            {
-                              "key": "$processDefinitionKey",
-                              "bpmnProcessId": "process",
-                              "version": 1
-                            }
-                          ]
+                    """)
+                .execute()
+                .path("processes.nodes")
+                .matchesJson("""
+                    [
+                        {
+                          "key": "$processDefinitionKey",
+                          "bpmnProcessId": "process",
+                          "version": 1
                         }
-                      }
-                    }                
-                    """
-        )
+                    ]              
+                    """)
     }
 
     @Test
     fun `should get elements of process`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       process(key: $processDefinitionKey) {
                         elements {
@@ -91,40 +83,34 @@ class ZeebeGraphqlProcessTest(
                         }
                       }
                     }
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "process": {
-                          "elements": [
-                            {
-                              "elementId": "to-task"
-                            },
-                            {
-                              "elementId": "to-end"
-                            },
-                            {
-                              "elementId": "end"
-                            },
-                            {
-                              "elementId": "service-task"
-                            },
-                            {
-                              "elementId": "start"
-                            }
-                          ]
+                    """)
+                .execute()
+                .path("process.elements")
+                .matchesJson("""
+                    [
+                        {
+                          "elementId": "to-task"
+                        },
+                        {
+                          "elementId": "to-end"
+                        },
+                        {
+                          "elementId": "end"
+                        },
+                        {
+                          "elementId": "service-task"
+                        },
+                        {
+                          "elementId": "start"
                         }
-                      }
-                    }                
-                    """
-        )
+                    ]              
+                    """)
     }
 
     @Test
     fun `should filter elements of process by their type`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       process(key: $processDefinitionKey) {
                         elements(elementTypeIn: [SERVICE_TASK]) {
@@ -132,24 +118,19 @@ class ZeebeGraphqlProcessTest(
                         }
                       }
                     }
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "process": {
-                          "elements": [                            
-                            {
-                              "elementId": "service-task"
-                            }
-                          ]
+                    """)
+                .execute()
+                .path("process.elements")
+                .matchesJson("""
+                    [                            
+                        {
+                          "elementId": "service-task"
                         }
-                      }
-                    }                
-                    """
-        )
+                    ]           
+                    """)
     }
 
     @SpringBootApplication
-    class TestConfiguration
+    class TestConfig
 
 }

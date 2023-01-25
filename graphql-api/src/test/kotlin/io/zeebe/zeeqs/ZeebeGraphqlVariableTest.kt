@@ -1,36 +1,27 @@
 package io.zeebe.zeeqs
 
-import io.camunda.zeebe.model.bpmn.Bpmn
-import io.zeebe.zeeqs.data.entity.*
-import io.zeebe.zeeqs.data.repository.*
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
+import io.zeebe.zeeqs.data.entity.BpmnElementType
+import io.zeebe.zeeqs.data.entity.ElementInstance
+import io.zeebe.zeeqs.data.entity.ProcessInstance
+import io.zeebe.zeeqs.data.entity.Variable
+import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
+import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
+import io.zeebe.zeeqs.data.repository.VariableRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.web.server.LocalServerPort
-import org.springframework.core.env.Environment
-import org.springframework.core.env.get
-import java.net.URI
-import java.net.URLEncoder
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.nio.charset.StandardCharsets
-import java.time.Instant
+import org.springframework.graphql.test.tester.GraphQlTester
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestConfiguration
 class ZeebeGraphqlVariableTest(
-        @LocalServerPort private val port: Int,
+        @Autowired private val graphQlTester: GraphQlTester,
         @Autowired val variableRepository: VariableRepository,
         @Autowired val elementInstanceRepository: ElementInstanceRepository,
         @Autowired val processInstanceRepository: ProcessInstanceRepository) {
-
-    private val graphqlAssertions = GraphqlAssertions(port = port)
 
     private val processInstanceKey = 10L
     private val scopeKey = 20L
@@ -101,8 +92,7 @@ class ZeebeGraphqlVariableTest(
     @Test
     fun `should get local variables`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       processInstance(key: $processInstanceKey) {
                         elementInstances {      
@@ -114,42 +104,37 @@ class ZeebeGraphqlVariableTest(
                         }
                       }
                     } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processInstance": {
-                          "elementInstances": [
+                    """)
+                .execute()
+                .path("processInstance.elementInstances")
+                .matchesJson("""
+                    [
+                        {
+                          "key": "$processInstanceKey",
+                          "variables": [
                             {
-                              "key": "$processInstanceKey",
-                              "variables": [
-                                {
-                                  "name": "x",
-                                  "value": "global"
-                                }
-                              ]
-                            },
+                              "name": "x",
+                              "value": "global"
+                            }
+                          ]
+                        },
+                        {
+                          "key": "$scopeKey",
+                          "variables": [
                             {
-                              "key": "$scopeKey",
-                              "variables": [
-                                {
-                                  "name": "x",
-                                  "value": "local"
-                                }
-                              ]
+                              "name": "x",
+                              "value": "local"
                             }
                           ]
                         }
-                      }
-                    }
+                    ]             
                     """)
     }
 
     @Test
     fun `should get all variables of element instance with shadowing`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       processInstance(key: $processInstanceKey) {
                         elementInstances {      
@@ -161,42 +146,37 @@ class ZeebeGraphqlVariableTest(
                         }
                       }
                     } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processInstance": {
-                          "elementInstances": [
+                    """)
+                .execute()
+                .path("processInstance.elementInstances")
+                .matchesJson("""
+                    [
+                        {
+                          "key": "$processInstanceKey",
+                          "variables": [
                             {
-                              "key": "$processInstanceKey",
-                              "variables": [
-                                {
-                                  "name": "x",
-                                  "value": "global"
-                                }
-                              ]
-                            },
+                              "name": "x",
+                              "value": "global"
+                            }
+                          ]
+                        },
+                        {
+                          "key": "$scopeKey",
+                          "variables": [
                             {
-                              "key": "$scopeKey",
-                              "variables": [
-                                {
-                                  "name": "x",
-                                  "value": "local"
-                                }
-                              ]
+                              "name": "x",
+                              "value": "local"
                             }
                           ]
                         }
-                      }
-                    }
+                    ]           
                     """)
     }
 
     @Test
     fun `should get all variables of element instance`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       processInstance(key: $processInstanceKey) {
                         elementInstances {      
@@ -208,59 +188,22 @@ class ZeebeGraphqlVariableTest(
                         }
                       }
                     } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processInstance": {
-                          "elementInstances": [
+                    """)
+                .execute()
+                .path("processInstance.elementInstances")
+                .matchesJson("""
+                    [
+                        {
+                          "key": "$processInstanceKey",
+                          "variables": [
                             {
-                              "key": "$processInstanceKey",
-                              "variables": [
-                                {
-                                  "name": "x",
-                                  "value": "global"
-                                }
-                              ]
-                            },
-                            {
-                              "key": "$scopeKey",
-                              "variables": [
-                                {
-                                  "name": "x",
-                                  "value": "global"
-                                },
-                                {
-                                  "name": "x",
-                                  "value": "local"
-                                }
-                              ]
+                              "name": "x",
+                              "value": "global"
                             }
                           ]
-                        }
-                      }
-                    }
-                    """)
-    }
-
-    @Test
-    fun `should get all variables of process instance`() {
-        // when/then
-        graphqlAssertions.assertQuery(
-                query = """
-                    {
-                      processInstance(key: $processInstanceKey) {
-                        variables {
-                          name
-                          value
-                        }
-                      }
-                    } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processInstance": {
+                        },
+                        {
+                          "key": "$scopeKey",
                           "variables": [
                             {
                               "name": "x",
@@ -272,16 +215,43 @@ class ZeebeGraphqlVariableTest(
                             }
                           ]
                         }
+                    ]          
+                    """)
+    }
+
+    @Test
+    fun `should get all variables of process instance`() {
+        // when/then
+        graphQlTester.document("""
+                    {
+                      processInstance(key: $processInstanceKey) {
+                        variables {
+                          name
+                          value
+                        }
                       }
-                    }
+                    } 
+                    """)
+                .execute()
+                .path("processInstance.variables")
+                .matchesJson("""
+                    [
+                        {
+                          "name": "x",
+                          "value": "global"
+                        },
+                        {
+                          "name": "x",
+                          "value": "local"
+                        }
+                    ]        
                     """)
     }
 
     @Test
     fun `should get all global variables`() {
         // when/then
-        graphqlAssertions.assertQuery(
-                query = """
+        graphQlTester.document("""
                     {
                       processInstance(key: $processInstanceKey) {
                         variables(globalOnly: true) {
@@ -290,24 +260,20 @@ class ZeebeGraphqlVariableTest(
                         }
                       }
                     } 
-                    """,
-                expectedResponseBody = """
-                    {
-                      "data": {
-                        "processInstance": {
-                          "variables": [
-                            {
-                              "name": "x",
-                              "value": "global"
-                            }
-                          ]
+                    """)
+                .execute()
+                .path("processInstance.variables")
+                .matchesJson("""
+                    [
+                        {
+                          "name": "x",
+                          "value": "global"
                         }
-                      }
-                    }
+                    ]      
                     """)
     }
 
     @SpringBootApplication
-    class TestConfiguration
+    class TestConfig
 
 }
