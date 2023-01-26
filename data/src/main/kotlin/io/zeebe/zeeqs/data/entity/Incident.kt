@@ -10,6 +10,7 @@ class Incident(
         @Lob val errorMessage: String,
         val processInstanceKey: Long,
         val elementInstanceKey: Long,
+        val processDefinitionKey: Long,
         val jobKey: Long?
 ) {
 

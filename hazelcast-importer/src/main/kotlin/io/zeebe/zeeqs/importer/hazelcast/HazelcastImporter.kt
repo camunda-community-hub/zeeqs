@@ -221,6 +221,7 @@ class HazelcastImporter(
         }
 
         elementInstanceRepository.save(entity)
+        dataUpdatesPublisher.onElementInstanceUpdated(entity)
     }
 
     private fun createElementInstance(record: Schema.ProcessInstanceRecord): ElementInstance {
@@ -309,6 +310,7 @@ class HazelcastImporter(
         entity.timestamp = record.metadata.timestamp
 
         variableRepository.save(entity)
+        dataUpdatesPublisher.onVariableUpdated(entity)
     }
 
     private fun createVariable(record: Schema.VariableRecord): Variable {
@@ -318,6 +320,7 @@ class HazelcastImporter(
                 name = record.name,
                 value = record.value,
                 processInstanceKey = record.processInstanceKey,
+                processDefinitionKey = record.processDefinitionKey,
                 scopeKey = record.scopeKey,
                 timestamp = record.metadata.timestamp
         )
@@ -387,6 +390,7 @@ class HazelcastImporter(
         entity.timestamp = record.metadata.timestamp
 
         jobRepository.save(entity)
+        dataUpdatesPublisher.onJobUpdated(entity)
     }
 
     private fun createJob(record: Schema.JobRecord): Job {
@@ -395,7 +399,8 @@ class HazelcastImporter(
                 position = record.metadata.position,
                 jobType = record.type,
                 processInstanceKey = record.processInstanceKey,
-                elementInstanceKey = record.elementInstanceKey
+                elementInstanceKey = record.elementInstanceKey,
+                processDefinitionKey = record.processDefinitionKey
         )
     }
 
@@ -460,6 +465,7 @@ class HazelcastImporter(
         }
 
         incidentRepository.save(entity)
+        dataUpdatesPublisher.onIncidentUpdated(entity)
     }
 
     private fun createIncident(record: Schema.IncidentRecord): Incident {
@@ -469,6 +475,7 @@ class HazelcastImporter(
                 errorType = record.errorType,
                 errorMessage = record.errorMessage,
                 processInstanceKey = record.processInstanceKey,
+                processDefinitionKey = record.processDefinitionKey,
                 elementInstanceKey = record.elementInstanceKey,
                 jobKey = record.jobKey.takeIf { it > 0 }
         )

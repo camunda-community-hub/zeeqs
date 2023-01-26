@@ -34,6 +34,7 @@ class ZeebeGraphqlVariableTest(
                         value = "global",
                         scopeKey = processInstanceKey,
                         processInstanceKey = processInstanceKey,
+                        processDefinitionKey = 10L,
                         key = 1L,
                         position = 2L,
                         timestamp = 1L
@@ -46,6 +47,7 @@ class ZeebeGraphqlVariableTest(
                         value = "local",
                         scopeKey = scopeKey,
                         processInstanceKey = processInstanceKey,
+                        processDefinitionKey = 10L,
                         key = 2L,
                         position = 2L,
                         timestamp = 1L

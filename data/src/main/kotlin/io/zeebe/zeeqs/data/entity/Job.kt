@@ -8,7 +8,8 @@ data class Job(
         val position: Long,
         val jobType: String,
         val processInstanceKey: Long,
-        val elementInstanceKey: Long
+        val elementInstanceKey: Long,
+        val processDefinitionKey: Long
 ) {
 
     @Enumerated(EnumType.STRING)

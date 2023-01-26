@@ -5,16 +5,15 @@ import io.zeebe.zeeqs.data.entity.ElementInstance
 import io.zeebe.zeeqs.data.entity.Variable
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.VariableRepository
-import io.zeebe.zeeqs.data.service.*
+import io.zeebe.zeeqs.data.service.VariableService
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import java.util.stream.LongStream
-
-import org.assertj.core.api.Assertions.*
-import org.springframework.beans.factory.annotation.Autowired
 import javax.transaction.Transactional
 
 @SpringBootTest
@@ -204,6 +203,7 @@ class VariableServiceTest(
                         value = value,
                         scopeKey = scopeKey,
                         processInstanceKey = processInstanceKey,
+                        processDefinitionKey = 10L,
                         key = nextVariableKey.next(),
                         position = 2L,
                         timestamp = 1L
