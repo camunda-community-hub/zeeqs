@@ -7,9 +7,13 @@ ZeeQS - Zeebe Query Service
 
 [![Compatible with: Camunda Platform 8](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%208-0072Ce)](https://github.com/camunda-community-hub/community/blob/main/extension-lifecycle.md#compatiblilty)
 
-A [Zeebe](https://zeebe.io) community extension that provides a GraphQL query API over Zeebe's data. The data is imported from the broker using an exporter (e.g. Hazelcast, Elasticsearch) and aggregated in the service.
+A [Zeebe](https://zeebe.io) community extension that provides a [GraphQL](https://graphql.org/) query API over Zeebe's
+data. The data is
+imported from the broker using
+the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter) and aggregated in the
+service.
 
-![architecture view](docs/ZeeQS.png)
+![architecture view](assets/ZeeQS.png)
 
 ## Usage
 
@@ -31,63 +35,65 @@ http://localhost:9000/graphiql
 ### Queries
 
 The API provide the following queries:
+
 * processes
 * processInstances
 * jobs
-* messages 
+* messages
 * incidents
 * errors
- 
+
 And additional queries to request a single object by its key (e.g. `process(key: "2251799813685249")`).
 
 ### Pagination
 
-In order to limit the response size and the query processing, each list query uses pagination to return only a subset of the data. By default, it returns the first 10 items of the list.
+In order to limit the response size and the query processing, each list query uses pagination to return only a subset of
+the data. By default, it returns the first 10 items of the list.
 
-In addition to the items, the query result contains also the total count of the items. 
+In addition to the items, the query result contains also the total count of the items.
 
 ```graphql
 {
-  processes(perPage: 10, page: 0) {
-    totalCount
-    nodes {
-      key
+    processes(perPage: 10, page: 0) {
+        totalCount
+        nodes {
+            key
+        }
     }
-  }
 }
 ```
 
 ### Filters
 
-Some queries allow to filter the result by passing arguments in the query. 
+Some queries allow to filter the result by passing arguments in the query.
 
 ```graphql
 {
-  processInstances(stateIn: [ACTIVATED]) {
-    nodes {
-      key
+    processInstances(stateIn: [ACTIVATED]) {
+        nodes {
+            key
+        }
     }
-  }
 }
 ```
 
 ### Examples
 
-Get processes including their process instance count: 
+Get processes including their process instance count:
 
 ```graphql
 {
-  processes {
-    totalCount
-    nodes {
-      key
-      bpmnProcessId
-      version
-      processInstances {
+    processes {
         totalCount
-      }
+        nodes {
+            key
+            bpmnProcessId
+            version
+            processInstances {
+                totalCount
+            }
+        }
     }
-  }
 }
 ```
 
@@ -138,22 +144,22 @@ Get process instances that are active including their active element instances:
 
 ```graphql
 {
-  processInstances(stateIn: [ACTIVATED]) {
-    totalCount
-    nodes {
-      key
-      state
-      process {
-        bpmnProcessId
-      }
-      elementInstances(stateIn: [ACTIVATED]) {
-        elementId
-        elementName
-        bpmnElementType
-        state
-      }
+    processInstances(stateIn: [ACTIVATED]) {
+        totalCount
+        nodes {
+            key
+            state
+            process {
+                bpmnProcessId
+            }
+            elementInstances(stateIn: [ACTIVATED]) {
+                elementId
+                elementName
+                bpmnElementType
+                state
+            }
+        }
     }
-  }
 }
 ```
 
@@ -306,25 +312,25 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
 
 ```graphql
 {
-  jobs(stateIn: [ACTIVATABLE, ACTIVATED], jobTypeIn: ["task-1", "task-2", "task-3"]) {
-    totalCount
-    nodes {
-      key
-      jobType
-      state
-      elementInstance {
-        elementId
-        elementName
-        processInstance {
-          key
-          process {
+    jobs(stateIn: [ACTIVATABLE, ACTIVATED], jobTypeIn: ["task-1", "task-2", "task-3"]) {
+        totalCount
+        nodes {
             key
-            bpmnProcessId
-          }
+            jobType
+            state
+            elementInstance {
+                elementId
+                elementName
+                processInstance {
+                    key
+                    process {
+                        key
+                        bpmnProcessId
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
 ```
 
@@ -430,17 +436,17 @@ Get jobs that are activate (i.e. not completed or canceled) and have one of the 
 Get jobs from a specific process instance
 
 ```graphql
-{ 
-  processInstance(key: "2251799814310503") { 
-    state 
-    jobs { 
-      key 
-      jobType 
-      elementInstance { 
-        elementId 
-      } 
-    } 
-  } 
+{
+    processInstance(key: "2251799814310503") {
+        state
+        jobs {
+            key
+            jobType
+            elementInstance {
+                elementId
+            }
+        }
+    }
 }
 ```
 
@@ -488,23 +494,27 @@ Get jobs from a specific process instance
 
 ### Docker
 
-The docker image for the ZeeQS application is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeeqs).
+The docker image for the ZeeQS application is published
+to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeeqs).
 
 ```
 docker pull ghcr.io/camunda-community-hub/zeeqs:2.3.1
 ```
- 
-* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 1.0.0)  
-* forward the Hazelcast port to the docker container (default: `5701`)
-* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
 
-If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
+* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 1.0.0)
+* forward the Hazelcast port to the docker container (default: `5701`)
+* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (
+  default: `localhost:5701`)
+
+If the Zeebe broker runs on your local machine with the default configs then start the container with the following
+command:
 
 ```
 docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:2.3.1
 ```
 
-For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the ZeeQS application. 
+For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker
+with the Hazelcast exporter and the ZeeQS application.
 
 ```
 mvn clean install -DskipTests
@@ -521,14 +531,16 @@ docker-compose --profile postgres up
 ```
 
 ### Manual
-    
-1. Download the latest [application JAR](https://github.com/zeebe-io/zeeqs/releases) _(zeeqs-%{VERSION}.jar )_   
+
+1. Download the latest [application JAR](https://github.com/zeebe-io/zeeqs/releases) _(zeeqs-%{VERSION}.jar )_
 
 1. Start the application `java -jar zeeqs-{VERSION}.jar`
 
 ### Configuration
 
-The application is a Spring Boot application. The configuration can be changed via environment variables or an `application.yaml` file. See also the following resources:
+The application is a Spring Boot application. The configuration can be changed via environment variables or
+an `application.yaml` file. See also the following resources:
+
 * [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config)
 
 By default, the port is set to `9000` and the database is only in-memory (i.e. not persistent).
