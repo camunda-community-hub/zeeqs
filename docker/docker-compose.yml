@@ -7,22 +7,19 @@ networks:
 services:
   zeebe:
     container_name: zeebe_broker
-    image: camunda/zeebe:8.0.5
+    image: ghcr.io/camunda-community-hub/zeebe-with-hazelcast-exporter:8.1.6
     environment:
       - ZEEBE_LOG_LEVEL=debug
     ports:
       - "26500:26500"
       - "9600:9600"
       - "5701:5701"
-    volumes:
-      - ../target/exporter/zeebe-hazelcast-exporter.jar:/usr/local/zeebe/exporters/zeebe-hazelcast-exporter.jar
-      - ./application.yaml:/usr/local/zeebe/config/application.yaml
     networks:
       - zeebe_network
 
   zeeqs-in-memory:
     container_name: zeeqs-in-memory
-    image: ghcr.io/camunda-community-hub/zeeqs:2.4.0
+    image: ghcr.io/camunda-community-hub/zeeqs:2.7.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
@@ -37,7 +34,7 @@ services:
 
   zeeqs-postgres:
     container_name: zeeqs-postgres
-    image: ghcr.io/camunda-community-hub/zeeqs:2.4.0
+    image: ghcr.io/camunda-community-hub/zeeqs:2.7.0
     environment:
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
       - spring.datasource.url=jdbc:postgresql://postgres-zeeqs:5432/postgres
