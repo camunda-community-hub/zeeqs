@@ -73,7 +73,7 @@ Go to http://localhost:9000/graphiql and explore the GraphQL API using GraphiQL.
 By default, the API endpoint is available under the port `9000`. And the database is only in-memory (i.e. not
 persistent).
 
-To configure the application, look at the [application.yml](main/app/src/main/resources/application.yml) and
+To configure the application, look at the [application.yml](app/src/main/resources/application.yml) and
 the [docker-compose file](docker/docker-compose.yml).
 See [here](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config)
 on how to configure a Spring Boot application in general.
@@ -101,13 +101,13 @@ under http://localhost:9000/graphiql.
 
 The GraphQL API provides the following queries:
 
-- processes
-- processInstances
-- jobs
-- userTasks
-- messages
-- incidents
-- errors
+- [processes](graphql-api/src/main/resources/graphql/Process.graphqls)
+- [processInstances](graphql-api/src/main/resources/graphql/ProcessInstance.graphqls)
+- [jobs](graphql-api/src/main/resources/graphql/Job.graphqls)
+- [userTasks](graphql-api/src/main/resources/graphql/UserTask.graphqls)
+- [messages](graphql-api/src/main/resources/graphql/Message.graphqls)
+- [incidents](graphql-api/src/main/resources/graphql/Incident.graphqls)
+- [errors](graphql-api/src/main/resources/graphql/Error.graphqls)
 
 <details>
   <summary>Example query</summary>
@@ -208,8 +208,8 @@ Some queries allow to filter the result by passing arguments in the query.
 
 The GraphQL API provides the following subscriptions:
 
-- processUpdates
-- processInstanceUpdates
+- [processUpdates](graphql-api/src/main/resources/graphql/Process.graphqls)
+- [processInstanceUpdates](graphql-api/src/main/resources/graphql/ProcessInstance.graphqls)
 
 The subscriptions are exposed via WebSockets over the same endpoint `/graphql`.
 
