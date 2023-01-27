@@ -11,6 +11,7 @@ class Variable(
         val position: Long,
         val name: String,
         val processInstanceKey: Long,
+        val processDefinitionKey: Long,
         val scopeKey: Long,
         @Lob @Column(name = "value_") var value: String,
         var timestamp: Long
