@@ -43,9 +43,9 @@ Or, if you run it on your local machine (Linux only):
 docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:2.7.0
 ```
 
-After the application is started, the GraphQL endpoint is available under http://localhost:9000.
+After the application is started, the GraphQL endpoint is available under `http://localhost:9000/graphql`.
 
-Go to http://localhost:9000/graphiql and explore the GraphQL API using GraphiQL.
+Go to http://localhost:9000/graphiql and explore the GraphQL API using [GraphiQL](https://github.com/graphql/graphiql).
 
 ### Docker Compose
 
@@ -64,9 +64,9 @@ Use a PostgreSQL database:
 docker-compose --profile postgres up
 ```
 
-After the application is started, the GraphQL endpoint is available under http://localhost:9000.
+After the application is started, the GraphQL endpoint is available under `http://localhost:9000/graphql`.
 
-Go to http://localhost:9000/graphiql and explore the GraphQL API using GraphiQL.
+Go to http://localhost:9000/graphiql and explore the GraphQL API using [GraphiQL](https://github.com/graphql/graphiql).
 
 ### Configuration
 
@@ -94,7 +94,7 @@ curl \
   http://localhost:9000/graphql
 ```
 
-The best way to explore and inspect the GraphQL API is to use the integrated web-based tool GraphiQL. It is available
+The best way to explore and inspect the GraphQL API is to use the integrated web-based tool [GraphiQL](https://github.com/graphql/graphiql). It is available
 under http://localhost:9000/graphiql.
 
 ### Queries
