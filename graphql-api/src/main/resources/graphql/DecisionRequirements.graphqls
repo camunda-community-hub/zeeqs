@@ -1,0 +1,33 @@
+# A deployed DMN decision requirements graph (DRG/DRD).
+type DecisionRequirements {
+    # The unique key of the DRG.
+    key: ID!
+    # The id of the DRG (i.e. the technical name of the DRG).
+    id: String!
+    # The name of the DRG (i.e. the descriptive name of the DRG).
+    name: String!
+    # The deployed version of the DRG based on the id.
+    version: Int!
+    # The namespace of the DRG.
+    namespace: String!
+    # The time when the DRG was deployed.
+    deployTime(zoneId: String = "Z"): String!
+    # The DMN XML resource of the DRG.
+    dmnXML: String!
+    # The decisions that belong to the DRG (i.e. the containing decisions).
+    decisions: [Decision!]
+}
+
+type DecisionRequirementsConnection {
+    totalCount: Int!
+    nodes: [DecisionRequirements!]!
+}
+
+extend type Query {
+    # Find the DRG with the given key.
+    decisionRequirement(key: ID!): DecisionRequirements
+    # Find all DRGs.
+    decisionRequirements(
+        perPage: Int = 10,
+        page: Int = 0,): DecisionRequirementsConnection!
+}

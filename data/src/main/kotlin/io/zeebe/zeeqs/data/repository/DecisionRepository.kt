@@ -5,4 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface DecisionRepository : PagingAndSortingRepository<Decision, Long>
+interface DecisionRepository : PagingAndSortingRepository<Decision, Long> {
+
+    fun findAllByDecisionRequirementsKey(decisionRequirementsKey: Long): List<Decision>
+}

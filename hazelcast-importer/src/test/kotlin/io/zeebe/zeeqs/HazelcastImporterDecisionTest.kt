@@ -21,9 +21,10 @@ import javax.transaction.Transactional
 @Testcontainers
 @Transactional
 class HazelcastImporterDecisionTest(
-        @Autowired val importer: HazelcastImporter,
-        @Autowired val decisionRepository: DecisionRepository,
-        @Autowired val decisionRequirementsRepository: DecisionRequirementsRepository) {
+    @Autowired val importer: HazelcastImporter,
+    @Autowired val decisionRepository: DecisionRepository,
+    @Autowired val decisionRequirementsRepository: DecisionRequirementsRepository
+) {
 
 
     private val hazelcastPort = 5701
@@ -32,31 +33,32 @@ class HazelcastImporterDecisionTest(
 
     @Container
     var zeebe = ZeebeContainer(ZeebeTestcontainerUtil.ZEEBE_DOCKER_IMAGE)
-            .withAdditionalExposedPort(hazelcastPort)
+        .withAdditionalExposedPort(hazelcastPort)
 
     @BeforeEach
     fun `start importer`() {
         val port = zeebe.getMappedPort(hazelcastPort)
         val hazelcastProperties = HazelcastProperties(
-                "localhost:$port", "PT10S", "zeebe")
+            "localhost:$port", "PT10S", "zeebe"
+        )
         importer.start(hazelcastProperties)
     }
 
     @BeforeEach
     fun `create Zeebe client`() {
         zeebeClient = ZeebeClient.newClientBuilder()
-                .gatewayAddress(zeebe.externalGatewayAddress)
-                .usePlaintext()
-                .build()
+            .gatewayAddress(zeebe.externalGatewayAddress)
+            .usePlaintext()
+            .build()
     }
 
     @Test
     fun `should import decision`() {
         // when
         zeebeClient.newDeployResourceCommand()
-                .addResourceFromClasspath("rating.dmn")
-                .send()
-                .join()
+            .addResourceFromClasspath("rating.dmn")
+            .send()
+            .join()
 
         // then
         await.untilAsserted { assertThat(decisionRepository.findAll()).hasSize(2) }
@@ -84,17 +86,17 @@ class HazelcastImporterDecisionTest(
     fun `should import decision requirements`() {
         // when
         zeebeClient.newDeployResourceCommand()
-                .addResourceFromClasspath("rating.dmn")
-                .send()
-                .join()
+            .addResourceFromClasspath("rating.dmn")
+            .send()
+            .join()
 
         // then
         await.untilAsserted { assertThat(decisionRequirementsRepository.findAll()).hasSize(1) }
 
         val decisionRequirements = decisionRequirementsRepository.findAll().first()
         assertThat(decisionRequirements.key).isPositive()
-        assertThat(decisionRequirements.decisionRequirementsId).isEqualTo("Ratings")
-        assertThat(decisionRequirements.decisionRequirementsName).isEqualTo("DRD")
+        assertThat(decisionRequirements.id).isEqualTo("Ratings")
+        assertThat(decisionRequirements.name).isEqualTo("DRD")
         assertThat(decisionRequirements.namespace).isEqualTo("http://camunda.org/schema/1.0/dmn")
         assertThat(decisionRequirements.version).isEqualTo(1)
         assertThat(decisionRequirements.deployTime).isPositive()

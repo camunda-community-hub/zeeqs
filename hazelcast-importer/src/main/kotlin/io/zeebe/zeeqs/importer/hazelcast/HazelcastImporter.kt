@@ -16,25 +16,25 @@ import java.time.Duration
 
 @Component
 class HazelcastImporter(
-        val hazelcastConfigRepository: HazelcastConfigRepository,
-        val processRepository: ProcessRepository,
-        val processInstanceRepository: ProcessInstanceRepository,
-        val elementInstanceRepository: ElementInstanceRepository,
-        val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
-        val variableRepository: VariableRepository,
-        val variableUpdateRepository: VariableUpdateRepository,
-        val jobRepository: JobRepository,
-        val userTaskRepository: UserTaskRepository,
-        val incidentRepository: IncidentRepository,
-        val timerRepository: TimerRepository,
-        val messageRepository: MessageRepository,
-        val messageVariableRepository: MessageVariableRepository,
-        val messageSubscriptionRepository: MessageSubscriptionRepository,
-        val messageCorrelationRepository: MessageCorrelationRepository,
-        val errorRepository: ErrorRepository,
-        private val decisionRepository: DecisionRepository,
-        private val decisionRequirementsRepository: DecisionRequirementsRepository,
-        private val dataUpdatesPublisher: DataUpdatesPublisher
+    val hazelcastConfigRepository: HazelcastConfigRepository,
+    val processRepository: ProcessRepository,
+    val processInstanceRepository: ProcessInstanceRepository,
+    val elementInstanceRepository: ElementInstanceRepository,
+    val elementInstanceStateTransitionRepository: ElementInstanceStateTransitionRepository,
+    val variableRepository: VariableRepository,
+    val variableUpdateRepository: VariableUpdateRepository,
+    val jobRepository: JobRepository,
+    val userTaskRepository: UserTaskRepository,
+    val incidentRepository: IncidentRepository,
+    val timerRepository: TimerRepository,
+    val messageRepository: MessageRepository,
+    val messageVariableRepository: MessageVariableRepository,
+    val messageSubscriptionRepository: MessageSubscriptionRepository,
+    val messageCorrelationRepository: MessageCorrelationRepository,
+    val errorRepository: ErrorRepository,
+    private val decisionRepository: DecisionRepository,
+    private val decisionRequirementsRepository: DecisionRequirementsRepository,
+    private val dataUpdatesPublisher: DataUpdatesPublisher
 ) {
 
     var zeebeHazelcast: ZeebeHazelcast? = null
@@ -45,17 +45,17 @@ class HazelcastImporter(
         val hazelcastConnectionTimeout = Duration.parse(hazelcastProperties.connectionTimeout)
         val hazelcastRingbuffer = hazelcastProperties.ringbuffer
         val hazelcastConnectionInitialBackoff =
-                Duration.parse(hazelcastProperties.connectionInitialBackoff)
+            Duration.parse(hazelcastProperties.connectionInitialBackoff)
         val hazelcastConnectionBackoffMultiplier = hazelcastProperties.connectionBackoffMultiplier
         val hazelcastConnectionMaxBackoff = Duration.parse(hazelcastProperties.connectionMaxBackoff)
 
         val hazelcastConfig = hazelcastConfigRepository.findById(hazelcastConnection)
-                .orElse(
-                        HazelcastConfig(
-                                id = hazelcastConnection,
-                                sequence = -1
-                        )
+            .orElse(
+                HazelcastConfig(
+                    id = hazelcastConnection,
+                    sequence = -1
                 )
+            )
 
         val updateSequence: ((Long) -> Unit) = {
             hazelcastConfig.sequence = it
@@ -70,55 +70,56 @@ class HazelcastImporter(
         connectionRetryConfig.clusterConnectTimeoutMillis = hazelcastConnectionTimeout.toMillis()
         // These retry configs can be user-configured in application.yml
         connectionRetryConfig.initialBackoffMillis =
-                hazelcastConnectionInitialBackoff.toMillis().toInt()
+            hazelcastConnectionInitialBackoff.toMillis().toInt()
         connectionRetryConfig.multiplier = hazelcastConnectionBackoffMultiplier
         connectionRetryConfig.maxBackoffMillis = hazelcastConnectionMaxBackoff.toMillis().toInt()
 
         val hazelcast = HazelcastClient.newHazelcastClient(clientConfig)
 
         val builder = ZeebeHazelcast.newBuilder(hazelcast).name(hazelcastRingbuffer)
-                .addProcessListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importProcess)
-                }
-                .addProcessInstanceListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importProcessInstanceRecord)
-                }
-                .addVariableListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importVariableRecord)
-                }
-                .addJobListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importJobRecord)
-                }
-                .addIncidentListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importIncidentRecord)
-                }
-                .addTimerListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importTimerRecord)
-                }
-                .addMessageListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importMessageRecord)
-                }
-                .addMessageStartEventSubscriptionListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importMessageStartEventSubscriptionRecord)
-                }
-                .addProcessMessageSubscriptionListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                            ?.let(this::importProcessMessageSubscriptionRecord)
-                }
-                .addDecisionListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importDecision)
-                }
-                .addDecisionRequirementsListener {
-                    it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importDecisionRequirements)
-                }
-                .addErrorListener(this::importError)
-                .postProcessListener(updateSequence)
+            .addProcessListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importProcess)
+            }
+            .addProcessInstanceListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importProcessInstanceRecord)
+            }
+            .addVariableListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importVariableRecord)
+            }
+            .addJobListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importJobRecord)
+            }
+            .addIncidentListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importIncidentRecord)
+            }
+            .addTimerListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importTimerRecord)
+            }
+            .addMessageListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importMessageRecord)
+            }
+            .addMessageStartEventSubscriptionListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importMessageStartEventSubscriptionRecord)
+            }
+            .addProcessMessageSubscriptionListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importProcessMessageSubscriptionRecord)
+            }
+            .addDecisionListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importDecision)
+            }
+            .addDecisionRequirementsListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(this::importDecisionRequirements)
+            }
+            .addErrorListener(this::importError)
+            .postProcessListener(updateSequence)
 
         if (hazelcastConfig.sequence >= 0) {
             builder.readFrom(hazelcastConfig.sequence)
@@ -134,12 +135,12 @@ class HazelcastImporter(
     }
 
     private fun getPartitionIdWithPosition(metadata: Schema.RecordMetadata) =
-            "${metadata.partitionId}-${metadata.position}"
+        "${metadata.partitionId}-${metadata.position}"
 
     private fun importProcess(process: Schema.ProcessRecord) {
         val entity = processRepository
-                .findById(process.processDefinitionKey)
-                .orElse(createProcess(process))
+            .findById(process.processDefinitionKey)
+            .orElse(createProcess(process))
 
         processRepository.save(entity)
 
@@ -148,13 +149,13 @@ class HazelcastImporter(
 
     private fun createProcess(process: Schema.ProcessRecord): Process {
         return Process(
-                key = process.processDefinitionKey,
-                bpmnProcessId = process.bpmnProcessId,
-                version = process.version,
-                bpmnXML = process.resource.toStringUtf8(),
-                deployTime = process.metadata.timestamp,
-                resourceName = process.resourceName,
-                checksum = process.checksum.toStringUtf8()
+            key = process.processDefinitionKey,
+            bpmnProcessId = process.bpmnProcessId,
+            version = process.version,
+            bpmnXML = process.resource.toStringUtf8(),
+            deployTime = process.metadata.timestamp,
+            resourceName = process.resourceName,
+            checksum = process.checksum.toStringUtf8()
         )
     }
 
@@ -169,8 +170,8 @@ class HazelcastImporter(
 
     private fun importProcessInstance(record: Schema.ProcessInstanceRecord) {
         val entity = processInstanceRepository
-                .findById(record.processInstanceKey)
-                .orElse(createProcessInstance(record))
+            .findById(record.processInstanceKey)
+            .orElse(createProcessInstance(record))
 
         when (record.metadata.intent) {
             "ELEMENT_ACTIVATED" -> {
@@ -196,20 +197,20 @@ class HazelcastImporter(
 
     private fun createProcessInstance(record: Schema.ProcessInstanceRecord): ProcessInstance {
         return ProcessInstance(
-                key = record.processInstanceKey,
-                position = record.metadata.position,
-                bpmnProcessId = record.bpmnProcessId,
-                version = record.version,
-                processDefinitionKey = record.processDefinitionKey,
-                parentProcessInstanceKey = record.parentProcessInstanceKey.takeIf { it > 0 },
-                parentElementInstanceKey = record.parentElementInstanceKey.takeIf { it > 0 }
+            key = record.processInstanceKey,
+            position = record.metadata.position,
+            bpmnProcessId = record.bpmnProcessId,
+            version = record.version,
+            processDefinitionKey = record.processDefinitionKey,
+            parentProcessInstanceKey = record.parentProcessInstanceKey.takeIf { it > 0 },
+            parentElementInstanceKey = record.parentElementInstanceKey.takeIf { it > 0 }
         )
     }
 
     private fun importElementInstance(record: Schema.ProcessInstanceRecord) {
         val entity = elementInstanceRepository
-                .findById(record.metadata.key)
-                .orElse(createElementInstance(record))
+            .findById(record.metadata.key)
+            .orElse(createElementInstance(record))
 
         entity.state = getElementInstanceState(record)
 
@@ -261,13 +262,13 @@ class HazelcastImporter(
         }
 
         return ElementInstance(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                elementId = record.elementId,
-                bpmnElementType = bpmnElementType,
-                processInstanceKey = record.processInstanceKey,
-                processDefinitionKey = record.processDefinitionKey,
-                scopeKey = record.flowScopeKey.takeIf { it > 0 }
+            key = record.metadata.key,
+            position = record.metadata.position,
+            elementId = record.elementId,
+            bpmnElementType = bpmnElementType,
+            processInstanceKey = record.processInstanceKey,
+            processDefinitionKey = record.processDefinitionKey,
+            scopeKey = record.flowScopeKey.takeIf { it > 0 }
         )
     }
 
@@ -290,15 +291,15 @@ class HazelcastImporter(
 
         val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = elementInstanceStateTransitionRepository
-                .findById(partitionIdWithPosition)
-                .orElse(
-                        ElementInstanceStateTransition(
-                                partitionIdWithPosition = partitionIdWithPosition,
-                                elementInstanceKey = record.metadata.key,
-                                timestamp = record.metadata.timestamp,
-                                state = state
-                        )
+            .findById(partitionIdWithPosition)
+            .orElse(
+                ElementInstanceStateTransition(
+                    partitionIdWithPosition = partitionIdWithPosition,
+                    elementInstanceKey = record.metadata.key,
+                    timestamp = record.metadata.timestamp,
+                    state = state
                 )
+            )
 
         elementInstanceStateTransitionRepository.save(entity)
     }
@@ -311,8 +312,8 @@ class HazelcastImporter(
     private fun importVariable(record: Schema.VariableRecord) {
 
         val entity = variableRepository
-                .findById(record.metadata.key)
-                .orElse(createVariable(record))
+            .findById(record.metadata.key)
+            .orElse(createVariable(record))
 
         entity.value = record.value
         entity.timestamp = record.metadata.timestamp
@@ -323,14 +324,14 @@ class HazelcastImporter(
 
     private fun createVariable(record: Schema.VariableRecord): Variable {
         return Variable(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                name = record.name,
-                value = record.value,
-                processInstanceKey = record.processInstanceKey,
-                processDefinitionKey = record.processDefinitionKey,
-                scopeKey = record.scopeKey,
-                timestamp = record.metadata.timestamp
+            key = record.metadata.key,
+            position = record.metadata.position,
+            name = record.name,
+            value = record.value,
+            processInstanceKey = record.processInstanceKey,
+            processDefinitionKey = record.processDefinitionKey,
+            scopeKey = record.scopeKey,
+            timestamp = record.metadata.timestamp
         )
     }
 
@@ -338,18 +339,18 @@ class HazelcastImporter(
 
         val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = variableUpdateRepository
-                .findById(partitionIdWithPosition)
-                .orElse(
-                        VariableUpdate(
-                                partitionIdWithPosition = partitionIdWithPosition,
-                                variableKey = record.metadata.key,
-                                name = record.name,
-                                value = record.value,
-                                processInstanceKey = record.processInstanceKey,
-                                scopeKey = record.scopeKey,
-                                timestamp = record.metadata.timestamp
-                        )
+            .findById(partitionIdWithPosition)
+            .orElse(
+                VariableUpdate(
+                    partitionIdWithPosition = partitionIdWithPosition,
+                    variableKey = record.metadata.key,
+                    name = record.name,
+                    value = record.value,
+                    processInstanceKey = record.processInstanceKey,
+                    scopeKey = record.scopeKey,
+                    timestamp = record.metadata.timestamp
                 )
+            )
 
         variableUpdateRepository.save(entity)
     }
@@ -362,12 +363,13 @@ class HazelcastImporter(
         }
     }
 
-    private fun isJobForUserTask(record: Schema.JobRecord) = record.type == Protocol.USER_TASK_JOB_TYPE
+    private fun isJobForUserTask(record: Schema.JobRecord) =
+        record.type == Protocol.USER_TASK_JOB_TYPE
 
     private fun importJobForWorker(record: Schema.JobRecord) {
         val entity = jobRepository
-                .findById(record.metadata.key)
-                .orElse(createJob(record))
+            .findById(record.metadata.key)
+            .orElse(createJob(record))
 
         when (record.metadata.intent) {
             "CREATED" -> {
@@ -403,19 +405,19 @@ class HazelcastImporter(
 
     private fun createJob(record: Schema.JobRecord): Job {
         return Job(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                jobType = record.type,
-                processInstanceKey = record.processInstanceKey,
-                elementInstanceKey = record.elementInstanceKey,
-                processDefinitionKey = record.processDefinitionKey
+            key = record.metadata.key,
+            position = record.metadata.position,
+            jobType = record.type,
+            processInstanceKey = record.processInstanceKey,
+            elementInstanceKey = record.elementInstanceKey,
+            processDefinitionKey = record.processDefinitionKey
         )
     }
 
     private fun importUserTask(record: Schema.JobRecord) {
         val entity = userTaskRepository
-                .findById(record.metadata.key)
-                .orElse(createUserTask(record))
+            .findById(record.metadata.key)
+            .orElse(createUserTask(record))
 
         when (record.metadata.intent) {
             "CREATED" -> {
@@ -441,24 +443,25 @@ class HazelcastImporter(
     private fun createUserTask(record: Schema.JobRecord): UserTask {
         val customHeaders = record.customHeaders.fieldsMap
         val assignee = customHeaders[Protocol.USER_TASK_ASSIGNEE_HEADER_NAME]?.stringValue
-        val candidateGroups = customHeaders[Protocol.USER_TASK_CANDIDATE_GROUPS_HEADER_NAME]?.stringValue
+        val candidateGroups =
+            customHeaders[Protocol.USER_TASK_CANDIDATE_GROUPS_HEADER_NAME]?.stringValue
         val formKey = customHeaders[Protocol.USER_TASK_FORM_KEY_HEADER_NAME]?.stringValue
         return UserTask(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                processInstanceKey = record.processInstanceKey,
-                processDefinitionKey = record.processDefinitionKey,
-                elementInstanceKey = record.elementInstanceKey,
-                assignee = assignee,
-                candidateGroups = candidateGroups,
-                formKey = formKey
+            key = record.metadata.key,
+            position = record.metadata.position,
+            processInstanceKey = record.processInstanceKey,
+            processDefinitionKey = record.processDefinitionKey,
+            elementInstanceKey = record.elementInstanceKey,
+            assignee = assignee,
+            candidateGroups = candidateGroups,
+            formKey = formKey
         )
     }
 
     private fun importIncidentRecord(record: Schema.IncidentRecord) {
         val entity = incidentRepository
-                .findById(record.metadata.key)
-                .orElse(createIncident(record))
+            .findById(record.metadata.key)
+            .orElse(createIncident(record))
 
         when (record.metadata.intent) {
             "CREATED" -> {
@@ -478,21 +481,21 @@ class HazelcastImporter(
 
     private fun createIncident(record: Schema.IncidentRecord): Incident {
         return Incident(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                errorType = record.errorType,
-                errorMessage = record.errorMessage,
-                processInstanceKey = record.processInstanceKey,
-                processDefinitionKey = record.processDefinitionKey,
-                elementInstanceKey = record.elementInstanceKey,
-                jobKey = record.jobKey.takeIf { it > 0 }
+            key = record.metadata.key,
+            position = record.metadata.position,
+            errorType = record.errorType,
+            errorMessage = record.errorMessage,
+            processInstanceKey = record.processInstanceKey,
+            processDefinitionKey = record.processDefinitionKey,
+            elementInstanceKey = record.elementInstanceKey,
+            jobKey = record.jobKey.takeIf { it > 0 }
         )
     }
 
     private fun importTimerRecord(record: Schema.TimerRecord) {
         val entity = timerRepository
-                .findById(record.metadata.key)
-                .orElse(createTimer(record))
+            .findById(record.metadata.key)
+            .orElse(createTimer(record))
 
         when (record.metadata.intent) {
             "CREATED" -> {
@@ -519,14 +522,14 @@ class HazelcastImporter(
 
     private fun createTimer(record: Schema.TimerRecord): Timer {
         return Timer(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                dueDate = record.dueDate,
-                repetitions = record.repetitions,
-                elementId = record.targetElementId,
-                processDefinitionKey = record.processDefinitionKey.takeIf { it > 0 },
-                processInstanceKey = record.processInstanceKey.takeIf { it > 0 },
-                elementInstanceKey = record.elementInstanceKey.takeIf { it > 0 }
+            key = record.metadata.key,
+            position = record.metadata.position,
+            dueDate = record.dueDate,
+            repetitions = record.repetitions,
+            elementId = record.targetElementId,
+            processDefinitionKey = record.processDefinitionKey.takeIf { it > 0 },
+            processInstanceKey = record.processInstanceKey.takeIf { it > 0 },
+            elementInstanceKey = record.elementInstanceKey.takeIf { it > 0 }
         );
     }
 
@@ -540,8 +543,8 @@ class HazelcastImporter(
 
     private fun importMessage(record: Schema.MessageRecord) {
         val entity = messageRepository
-                .findById(record.metadata.key)
-                .orElse(createMessage(record))
+            .findById(record.metadata.key)
+            .orElse(createMessage(record))
 
         when (record.metadata.intent) {
             "PUBLISHED" -> entity.state = MessageState.PUBLISHED
@@ -555,12 +558,12 @@ class HazelcastImporter(
 
     private fun createMessage(record: Schema.MessageRecord): Message {
         return Message(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                name = record.name,
-                correlationKey = record.correlationKey.takeIf { it.isNotEmpty() },
-                messageId = record.messageId.takeIf { it.isNotEmpty() },
-                timeToLive = record.timeToLive
+            key = record.metadata.key,
+            position = record.metadata.position,
+            name = record.name,
+            correlationKey = record.correlationKey.takeIf { it.isNotEmpty() },
+            messageId = record.messageId.takeIf { it.isNotEmpty() },
+            timeToLive = record.timeToLive
         );
     }
 
@@ -572,14 +575,16 @@ class HazelcastImporter(
             val id = messageKey.toString() + name
 
             val entity = messageVariableRepository
-                    .findById(id)
-                    .orElse(MessageVariable(
-                            id = id,
-                            name = name,
-                            value = value,
-                            messageKey = messageKey,
-                            position = messagePosition
-                    ))
+                .findById(id)
+                .orElse(
+                    MessageVariable(
+                        id = id,
+                        name = name,
+                        value = value,
+                        messageKey = messageKey,
+                        position = messagePosition
+                    )
+                )
 
             messageVariableRepository.save(entity)
         }
@@ -595,16 +600,23 @@ class HazelcastImporter(
             Value.KindCase.BOOL_VALUE -> value.boolValue.toString()
             Value.KindCase.NUMBER_VALUE -> value.numberValue.toString()
             Value.KindCase.STRING_VALUE -> "\"${value.stringValue}\""
-            Value.KindCase.LIST_VALUE -> value.listValue.valuesList.map { valueToString(it) }.joinToString(separator = ",", prefix = "[", postfix = "]")
-            Value.KindCase.STRUCT_VALUE -> value.structValue.fieldsMap.map { (key, value) -> "\"$key\":" + valueToString(value) }.joinToString(separator = ",", prefix = "{", postfix = "}")
+            Value.KindCase.LIST_VALUE -> value.listValue.valuesList.map { valueToString(it) }
+                .joinToString(separator = ",", prefix = "[", postfix = "]")
+
+            Value.KindCase.STRUCT_VALUE -> value.structValue.fieldsMap.map { (key, value) ->
+                "\"$key\":" + valueToString(
+                    value
+                )
+            }.joinToString(separator = ",", prefix = "{", postfix = "}")
+
             else -> value.toString()
         }
     }
 
     private fun importMessageStartEventSubscriptionRecord(record: Schema.MessageStartEventSubscriptionRecord) {
         val entity = messageSubscriptionRepository
-                .findById(record.metadata.key)
-                .orElse(createMessageSubscription(record))
+            .findById(record.metadata.key)
+            .orElse(createMessageSubscription(record))
 
         when (record.metadata.intent) {
             "CREATED" -> entity.state = MessageSubscriptionState.CREATED
@@ -623,21 +635,21 @@ class HazelcastImporter(
 
     private fun createMessageSubscription(record: Schema.MessageStartEventSubscriptionRecord): MessageSubscription {
         return MessageSubscription(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                messageName = record.messageName,
-                processDefinitionKey = record.processDefinitionKey,
-                elementId = record.startEventId,
-                elementInstanceKey = null,
-                processInstanceKey = null,
-                messageCorrelationKey = null
+            key = record.metadata.key,
+            position = record.metadata.position,
+            messageName = record.messageName,
+            processDefinitionKey = record.processDefinitionKey,
+            elementId = record.startEventId,
+            elementInstanceKey = null,
+            processInstanceKey = null,
+            messageCorrelationKey = null
         );
     }
 
     private fun importProcessMessageSubscriptionRecord(record: Schema.ProcessMessageSubscriptionRecord) {
         val entity = messageSubscriptionRepository
-                .findById(record.metadata.key)
-                .orElse(createMessageSubscription(record))
+            .findById(record.metadata.key)
+            .orElse(createMessageSubscription(record))
 
         when (record.metadata.intent) {
             "CREATING" -> entity.state = MessageSubscriptionState.CREATING
@@ -660,14 +672,14 @@ class HazelcastImporter(
 
     private fun createMessageSubscription(record: Schema.ProcessMessageSubscriptionRecord): MessageSubscription {
         return MessageSubscription(
-                key = record.metadata.key,
-                position = record.metadata.position,
-                messageName = record.messageName,
-                messageCorrelationKey = record.correlationKey,
-                processInstanceKey = record.processInstanceKey,
-                elementInstanceKey = record.elementInstanceKey,
-                elementId = record.elementId,
-                processDefinitionKey = null
+            key = record.metadata.key,
+            position = record.metadata.position,
+            messageName = record.messageName,
+            messageCorrelationKey = record.correlationKey,
+            processInstanceKey = record.processInstanceKey,
+            elementInstanceKey = record.elementInstanceKey,
+            elementId = record.elementId,
+            processDefinitionKey = null
         );
     }
 
@@ -675,19 +687,19 @@ class HazelcastImporter(
 
         val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = messageCorrelationRepository
-                .findById(partitionIdWithPosition)
-                .orElse(
-                        MessageCorrelation(
-                                partitionIdWithPosition = partitionIdWithPosition,
-                                messageKey = record.messageKey,
-                                messageName = record.messageName,
-                                elementInstanceKey = record.elementInstanceKey,
-                                processInstanceKey = record.processInstanceKey,
-                                elementId = record.elementId,
-                                processDefinitionKey = null,
-                                timestamp = record.metadata.timestamp
-                        )
+            .findById(partitionIdWithPosition)
+            .orElse(
+                MessageCorrelation(
+                    partitionIdWithPosition = partitionIdWithPosition,
+                    messageKey = record.messageKey,
+                    messageName = record.messageName,
+                    elementInstanceKey = record.elementInstanceKey,
+                    processInstanceKey = record.processInstanceKey,
+                    elementId = record.elementId,
+                    processDefinitionKey = null,
+                    timestamp = record.metadata.timestamp
                 )
+            )
 
         messageCorrelationRepository.save(entity)
     }
@@ -696,19 +708,19 @@ class HazelcastImporter(
 
         val partitionIdWithPosition = getPartitionIdWithPosition(record.metadata)
         val entity = messageCorrelationRepository
-                .findById(partitionIdWithPosition)
-                .orElse(
-                        MessageCorrelation(
-                                partitionIdWithPosition = partitionIdWithPosition,
-                                messageKey = record.messageKey,
-                                messageName = record.messageName,
-                                elementInstanceKey = null,
-                                processInstanceKey = record.processInstanceKey,
-                                elementId = record.startEventId,
-                                processDefinitionKey = record.processDefinitionKey,
-                                timestamp = record.metadata.timestamp
-                        )
+            .findById(partitionIdWithPosition)
+            .orElse(
+                MessageCorrelation(
+                    partitionIdWithPosition = partitionIdWithPosition,
+                    messageKey = record.messageKey,
+                    messageName = record.messageName,
+                    elementInstanceKey = null,
+                    processInstanceKey = record.processInstanceKey,
+                    elementId = record.startEventId,
+                    processDefinitionKey = record.processDefinitionKey,
+                    timestamp = record.metadata.timestamp
                 )
+            )
 
         messageCorrelationRepository.save(entity)
     }
@@ -716,21 +728,21 @@ class HazelcastImporter(
     private fun importError(record: Schema.ErrorRecord) {
 
         val entity = errorRepository.findById(record.metadata.position)
-                .orElse(Error(
-                        position = record.metadata.position,
-                        errorEventPosition = record.errorEventPosition,
-                        exceptionMessage = record.exceptionMessage,
-                        stacktrace = record.stacktrace,
-                        processInstanceKey = record.processInstanceKey.takeIf { it > 0 }
-                ))
+            .orElse(Error(
+                position = record.metadata.position,
+                errorEventPosition = record.errorEventPosition,
+                exceptionMessage = record.exceptionMessage,
+                stacktrace = record.stacktrace,
+                processInstanceKey = record.processInstanceKey.takeIf { it > 0 }
+            ))
 
         errorRepository.save(entity)
     }
 
     private fun importDecision(decision: Schema.DecisionRecord) {
         val entity = decisionRepository
-                .findById(decision.decisionKey)
-                .orElse(createDecision(decision))
+            .findById(decision.decisionKey)
+            .orElse(createDecision(decision))
 
         decisionRepository.save(entity)
 
@@ -739,19 +751,19 @@ class HazelcastImporter(
 
     private fun createDecision(decision: Schema.DecisionRecord): Decision {
         return Decision(
-                key = decision.decisionKey,
-                decisionId = decision.decisionId,
-                decisionName = decision.decisionName,
-                version = decision.version,
-                decisionRequirementsKey = decision.decisionRequirementsKey,
-                decisionRequirementsId = decision.decisionRequirementsId
+            key = decision.decisionKey,
+            decisionId = decision.decisionId,
+            decisionName = decision.decisionName,
+            version = decision.version,
+            decisionRequirementsKey = decision.decisionRequirementsKey,
+            decisionRequirementsId = decision.decisionRequirementsId
         )
     }
 
     private fun importDecisionRequirements(decisionRequirements: Schema.DecisionRequirementsRecord) {
         val entity = decisionRequirementsRepository
-                .findById(decisionRequirements.decisionRequirementsMetadata.decisionRequirementsKey)
-                .orElse(createDecisionRequirements(decisionRequirements))
+            .findById(decisionRequirements.decisionRequirementsMetadata.decisionRequirementsKey)
+            .orElse(createDecisionRequirements(decisionRequirements))
 
         decisionRequirementsRepository.save(entity)
     }
@@ -759,15 +771,15 @@ class HazelcastImporter(
     private fun createDecisionRequirements(decisionRequirements: Schema.DecisionRequirementsRecord): DecisionRequirements {
         val metadata = decisionRequirements.decisionRequirementsMetadata
         return DecisionRequirements(
-                key = metadata.decisionRequirementsKey,
-                decisionRequirementsId = metadata.decisionRequirementsId,
-                decisionRequirementsName = metadata.decisionRequirementsName,
-                version = metadata.decisionRequirementsVersion,
-                namespace = metadata.namespace,
-                dmnXml = decisionRequirements.resource.toStringUtf8(),
-                deployTime = decisionRequirements.metadata.timestamp,
-                resourceName = metadata.resourceName,
-                checksum = metadata.checksum.toStringUtf8()
+            key = metadata.decisionRequirementsKey,
+            id = metadata.decisionRequirementsId,
+            name = metadata.decisionRequirementsName,
+            version = metadata.decisionRequirementsVersion,
+            namespace = metadata.namespace,
+            dmnXml = decisionRequirements.resource.toStringUtf8(),
+            deployTime = decisionRequirements.metadata.timestamp,
+            resourceName = metadata.resourceName,
+            checksum = metadata.checksum.toStringUtf8()
         )
     }
 
