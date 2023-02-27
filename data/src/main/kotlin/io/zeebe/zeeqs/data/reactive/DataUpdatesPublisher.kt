@@ -8,6 +8,7 @@ import java.util.function.Consumer
 class DataUpdatesPublisher {
 
     private val processListeners = mutableListOf<Consumer<Process>>()
+    private val decisionListeners = mutableListOf<Consumer<Decision>>()
     private val processInstanceListeners = mutableListOf<Consumer<ProcessInstance>>()
     private val elementInstanceListeners = mutableListOf<Consumer<ElementInstance>>()
     private val variableListeners = mutableListOf<Consumer<Variable>>()
@@ -16,6 +17,10 @@ class DataUpdatesPublisher {
 
     fun onProcessUpdated(process: Process) {
         processListeners.forEach { it.accept(process) }
+    }
+
+    fun onDecisionUpdated(decision: Decision) {
+        decisionListeners.forEach { it.accept(decision) }
     }
 
     fun onProcessInstanceUpdated(processInstance: ProcessInstance) {
@@ -40,6 +45,10 @@ class DataUpdatesPublisher {
 
     fun registerProcessListener(listener: Consumer<Process>) {
         processListeners.add(listener)
+    }
+
+    fun registerDecisionListener(listener: Consumer<Decision>) {
+        decisionListeners.add(listener)
     }
 
     fun registerProcessInstanceListener(listener: Consumer<ProcessInstance>) {
