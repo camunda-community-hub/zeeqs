@@ -1,0 +1,32 @@
+# A deployed DMN decision.
+type Decision {
+    # The unique key of the decision.
+    key: ID!
+    # The id of the decision (i.e. the technical name of the decision).
+    decisionId: String!
+    # The name of the decision (i.e. the descriptive name of the decision).
+    decisionName: String!
+    # The deployed version of the decision based on the decision id.
+    version: Int!
+    # The decision requirements graph that contains the decision.
+    decisionRequirements: DecisionRequirements
+}
+
+type DecisionConnection {
+    totalCount: Int!
+    nodes: [Decision!]!
+}
+
+extend type Query {
+    # Find the decision with the given key.
+    decision(key: ID!): Decision
+    # Find all decisions.
+    decisions(
+        perPage: Int = 10,
+        page: Int = 0,): DecisionConnection!
+}
+
+extend type Subscription {
+    # Subscribe to updates of decisions (i.e. new decision deployed).
+    decisionUpdates: Decision!
+}
