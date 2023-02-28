@@ -3,9 +3,9 @@ type DecisionRequirements {
     # The unique key of the DRG.
     key: ID!
     # The id of the DRG (i.e. the technical name of the DRG).
-    id: String!
+    decisionRequirementsId: String!
     # The name of the DRG (i.e. the descriptive name of the DRG).
-    name: String!
+    decisionRequirementsName: String!
     # The deployed version of the DRG based on the id.
     version: Int!
     # The namespace of the DRG.

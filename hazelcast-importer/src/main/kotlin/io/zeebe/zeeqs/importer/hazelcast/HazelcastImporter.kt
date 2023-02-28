@@ -772,8 +772,8 @@ class HazelcastImporter(
         val metadata = decisionRequirements.decisionRequirementsMetadata
         return DecisionRequirements(
             key = metadata.decisionRequirementsKey,
-            id = metadata.decisionRequirementsId,
-            name = metadata.decisionRequirementsName,
+            decisionRequirementsId = metadata.decisionRequirementsId,
+            decisionRequirementsName = metadata.decisionRequirementsName,
             version = metadata.decisionRequirementsVersion,
             namespace = metadata.namespace,
             dmnXml = decisionRequirements.resource.toStringUtf8(),

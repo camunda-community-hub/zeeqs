@@ -30,8 +30,8 @@ class ZeebeGraphqlDecisionTest(
         decisionRequirementsRepository.save(
             DecisionRequirements(
                 key = decisionRequirementsKey,
-                id = "Ratings",
-                name = "Rating example",
+                decisionRequirementsId = "Ratings",
+                decisionRequirementsName = "Rating example",
                 version = 1,
                 namespace = "namespace",
                 dmnXml = "<xml>",
@@ -97,7 +97,7 @@ class ZeebeGraphqlDecisionTest(
                       decisionRequirements {
                         nodes {
                           key
-                          id
+                          decisionRequirementsId
                           decisions {
                             key
                           }
@@ -113,7 +113,7 @@ class ZeebeGraphqlDecisionTest(
                     [
                         {
                           "key": "$decisionRequirementsKey",
-                          "id": "Ratings",
+                          "decisionRequirementsId": "Ratings",
                           "decisions": [
                             { "key": "$decisionKey" }
                           ]

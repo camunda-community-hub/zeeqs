@@ -8,8 +8,8 @@ import javax.persistence.Lob
 @Entity
 data class DecisionRequirements(
     @Id @Column(name = "key_") val key: Long,
-    val id: String,
-    val name: String,
+    val decisionRequirementsId: String,
+    val decisionRequirementsName: String,
     val version: Int,
     val namespace: String,
     @Lob val dmnXml: String,

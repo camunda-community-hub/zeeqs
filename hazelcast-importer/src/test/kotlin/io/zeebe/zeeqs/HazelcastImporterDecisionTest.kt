@@ -95,8 +95,8 @@ class HazelcastImporterDecisionTest(
 
         val decisionRequirements = decisionRequirementsRepository.findAll().first()
         assertThat(decisionRequirements.key).isPositive()
-        assertThat(decisionRequirements.id).isEqualTo("Ratings")
-        assertThat(decisionRequirements.name).isEqualTo("DRD")
+        assertThat(decisionRequirements.decisionRequirementsId).isEqualTo("Ratings")
+        assertThat(decisionRequirements.decisionRequirementsName).isEqualTo("DRD")
         assertThat(decisionRequirements.namespace).isEqualTo("http://camunda.org/schema/1.0/dmn")
         assertThat(decisionRequirements.version).isEqualTo(1)
         assertThat(decisionRequirements.deployTime).isPositive()
