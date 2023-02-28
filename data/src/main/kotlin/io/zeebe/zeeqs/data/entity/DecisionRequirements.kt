@@ -12,7 +12,7 @@ data class DecisionRequirements(
     val decisionRequirementsName: String,
     val version: Int,
     val namespace: String,
-    @Lob val dmnXml: String,
+    @Lob val dmnXML: String,
     val deployTime: Long,
     val resourceName: String,
     @Lob val checksum: String

@@ -34,7 +34,7 @@ class ZeebeGraphqlDecisionTest(
                 decisionRequirementsName = "Rating example",
                 version = 1,
                 namespace = "namespace",
-                dmnXml = "<xml>",
+                dmnXML = "<xml>",
                 deployTime = Instant.now().toEpochMilli(),
                 resourceName = "rating.dmn",
                 checksum = "checksum"

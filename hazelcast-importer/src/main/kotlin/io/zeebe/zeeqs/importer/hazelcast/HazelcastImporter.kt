@@ -776,7 +776,7 @@ class HazelcastImporter(
             decisionRequirementsName = metadata.decisionRequirementsName,
             version = metadata.decisionRequirementsVersion,
             namespace = metadata.namespace,
-            dmnXml = decisionRequirements.resource.toStringUtf8(),
+            dmnXML = decisionRequirements.resource.toStringUtf8(),
             deployTime = decisionRequirements.metadata.timestamp,
             resourceName = metadata.resourceName,
             checksum = metadata.checksum.toStringUtf8()

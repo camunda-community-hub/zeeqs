@@ -101,7 +101,7 @@ class HazelcastImporterDecisionTest(
         assertThat(decisionRequirements.version).isEqualTo(1)
         assertThat(decisionRequirements.deployTime).isPositive()
         assertThat(decisionRequirements.resourceName).isEqualTo("rating.dmn")
-        assertThat(decisionRequirements.dmnXml).isNotEmpty()
+        assertThat(decisionRequirements.dmnXML).isNotEmpty()
         assertThat(decisionRequirements.checksum).isNotEmpty()
     }
 
