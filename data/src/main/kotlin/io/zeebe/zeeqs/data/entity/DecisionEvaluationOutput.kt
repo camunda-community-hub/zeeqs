@@ -11,7 +11,7 @@ data class DecisionEvaluationOutput(
     val outputId: String,
     val outputName: String,
     @Lob @Column(name = "value_") val value: String,
-    val decisionEvaluationKey: Long,
+    val evaluatedDecisionId: String,
     val ruleId: String,
     val ruleIndex: Int
 )

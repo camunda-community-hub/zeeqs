@@ -11,5 +11,5 @@ data class DecisionEvaluationInput(
     val inputId: String,
     val inputName: String,
     @Lob @Column(name = "value_") val value: String,
-    val decisionEvaluationKey: Long
+    val evaluatedDecisionId: String
 )

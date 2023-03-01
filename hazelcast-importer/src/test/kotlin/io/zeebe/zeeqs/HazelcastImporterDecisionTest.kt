@@ -1,9 +1,13 @@
 package io.zeebe.zeeqs
 
 import io.camunda.zeebe.client.ZeebeClient
+import io.camunda.zeebe.model.bpmn.Bpmn
 import io.zeebe.containers.ZeebeContainer
+import io.zeebe.zeeqs.data.entity.DecisionEvaluationState
+import io.zeebe.zeeqs.data.repository.DecisionEvaluationRepository
 import io.zeebe.zeeqs.data.repository.DecisionRepository
 import io.zeebe.zeeqs.data.repository.DecisionRequirementsRepository
+import io.zeebe.zeeqs.data.repository.EvaluatedDecisionRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
 import org.assertj.core.api.Assertions.assertThat
@@ -23,7 +27,9 @@ import javax.transaction.Transactional
 class HazelcastImporterDecisionTest(
     @Autowired val importer: HazelcastImporter,
     @Autowired val decisionRepository: DecisionRepository,
-    @Autowired val decisionRequirementsRepository: DecisionRequirementsRepository
+    @Autowired val decisionRequirementsRepository: DecisionRequirementsRepository,
+    @Autowired val decisionEvaluationRepository: DecisionEvaluationRepository,
+    @Autowired val evaluatedDecisionRepository: EvaluatedDecisionRepository
 ) {
 
 
@@ -103,6 +109,45 @@ class HazelcastImporterDecisionTest(
         assertThat(decisionRequirements.resourceName).isEqualTo("rating.dmn")
         assertThat(decisionRequirements.dmnXML).isNotEmpty()
         assertThat(decisionRequirements.checksum).isNotEmpty()
+    }
+
+    @Test
+    fun `should import decision evaluation`() {
+        // given
+        zeebeClient.newDeployResourceCommand()
+            .addResourceFromClasspath("rating.dmn")
+            .addProcessModel(Bpmn.createExecutableProcess("process")
+                .startEvent()
+                .businessRuleTask("task") {
+                    it.zeebeCalledDecisionId("decision_a")
+                        .zeebeResultVariable("rating")
+                }
+                .endEvent()
+                .done(), "process.bpmn")
+            .send()
+            .join()
+
+        // when
+        val processInstanceKey = zeebeClient.newCreateInstanceCommand()
+            .bpmnProcessId("process")
+            .latestVersion()
+            .variables(mapOf("x" to 7))
+            .send()
+            .join()
+            .processInstanceKey
+
+        // then
+        await.untilAsserted { assertThat(decisionEvaluationRepository.findAll()).hasSize(1) }
+
+        val decisionEvaluation = decisionEvaluationRepository.findAll().first()
+
+        assertThat(decisionEvaluation.key).isPositive()
+        assertThat(decisionEvaluation.decisionOutput).isEqualTo("\"A+\"")
+        assertThat(decisionEvaluation.state).isEqualTo(DecisionEvaluationState.EVALUATED)
+        assertThat(decisionEvaluation.processInstanceKey).isEqualTo(processInstanceKey)
+
+        assertThat(evaluatedDecisionRepository.findAllByDecisionEvaluationKey(decisionEvaluation.key))
+            .hasSize(2)
     }
 
     @SpringBootApplication

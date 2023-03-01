@@ -34,6 +34,7 @@ class HazelcastImporter(
     val errorRepository: ErrorRepository,
     private val decisionRepository: DecisionRepository,
     private val decisionRequirementsRepository: DecisionRequirementsRepository,
+    private val decisionEvaluationImporter: HazelcastDecisionEvaluationImporter,
     private val dataUpdatesPublisher: DataUpdatesPublisher
 ) {
 
@@ -117,6 +118,10 @@ class HazelcastImporter(
             .addDecisionRequirementsListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
                     ?.let(this::importDecisionRequirements)
+            }
+            .addDecisionEvaluationListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(decisionEvaluationImporter::importDecisionEvaluation)
             }
             .addErrorListener(this::importError)
             .postProcessListener(updateSequence)

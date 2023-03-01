@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 interface DecisionEvaluationOutputRepository :
     PagingAndSortingRepository<DecisionEvaluationOutput, String> {
 
-    fun findAllByDecisionEvaluationKey(decisionEvaluationKey: Long): List<DecisionEvaluationOutput>
+    fun findAllByEvaluatedDecisionId(evaluatedDecisionId: String): List<DecisionEvaluationOutput>
 }
