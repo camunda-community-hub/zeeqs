@@ -123,6 +123,7 @@ class HazelcastDecisionImporter(
         return DecisionEvaluation(
             key = metadata.key,
             decisionKey = decisionEvaluation.decisionKey,
+            decisionRequirementsKey = decisionEvaluation.decisionRequirementsKey,
             decisionOutput = decisionEvaluation.decisionOutput,
             state = when (metadata.intent) {
                 "EVALUATED" -> DecisionEvaluationState.EVALUATED

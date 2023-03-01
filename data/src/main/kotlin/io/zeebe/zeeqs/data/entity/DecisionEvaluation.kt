@@ -6,6 +6,7 @@ import javax.persistence.*
 data class DecisionEvaluation(
     @Id @Column(name = "key_") val key: Long,
     val decisionKey: Long,
+    val decisionRequirementsKey: Long,
     @Lob val decisionOutput: String,
     @Enumerated(EnumType.STRING) var state: DecisionEvaluationState = DecisionEvaluationState.EVALUATED,
     val evaluationTime: Long,

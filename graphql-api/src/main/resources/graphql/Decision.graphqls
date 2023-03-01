@@ -10,6 +10,8 @@ type Decision {
     version: Int!
     # The decision requirements graph that contains the decision.
     decisionRequirements: DecisionRequirements
+    # The evaluations of the decision.
+    evaluations: DecisionEvaluationConnection!
 }
 
 type DecisionConnection {
