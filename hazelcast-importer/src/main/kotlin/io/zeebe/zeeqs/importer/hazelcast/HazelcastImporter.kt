@@ -32,9 +32,7 @@ class HazelcastImporter(
     val messageSubscriptionRepository: MessageSubscriptionRepository,
     val messageCorrelationRepository: MessageCorrelationRepository,
     val errorRepository: ErrorRepository,
-    private val decisionRepository: DecisionRepository,
-    private val decisionRequirementsRepository: DecisionRequirementsRepository,
-    private val decisionEvaluationImporter: HazelcastDecisionEvaluationImporter,
+    private val decisionEvaluationImporter: HazelcastDecisionImporter,
     private val dataUpdatesPublisher: DataUpdatesPublisher
 ) {
 
@@ -113,11 +111,12 @@ class HazelcastImporter(
                     ?.let(this::importProcessMessageSubscriptionRecord)
             }
             .addDecisionListener {
-                it.takeIf { it.metadata.recordType == RecordType.EVENT }?.let(this::importDecision)
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(decisionEvaluationImporter::importDecision)
             }
             .addDecisionRequirementsListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
-                    ?.let(this::importDecisionRequirements)
+                    ?.let(decisionEvaluationImporter::importDecisionRequirements)
             }
             .addDecisionEvaluationListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
@@ -744,48 +743,5 @@ class HazelcastImporter(
         errorRepository.save(entity)
     }
 
-    private fun importDecision(decision: Schema.DecisionRecord) {
-        val entity = decisionRepository
-            .findById(decision.decisionKey)
-            .orElse(createDecision(decision))
-
-        decisionRepository.save(entity)
-
-        dataUpdatesPublisher.onDecisionUpdated(entity)
-    }
-
-    private fun createDecision(decision: Schema.DecisionRecord): Decision {
-        return Decision(
-            key = decision.decisionKey,
-            decisionId = decision.decisionId,
-            decisionName = decision.decisionName,
-            version = decision.version,
-            decisionRequirementsKey = decision.decisionRequirementsKey,
-            decisionRequirementsId = decision.decisionRequirementsId
-        )
-    }
-
-    private fun importDecisionRequirements(decisionRequirements: Schema.DecisionRequirementsRecord) {
-        val entity = decisionRequirementsRepository
-            .findById(decisionRequirements.decisionRequirementsMetadata.decisionRequirementsKey)
-            .orElse(createDecisionRequirements(decisionRequirements))
-
-        decisionRequirementsRepository.save(entity)
-    }
-
-    private fun createDecisionRequirements(decisionRequirements: Schema.DecisionRequirementsRecord): DecisionRequirements {
-        val metadata = decisionRequirements.decisionRequirementsMetadata
-        return DecisionRequirements(
-            key = metadata.decisionRequirementsKey,
-            decisionRequirementsId = metadata.decisionRequirementsId,
-            decisionRequirementsName = metadata.decisionRequirementsName,
-            version = metadata.decisionRequirementsVersion,
-            namespace = metadata.namespace,
-            dmnXML = decisionRequirements.resource.toStringUtf8(),
-            deployTime = decisionRequirements.metadata.timestamp,
-            resourceName = metadata.resourceName,
-            checksum = metadata.checksum.toStringUtf8()
-        )
-    }
 
 }

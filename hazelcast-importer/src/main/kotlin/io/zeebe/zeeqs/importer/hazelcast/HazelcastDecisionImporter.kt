@@ -2,19 +2,64 @@ package io.zeebe.zeeqs.importer.hazelcast
 
 import io.zeebe.exporter.proto.Schema
 import io.zeebe.zeeqs.data.entity.*
-import io.zeebe.zeeqs.data.repository.DecisionEvaluationInputRepository
-import io.zeebe.zeeqs.data.repository.DecisionEvaluationOutputRepository
-import io.zeebe.zeeqs.data.repository.DecisionEvaluationRepository
-import io.zeebe.zeeqs.data.repository.EvaluatedDecisionRepository
+import io.zeebe.zeeqs.data.reactive.DataUpdatesPublisher
+import io.zeebe.zeeqs.data.repository.*
 import org.springframework.stereotype.Component
 
 @Component
-class HazelcastDecisionEvaluationImporter(
+class HazelcastDecisionImporter(
+    private val dataUpdatesPublisher: DataUpdatesPublisher,
+    private val decisionRepository: DecisionRepository,
+    private val decisionRequirementsRepository: DecisionRequirementsRepository,
     private val decisionEvaluationRepository: DecisionEvaluationRepository,
     private val evaluatedDecisionRepository: EvaluatedDecisionRepository,
     private val decisionEvaluationInputRepository: DecisionEvaluationInputRepository,
     private val decisionEvaluationOutputRepository: DecisionEvaluationOutputRepository
 ) {
+
+    fun importDecision(decision: Schema.DecisionRecord) {
+        val entity = decisionRepository
+            .findById(decision.decisionKey)
+            .orElse(createDecision(decision))
+
+        decisionRepository.save(entity)
+
+        dataUpdatesPublisher.onDecisionUpdated(entity)
+    }
+
+    private fun createDecision(decision: Schema.DecisionRecord): Decision {
+        return Decision(
+            key = decision.decisionKey,
+            decisionId = decision.decisionId,
+            decisionName = decision.decisionName,
+            version = decision.version,
+            decisionRequirementsKey = decision.decisionRequirementsKey,
+            decisionRequirementsId = decision.decisionRequirementsId
+        )
+    }
+
+    fun importDecisionRequirements(decisionRequirements: Schema.DecisionRequirementsRecord) {
+        val entity = decisionRequirementsRepository
+            .findById(decisionRequirements.decisionRequirementsMetadata.decisionRequirementsKey)
+            .orElse(createDecisionRequirements(decisionRequirements))
+
+        decisionRequirementsRepository.save(entity)
+    }
+
+    private fun createDecisionRequirements(decisionRequirements: Schema.DecisionRequirementsRecord): DecisionRequirements {
+        val metadata = decisionRequirements.decisionRequirementsMetadata
+        return DecisionRequirements(
+            key = metadata.decisionRequirementsKey,
+            decisionRequirementsId = metadata.decisionRequirementsId,
+            decisionRequirementsName = metadata.decisionRequirementsName,
+            version = metadata.decisionRequirementsVersion,
+            namespace = metadata.namespace,
+            dmnXML = decisionRequirements.resource.toStringUtf8(),
+            deployTime = decisionRequirements.metadata.timestamp,
+            resourceName = metadata.resourceName,
+            checksum = metadata.checksum.toStringUtf8()
+        )
+    }
 
     fun importDecisionEvaluation(decisionEvaluation: Schema.DecisionEvaluationRecord) {
         val decisionEvaluationKey = decisionEvaluation.metadata.key
