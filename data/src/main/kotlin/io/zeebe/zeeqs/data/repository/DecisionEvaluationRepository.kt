@@ -1,6 +1,8 @@
 package io.zeebe.zeeqs.data.repository
 
 import io.zeebe.zeeqs.data.entity.DecisionEvaluation
+import io.zeebe.zeeqs.data.entity.DecisionEvaluationState
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
@@ -18,4 +20,11 @@ interface DecisionEvaluationRepository : PagingAndSortingRepository<DecisionEval
     fun findAllByElementInstanceKey(elementInstanceKey: Long): List<DecisionEvaluation>
 
     fun countByElementInstanceKey(elementInstanceKey: Long): Long
+
+    fun findByStateIn(
+        stateIn: List<DecisionEvaluationState>,
+        pageable: Pageable
+    ): List<DecisionEvaluation>
+
+    fun countByStateIn(stateIn: List<DecisionEvaluationState>): Long
 }
