@@ -1,0 +1,76 @@
+# An evaluation of a DMN decision.
+type DecisionEvaluation {
+    # The unique key of the decision evaluation.
+    key: ID!
+    # The evaluated decision (i.e. the root/called decision).
+    decision: Decision
+    # The output of the evaluation (i.e. the decision result).
+    decisionOutput: String!
+    # The state of the evaluation (i.e. evaluation was successful or with failures).
+    state: DecisionEvaluationState!
+    # All evaluated decisions (i.e. the root decision and all required decisions).
+    evaluatedDecisions: [EvaluatedDecision!]
+    # The failure message if the evaluation was not successful.
+    evaluationFailureMessage: String
+    # The decision that caused the failure if the evaluation was not successful.
+    failedDecision: Decision
+    # The related process instance if the decision was called from a BPMN process.
+    processInstance: ProcessInstance
+    # The related element instance of the business rule task if the decision was called from a BPMN process.
+    elementInstance: ElementInstance
+}
+
+# An intermediate result of a decision evaluation.
+type EvaluatedDecision {
+    # The evaluated decision.
+    decision: Decision
+    # The output of the decision evaluation.
+    decisionOutput: String!
+    # The evaluated inputs if the decision is a decision table.
+    inputs: [DecisionEvaluationInput!]
+    # The matched rules if the decision is a decision table.
+    matchedRules: [DecisionEvaluationMatchedRule!]
+}
+
+# An evaluated input of a decision table.
+type DecisionEvaluationInput {
+    # The id of the input.
+    inputId: String!
+    # The name of the input.
+    inputName: String!
+    # The value of the evaluated input.
+    value: String!
+}
+
+# A matched rule of a decision table evaluation.
+type DecisionEvaluationMatchedRule {
+    # The id of the rule.
+    ruleId: String!
+    # The index of the rule.
+    ruleIndex: Int!
+    # The evaluated outputs of the rule.
+    outputs: [DecisionEvaluationOutput!]
+}
+
+# An evaluated output of a decision table.
+type DecisionEvaluationOutput {
+    # The id of the output.
+    outputId: String!
+    # The name of the output.
+    outputName: String!
+    # The value of the evaluated output.
+    value: String!
+}
+
+# The state of a decision evaluation.
+enum DecisionEvaluationState {
+    # The decision was evaluated successfully.
+    EVALUATED,
+    # The decision evaluation failed.
+    FAILED
+}
+
+type DecisionEvaluationConnection {
+    totalCount: Int!
+    nodes: [DecisionEvaluation!]!
+}
