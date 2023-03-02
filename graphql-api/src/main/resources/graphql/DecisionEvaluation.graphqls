@@ -77,6 +77,19 @@ type DecisionEvaluationConnection {
     nodes: [DecisionEvaluation!]!
 }
 
+extend type Query {
+    # Find the decision evaluation with the given key.
+    decisionEvaluation(key: ID!): DecisionEvaluation
+
+    # Find all decision evaluations.
+    decisionEvaluations(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [DecisionEvaluationState!] = [EVALUATED, FAILED]
+    ): DecisionEvaluationConnection!
+
+}
+
 extend type Subscription {
     # Subscribe to updates of decision evaluations (i.e. a decision was evaluated).
     decisionEvaluationUpdates(
