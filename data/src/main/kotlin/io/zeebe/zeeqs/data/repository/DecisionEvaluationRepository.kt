@@ -13,5 +13,9 @@ interface DecisionEvaluationRepository : PagingAndSortingRepository<DecisionEval
 
     fun findAllByProcessInstanceKey(processInstanceKey: Long): List<DecisionEvaluation>
 
+    fun countByProcessInstanceKey(processInstanceKey: Long): Long
+
     fun findAllByElementInstanceKey(elementInstanceKey: Long): List<DecisionEvaluation>
+
+    fun countByElementInstanceKey(elementInstanceKey: Long): Long
 }
