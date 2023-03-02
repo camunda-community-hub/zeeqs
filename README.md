@@ -27,7 +27,7 @@ to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/cont
 Run the following command to start the application:
 
 ```
-docker run -p 9000:9000 ghcr.io/camunda-community-hub/zeeqs:2.7.0
+docker run -p 9000:9000 ghcr.io/camunda-community-hub/zeeqs:latest
 ```
 
 - Ensure that a Zeebe broker is running with
@@ -40,7 +40,7 @@ docker run -p 9000:9000 ghcr.io/camunda-community-hub/zeeqs:2.7.0
 Or, if you run it on your local machine (Linux only):
 
 ```
-docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:2.7.0
+docker run --network="host" ghcr.io/camunda-community-hub/zeeqs:latest
 ```
 
 After the application is started, the GraphQL endpoint is available under `http://localhost:9000/graphql`.
