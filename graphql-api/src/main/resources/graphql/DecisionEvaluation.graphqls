@@ -8,6 +8,8 @@ type DecisionEvaluation {
     decisionOutput: String!
     # The state of the evaluation (i.e. evaluation was successful or with failures).
     state: DecisionEvaluationState!
+    # The time when the decision was evaluated.
+    evaluationTime(zoneId: String = "Z"): String!
     # All evaluated decisions (i.e. the root decision and all required decisions).
     evaluatedDecisions: [EvaluatedDecision!]
     # The failure message if the evaluation was not successful.
