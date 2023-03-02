@@ -1,6 +1,7 @@
 package io.zeebe.zeeqs.data.reactive
 
 import io.zeebe.zeeqs.data.entity.Decision
+import io.zeebe.zeeqs.data.entity.DecisionEvaluation
 import io.zeebe.zeeqs.data.entity.Process
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -71,6 +72,12 @@ class DataUpdatesSubscription(private val publisher: DataUpdatesPublisher) {
                     )
                 )
             }
+        }
+    }
+
+    fun decisionEvaluationSubscription(): Flux<DecisionEvaluation> {
+        return Flux.create { sink ->
+            publisher.registerDecisionEvaluationListener { sink.next(it) }
         }
     }
 

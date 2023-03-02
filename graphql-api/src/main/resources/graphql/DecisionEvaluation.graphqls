@@ -76,3 +76,18 @@ type DecisionEvaluationConnection {
     totalCount: Int!
     nodes: [DecisionEvaluation!]!
 }
+
+extend type Subscription {
+    # Subscribe to updates of decision evaluations (i.e. a decision was evaluated).
+    decisionEvaluationUpdates(
+        # Limit the updates by the given filter.
+        filter: DecisionEvaluationUpdateFilter = null): DecisionEvaluation!
+}
+
+# A filter to limit the decision evaluation updates.
+input DecisionEvaluationUpdateFilter {
+    # Limit the updates to evaluations of the given decision.
+    decisionKey: ID
+    # Limit the updates to evaluations that belong to a decision of the given DRG.
+    decisionRequirementsKey: ID
+}

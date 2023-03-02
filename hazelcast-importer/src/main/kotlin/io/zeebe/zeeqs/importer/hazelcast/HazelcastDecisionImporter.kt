@@ -115,6 +115,8 @@ class HazelcastDecisionImporter(
                 }
             }
         }
+
+        dataUpdatesPublisher.onDecisionEvaluationUpdated(entity)
     }
 
     private fun createDecisionEvaluation(decisionEvaluation: Schema.DecisionEvaluationRecord): DecisionEvaluation {
