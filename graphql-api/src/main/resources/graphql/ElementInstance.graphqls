@@ -38,6 +38,9 @@ type ElementInstance {
         # If false, it returns all variables, including variables with the same name.
         shadowing: Boolean = true
     ): [Variable!]!
+
+    # The evaluated decisions that are called by this element instance if the element is a business rule task.
+    decisionEvaluations: DecisionEvaluationConnection
 }
 
 type ElementInstanceStateTransition {

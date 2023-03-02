@@ -2,6 +2,7 @@ package io.zeebe.zeeqs.graphql.resolvers.type
 
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.*
+import io.zeebe.zeeqs.graphql.resolvers.connection.DecisionEvaluationConnection
 import io.zeebe.zeeqs.graphql.resolvers.connection.UserTaskConnection
 import io.zeebe.zeeqs.graphql.resolvers.type.ResolverExtension.timestampToString
 import org.springframework.data.domain.PageRequest
@@ -12,38 +13,39 @@ import org.springframework.stereotype.Controller
 
 @Controller
 class ProcessInstanceResolver(
-        val processInstanceRepository: ProcessInstanceRepository,
-        val variableRepository: VariableRepository,
-        val processRepository: ProcessRepository,
-        val jobRepository: JobRepository,
-        val userTaskRepository: UserTaskRepository,
-        val incidentRepository: IncidentRepository,
-        val elementInstanceRepository: ElementInstanceRepository,
-        val timerRepository: TimerRepository,
-        val messageSubscriptionRepository: MessageSubscriptionRepository,
-        val errorRepository: ErrorRepository
+    val processInstanceRepository: ProcessInstanceRepository,
+    val variableRepository: VariableRepository,
+    val processRepository: ProcessRepository,
+    val jobRepository: JobRepository,
+    val userTaskRepository: UserTaskRepository,
+    val incidentRepository: IncidentRepository,
+    val elementInstanceRepository: ElementInstanceRepository,
+    val timerRepository: TimerRepository,
+    val messageSubscriptionRepository: MessageSubscriptionRepository,
+    val errorRepository: ErrorRepository,
+    private val decisionEvaluationRepository: DecisionEvaluationRepository
 ) {
 
     @SchemaMapping(typeName = "ProcessInstance", field = "startTime")
     fun startTime(
-            processInstance: ProcessInstance,
-            @Argument zoneId: String
+        processInstance: ProcessInstance,
+        @Argument zoneId: String
     ): String? {
         return processInstance.startTime?.let { timestampToString(it, zoneId) }
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "endTime")
     fun endTime(
-            processInstance: ProcessInstance,
-            @Argument zoneId: String
+        processInstance: ProcessInstance,
+        @Argument zoneId: String
     ): String? {
         return processInstance.endTime?.let { timestampToString(it, zoneId) }
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "variables")
     fun variables(
-            processInstance: ProcessInstance,
-            @Argument globalOnly: Boolean
+        processInstance: ProcessInstance,
+        @Argument globalOnly: Boolean
     ): List<Variable> {
         return if (globalOnly) {
             variableRepository.findByScopeKey(scopeKey = processInstance.key)
@@ -54,40 +56,42 @@ class ProcessInstanceResolver(
 
     @SchemaMapping(typeName = "ProcessInstance", field = "jobs")
     fun jobs(
-            processInstance: ProcessInstance,
-            @Argument stateIn: List<JobState>,
-            @Argument jobTypeIn: List<String>
+        processInstance: ProcessInstance,
+        @Argument stateIn: List<JobState>,
+        @Argument jobTypeIn: List<String>
     ): List<Job> {
         return if (jobTypeIn.isEmpty()) {
             jobRepository.findByProcessInstanceKeyAndStateIn(processInstance.key, stateIn)
         } else {
             jobRepository.findByProcessInstanceKeyAndStateInAndJobTypeIn(
-                    processInstanceKey = processInstance.key,
-                    stateIn = stateIn,
-                    jobTypeIn = jobTypeIn
+                processInstanceKey = processInstance.key,
+                stateIn = stateIn,
+                jobTypeIn = jobTypeIn
             )
         }
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "userTasks")
     fun userTasks(
-            processInstance: ProcessInstance,
-            @Argument perPage: Int,
-            @Argument page: Int,
-            @Argument stateIn: List<UserTaskState>): UserTaskConnection {
+        processInstance: ProcessInstance,
+        @Argument perPage: Int,
+        @Argument page: Int,
+        @Argument stateIn: List<UserTaskState>
+    ): UserTaskConnection {
         return UserTaskConnection(
-                getItems = {
-                    userTaskRepository.findByProcessInstanceKeyAndStateIn(
-                            processInstanceKey = processInstance.key,
-                            stateIn = stateIn,
-                            pageable = PageRequest.of(page, perPage))
-                },
-                getCount = {
-                    userTaskRepository.countByProcessInstanceKeyAndStateIn(
-                            processInstanceKey = processInstance.key,
-                            stateIn = stateIn
-                    )
-                }
+            getItems = {
+                userTaskRepository.findByProcessInstanceKeyAndStateIn(
+                    processInstanceKey = processInstance.key,
+                    stateIn = stateIn,
+                    pageable = PageRequest.of(page, perPage)
+                )
+            },
+            getCount = {
+                userTaskRepository.countByProcessInstanceKeyAndStateIn(
+                    processInstanceKey = processInstance.key,
+                    stateIn = stateIn
+                )
+            }
         )
     }
 
@@ -98,18 +102,22 @@ class ProcessInstanceResolver(
 
     @SchemaMapping(typeName = "ProcessInstance", field = "incidents")
     fun incidents(
-            processInstance: ProcessInstance,
-            @Argument stateIn: List<IncidentState>
+        processInstance: ProcessInstance,
+        @Argument stateIn: List<IncidentState>
     ): List<Incident> {
         return incidentRepository.findByProcessInstanceKeyAndStateIn(
-                processInstanceKey = processInstance.key,
-                stateIn = stateIn
+            processInstanceKey = processInstance.key,
+            stateIn = stateIn
         )
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "parentElementInstance")
     fun parentElementInstance(processInstance: ProcessInstance): ElementInstance? {
-        return processInstance.parentElementInstanceKey?.let { elementInstanceRepository.findByIdOrNull(it) }
+        return processInstance.parentElementInstanceKey?.let {
+            elementInstanceRepository.findByIdOrNull(
+                it
+            )
+        }
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "childProcessInstances")
@@ -119,12 +127,12 @@ class ProcessInstanceResolver(
 
     @SchemaMapping(typeName = "ProcessInstance", field = "elementInstances")
     fun elementInstances(
-            processInstance: ProcessInstance,
-            @Argument stateIn: List<ElementInstanceState>
+        processInstance: ProcessInstance,
+        @Argument stateIn: List<ElementInstanceState>
     ): List<ElementInstance> {
         return elementInstanceRepository.findByProcessInstanceKeyAndStateIn(
-                processInstanceKey = processInstance.key,
-                stateIn = stateIn
+            processInstanceKey = processInstance.key,
+            stateIn = stateIn
         )
     }
 
@@ -143,4 +151,11 @@ class ProcessInstanceResolver(
         return errorRepository.findByProcessInstanceKey(processInstance.key)
     }
 
+    @SchemaMapping(typeName = "ProcessInstance", field = "decisionEvaluations")
+    fun decisionEvaluations(processInstance: ProcessInstance): DecisionEvaluationConnection {
+        return DecisionEvaluationConnection(
+            getItems = { decisionEvaluationRepository.findAllByProcessInstanceKey(processInstanceKey = processInstance.key) },
+            getCount = { decisionEvaluationRepository.countByProcessInstanceKey(processInstanceKey = processInstance.key) }
+        )
+    }
 }
