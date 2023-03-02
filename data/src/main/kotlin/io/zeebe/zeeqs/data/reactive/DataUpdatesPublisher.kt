@@ -14,6 +14,7 @@ class DataUpdatesPublisher {
     private val variableListeners = mutableListOf<Consumer<Variable>>()
     private val incidentListeners = mutableListOf<Consumer<Incident>>()
     private val jobListeners = mutableListOf<Consumer<Job>>()
+    private val decisionEvaluationListeners = mutableListOf<Consumer<DecisionEvaluation>>()
 
     fun onProcessUpdated(process: Process) {
         processListeners.forEach { it.accept(process) }
@@ -43,6 +44,10 @@ class DataUpdatesPublisher {
         jobListeners.forEach { it.accept(job) }
     }
 
+    fun onDecisionEvaluationUpdated(decisionEvaluation: DecisionEvaluation) {
+        decisionEvaluationListeners.forEach { it.accept(decisionEvaluation) }
+    }
+
     fun registerProcessListener(listener: Consumer<Process>) {
         processListeners.add(listener)
     }
@@ -69,5 +74,9 @@ class DataUpdatesPublisher {
 
     fun registerJobListener(listener: Consumer<Job>) {
         jobListeners.add(listener)
+    }
+
+    fun registerDecisionEvaluationListener(listener: Consumer<DecisionEvaluation>) {
+        decisionEvaluationListeners.add(listener)
     }
 }
