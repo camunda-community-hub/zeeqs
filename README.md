@@ -107,6 +107,8 @@ The GraphQL API provides the following queries:
 - [userTasks](graphql-api/src/main/resources/graphql/UserTask.graphqls)
 - [messages](graphql-api/src/main/resources/graphql/Message.graphqls)
 - [incidents](graphql-api/src/main/resources/graphql/Incident.graphqls)
+- [decisions](graphql-api/src/main/resources/graphql/Decision.graphqls)
+- [decisionEvaluations](graphql-api/src/main/resources/graphql/DecisionEvaluation.graphqls)
 - [errors](graphql-api/src/main/resources/graphql/Error.graphqls)
 
 <details>
@@ -210,6 +212,8 @@ The GraphQL API provides the following subscriptions:
 
 - [processUpdates](graphql-api/src/main/resources/graphql/Process.graphqls)
 - [processInstanceUpdates](graphql-api/src/main/resources/graphql/ProcessInstance.graphqls)
+- [decisionUpdates](graphql-api/src/main/resources/graphql/Decision.graphqls)
+- [decisionEvaluationUpdates](graphql-api/src/main/resources/graphql/DecisionEvaluation.graphqls)
 
 The subscriptions are exposed via WebSockets over the same endpoint `/graphql`.
 
