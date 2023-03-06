@@ -11,7 +11,11 @@ type Decision {
     # The decision requirements graph that contains the decision.
     decisionRequirements: DecisionRequirements
     # The evaluations of the decision.
-    evaluations: DecisionEvaluationConnection!
+    evaluations(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [DecisionEvaluationState!] = [EVALUATED, FAILED]
+    ): DecisionEvaluationConnection!
 }
 
 type DecisionConnection {

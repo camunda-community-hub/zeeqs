@@ -9,7 +9,21 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DecisionEvaluationRepository : PagingAndSortingRepository<DecisionEvaluation, Long> {
 
-    fun findAllByDecisionKey(decisionKey: Long): List<DecisionEvaluation>
+    fun findAllByDecisionKey(
+        decisionKey: Long,
+        pageable: Pageable
+    ): List<DecisionEvaluation>
+
+    fun findAllByDecisionKeyAndStateIn(
+        decisionKey: Long,
+        stateIn: List<DecisionEvaluationState>,
+        pageable: Pageable
+    ): List<DecisionEvaluation>
+
+    fun countByDecisionKeyAndStateIn(
+        decisionKey: Long,
+        stateIn: List<DecisionEvaluationState>
+    ): Long
 
     fun countByDecisionKey(decisionKey: Long): Long
 
