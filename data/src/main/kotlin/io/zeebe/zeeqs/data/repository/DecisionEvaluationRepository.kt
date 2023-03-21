@@ -27,9 +27,16 @@ interface DecisionEvaluationRepository : PagingAndSortingRepository<DecisionEval
 
     fun countByDecisionKey(decisionKey: Long): Long
 
-    fun findAllByProcessInstanceKey(processInstanceKey: Long): List<DecisionEvaluation>
+    fun findAllByProcessInstanceKeyAndStateIn(
+        processInstanceKey: Long,
+        stateIn: List<DecisionEvaluationState>,
+        pageable: Pageable
+    ): List<DecisionEvaluation>
 
-    fun countByProcessInstanceKey(processInstanceKey: Long): Long
+    fun countByProcessInstanceKeyAndStateIn(
+        processInstanceKey: Long,
+        stateIn: List<DecisionEvaluationState>
+    ): Long
 
     fun findAllByElementInstanceKey(elementInstanceKey: Long): List<DecisionEvaluation>
 
