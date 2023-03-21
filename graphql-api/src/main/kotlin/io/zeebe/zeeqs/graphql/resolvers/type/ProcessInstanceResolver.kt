@@ -152,10 +152,26 @@ class ProcessInstanceResolver(
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "decisionEvaluations")
-    fun decisionEvaluations(processInstance: ProcessInstance): DecisionEvaluationConnection {
+    fun decisionEvaluations(
+        processInstance: ProcessInstance,
+        @Argument perPage: Int,
+        @Argument page: Int,
+        @Argument stateIn: List<DecisionEvaluationState>
+    ): DecisionEvaluationConnection {
         return DecisionEvaluationConnection(
-            getItems = { decisionEvaluationRepository.findAllByProcessInstanceKey(processInstanceKey = processInstance.key) },
-            getCount = { decisionEvaluationRepository.countByProcessInstanceKey(processInstanceKey = processInstance.key) }
+            getItems = {
+                decisionEvaluationRepository.findAllByProcessInstanceKeyAndStateIn(
+                    processInstanceKey = processInstance.key,
+                    stateIn = stateIn,
+                    pageable = PageRequest.of(page, perPage)
+                )
+            },
+            getCount = {
+                decisionEvaluationRepository.countByProcessInstanceKeyAndStateIn(
+                    processInstanceKey = processInstance.key,
+                    stateIn = stateIn
+                )
+            }
         )
     }
 }

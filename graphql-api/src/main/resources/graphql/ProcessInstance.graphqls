@@ -45,7 +45,11 @@ type ProcessInstance {
     # the opened message subscriptions related to the process instance (e.g. message catch events)
     messageSubscriptions: [MessageSubscription!]
     # The evaluated decisions that are called by a business rule task of this process instance.
-    decisionEvaluations: DecisionEvaluationConnection
+    decisionEvaluations(
+        perPage: Int = 10,
+        page: Int = 0,
+        stateIn: [DecisionEvaluationState!] = [EVALUATED, FAILED]
+    ): DecisionEvaluationConnection
     # the occurred error related to the process instance
     error: Error
 }
