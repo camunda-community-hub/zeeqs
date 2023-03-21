@@ -6,7 +6,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.stereotype.Controller
-import kotlin.jvm.optionals.getOrNull
 
 @Controller
 class DecisionEvaluationResolver(
@@ -29,7 +28,7 @@ class DecisionEvaluationResolver(
             decisionRepository.findByDecisionRequirementsKeyAndDecisionId(
                 decisionRequirementsKey = decisionEvaluation.decisionRequirementsKey,
                 decisionId = it
-            ).getOrNull()
+            )
         }
     }
 
