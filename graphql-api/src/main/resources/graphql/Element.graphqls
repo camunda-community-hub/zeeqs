@@ -66,6 +66,8 @@ type BpmnElementMetadata {
     userTaskAssignmentDefinition: UserTaskAssignmentDefinition
     # the user form if the element is a user task
     userTaskForm: UserTaskForm
+    # The name of the signal if the element is a signal event.
+    signalName: String
 }
 
 # The definition of a message subscription from a BPMN element.

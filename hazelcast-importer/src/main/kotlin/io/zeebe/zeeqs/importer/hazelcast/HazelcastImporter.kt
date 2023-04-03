@@ -1,7 +1,5 @@
 package io.zeebe.zeeqs.importer.hazelcast
 
-import com.google.protobuf.Struct
-import com.google.protobuf.Value
 import com.hazelcast.client.HazelcastClient
 import com.hazelcast.client.config.ClientConfig
 import io.camunda.zeebe.protocol.Protocol
@@ -11,6 +9,7 @@ import io.zeebe.hazelcast.connect.java.ZeebeHazelcast
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.reactive.DataUpdatesPublisher
 import io.zeebe.zeeqs.data.repository.*
+import io.zeebe.zeeqs.importer.hazelcast.ProtobufTransformer.structToMap
 import org.springframework.stereotype.Component
 import java.time.Duration
 
@@ -33,6 +32,7 @@ class HazelcastImporter(
     val messageCorrelationRepository: MessageCorrelationRepository,
     val errorRepository: ErrorRepository,
     private val decisionEvaluationImporter: HazelcastDecisionImporter,
+    private val signalImporter: HazelcastSignalImporter,
     private val dataUpdatesPublisher: DataUpdatesPublisher
 ) {
 
@@ -121,6 +121,14 @@ class HazelcastImporter(
             .addDecisionEvaluationListener {
                 it.takeIf { it.metadata.recordType == RecordType.EVENT }
                     ?.let(decisionEvaluationImporter::importDecisionEvaluation)
+            }
+            .addSignalListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(signalImporter::importSignal)
+            }
+            .addSignalSubscriptionListener {
+                it.takeIf { it.metadata.recordType == RecordType.EVENT }
+                    ?.let(signalImporter::importSignalSubscription)
             }
             .addErrorListener(this::importError)
             .postProcessListener(updateSequence)
@@ -591,29 +599,6 @@ class HazelcastImporter(
                 )
 
             messageVariableRepository.save(entity)
-        }
-    }
-
-    private fun structToMap(struct: Struct): Map<String, String> {
-        return struct.fieldsMap.mapValues { (_, value) -> valueToString(value) }
-    }
-
-    private fun valueToString(value: Value): String {
-        return when (value.kindCase) {
-            Value.KindCase.NULL_VALUE -> "null"
-            Value.KindCase.BOOL_VALUE -> value.boolValue.toString()
-            Value.KindCase.NUMBER_VALUE -> value.numberValue.toString()
-            Value.KindCase.STRING_VALUE -> "\"${value.stringValue}\""
-            Value.KindCase.LIST_VALUE -> value.listValue.valuesList.map { valueToString(it) }
-                .joinToString(separator = ",", prefix = "[", postfix = "]")
-
-            Value.KindCase.STRUCT_VALUE -> value.structValue.fieldsMap.map { (key, value) ->
-                "\"$key\":" + valueToString(
-                    value
-                )
-            }.joinToString(separator = ",", prefix = "{", postfix = "}")
-
-            else -> value.toString()
         }
     }
 
