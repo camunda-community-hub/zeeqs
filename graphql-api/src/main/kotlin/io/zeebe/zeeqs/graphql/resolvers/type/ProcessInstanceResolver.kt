@@ -138,7 +138,11 @@ class ProcessInstanceResolver(
 
     @SchemaMapping(typeName = "ProcessInstance", field = "timers")
     fun timers(processInstance: ProcessInstance): List<Timer> {
-        return timerRepository.findByProcessInstanceKey(processInstance.key)
+        // all timers of the process instance must have an element instance key
+        // - timers for process timer start events have a process instance key after triggered
+        return timerRepository.findByProcessInstanceKeyAndElementInstanceKeyIsNotNull(
+            processInstance.key
+        )
     }
 
     @SchemaMapping(typeName = "ProcessInstance", field = "messageSubscriptions")
