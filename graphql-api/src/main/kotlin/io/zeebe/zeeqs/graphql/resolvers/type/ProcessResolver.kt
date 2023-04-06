@@ -3,6 +3,7 @@ package io.zeebe.zeeqs.graphql.resolvers.type
 import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.MessageSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
+import io.zeebe.zeeqs.data.repository.SignalSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
 import io.zeebe.zeeqs.data.service.ProcessService
@@ -14,29 +15,41 @@ import org.springframework.stereotype.Controller
 
 @Controller
 class ProcessResolver(
-        val processInstanceRepository: ProcessInstanceRepository,
-        val timerRepository: TimerRepository,
-        val messageSubscriptionRepository: MessageSubscriptionRepository,
-        val processService: ProcessService
+    val processInstanceRepository: ProcessInstanceRepository,
+    val timerRepository: TimerRepository,
+    val messageSubscriptionRepository: MessageSubscriptionRepository,
+    val processService: ProcessService,
+    private val signalSubscriptionRepository: SignalSubscriptionRepository
 ) {
 
     @SchemaMapping(typeName = "Process", field = "processInstances")
     fun processInstances(
-            process: Process,
-            @Argument perPage: Int,
-            @Argument page: Int,
-            @Argument stateIn: List<ProcessInstanceState>
+        process: Process,
+        @Argument perPage: Int,
+        @Argument page: Int,
+        @Argument stateIn: List<ProcessInstanceState>
     ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
-                getItems = { processInstanceRepository.findByProcessDefinitionKeyAndStateIn(process.key, stateIn, PageRequest.of(page, perPage)).toList() },
-                getCount = { processInstanceRepository.countByProcessDefinitionKeyAndStateIn(process.key, stateIn) }
+            getItems = {
+                processInstanceRepository.findByProcessDefinitionKeyAndStateIn(
+                    process.key,
+                    stateIn,
+                    PageRequest.of(page, perPage)
+                ).toList()
+            },
+            getCount = {
+                processInstanceRepository.countByProcessDefinitionKeyAndStateIn(
+                    process.key,
+                    stateIn
+                )
+            }
         )
     }
 
     @SchemaMapping(typeName = "Process", field = "deployTime")
     fun deployTime(
-            process: Process,
-            @Argument zoneId: String
+        process: Process,
+        @Argument zoneId: String
     ): String? {
         return process.deployTime.let { ResolverExtension.timestampToString(it, zoneId) }
     }
@@ -48,38 +61,45 @@ class ProcessResolver(
 
     @SchemaMapping(typeName = "Process", field = "messageSubscriptions")
     fun messageSubscriptions(process: Process): List<MessageSubscription> {
-        return messageSubscriptionRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(process.key)
+        return messageSubscriptionRepository.findByProcessDefinitionKeyAndElementInstanceKeyIsNull(
+            process.key
+        )
+    }
+
+    @SchemaMapping(typeName = "Process", field = "signalSubscriptions")
+    fun signalSubscriptions(process: Process): List<SignalSubscription> {
+        return signalSubscriptionRepository.findByProcessDefinitionKey(processDefinitionKey = process.key)
     }
 
     @SchemaMapping(typeName = "Process", field = "elements")
     fun elements(
-            process: Process,
-            @Argument elementTypeIn: List<BpmnElementType>
+        process: Process,
+        @Argument elementTypeIn: List<BpmnElementType>
     ): List<BpmnElement> {
         return processService
-                .getBpmnElementInfo(process.key)
-                ?.values
-                ?.filter { elementTypeIn.isEmpty() || elementTypeIn.contains(it.elementType) }
-                ?.map { asBpmnElement(process, it) }
-                ?: emptyList()
+            .getBpmnElementInfo(process.key)
+            ?.values
+            ?.filter { elementTypeIn.isEmpty() || elementTypeIn.contains(it.elementType) }
+            ?.map { asBpmnElement(process, it) }
+            ?: emptyList()
     }
 
     private fun asBpmnElement(process: Process, it: BpmnElementInfo) =
-            BpmnElement(
-                    processDefinitionKey = process.key,
-                    elementId = it.elementId,
-                    elementType = it.elementType
-            )
+        BpmnElement(
+            processDefinitionKey = process.key,
+            elementId = it.elementId,
+            elementType = it.elementType
+        )
 
     @SchemaMapping(typeName = "Process", field = "element")
     fun element(
-            process: Process,
-            @Argument elementId: String
+        process: Process,
+        @Argument elementId: String
     ): BpmnElement? {
         return processService
-                .getBpmnElementInfo(process.key)
-                ?.get(elementId)
-                ?.let { asBpmnElement(process, it) }
+            .getBpmnElementInfo(process.key)
+            ?.get(elementId)
+            ?.let { asBpmnElement(process, it) }
     }
 
 }

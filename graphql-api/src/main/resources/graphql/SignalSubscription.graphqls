@@ -1,0 +1,23 @@
+# A subscription of a signal event.
+type SignalSubscription {
+    # The key of the subscription.
+    key: ID!
+    # The name of the signal that it subscribed to.
+    signalName: String!
+    # The process that belongs to the subscription.
+    process: Process
+    # The current state of the subscription.
+    state: SignalSubscriptionState
+    # The time when the subscription was updated last.
+    timestamp(zoneId: String = "Z"): String
+    # The BPMN element that belong to the subscription.
+    element: BpmnElement
+}
+
+# A state of a signal subscription.
+enum SignalSubscriptionState {
+    # The subscription was created.
+    CREATED
+    # The subscription was deleted.
+    DELETED
+}

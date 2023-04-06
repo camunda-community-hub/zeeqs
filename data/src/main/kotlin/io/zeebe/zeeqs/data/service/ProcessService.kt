@@ -20,23 +20,25 @@ class ProcessService(val processRepository: ProcessRepository) {
     @Cacheable(cacheNames = ["bpmnElementInfo"])
     fun getBpmnElementInfo(processDefinitionKey: Long): Map<String, BpmnElementInfo>? {
         return getBpmnModel(processDefinitionKey)
-                ?.let { it.getModelElementsByType(FlowElement::class.java) }
-                ?.map { flowElement ->
-                    Pair(flowElement.id, BpmnElementInfo(
-                            elementId = flowElement.id,
-                            elementName = flowElement.name,
-                            elementType = getBpmnElementType(flowElement),
-                            metadata = getMetadata(flowElement)
-                    ))
-                }
-                ?.toMap()
+            ?.let { it.getModelElementsByType(FlowElement::class.java) }
+            ?.map { flowElement ->
+                Pair(
+                    flowElement.id, BpmnElementInfo(
+                        elementId = flowElement.id,
+                        elementName = flowElement.name,
+                        elementType = getBpmnElementType(flowElement),
+                        metadata = getMetadata(flowElement)
+                    )
+                )
+            }
+            ?.toMap()
     }
 
     private fun getBpmnModel(processDefinitionKey: Long): BpmnModelInstance? {
         return processRepository.findByIdOrNull(processDefinitionKey)
-                ?.bpmnXML
-                ?.byteInputStream()
-                ?.let { Bpmn.readModelFromStream(it) }
+            ?.bpmnXML
+            ?.byteInputStream()
+            ?.let { Bpmn.readModelFromStream(it) }
     }
 
     private fun getBpmnElementType(element: FlowElement): BpmnElementType {
@@ -66,97 +68,106 @@ class ProcessService(val processRepository: ProcessRepository) {
     }
 
     private fun getBpmnSubprocessType(element: FlowElement) =
-            if (element is SubProcess) {
-                if (element.triggeredByEvent()) {
-                    BpmnElementType.EVENT_SUB_PROCESS
-                } else {
-                    BpmnElementType.SUB_PROCESS
-                }
+        if (element is SubProcess) {
+            if (element.triggeredByEvent()) {
+                BpmnElementType.EVENT_SUB_PROCESS
             } else {
-                BpmnElementType.UNKNOWN
+                BpmnElementType.SUB_PROCESS
             }
+        } else {
+            BpmnElementType.UNKNOWN
+        }
 
     private fun getMetadata(element: FlowElement): BpmnElementMetadata {
         return BpmnElementMetadata(
-                jobType = element
-                        .getSingleExtensionElement(ZeebeTaskDefinition::class.java)
-                        ?.type,
-                conditionExpression = when (element) {
-                    is SequenceFlow -> element.conditionExpression?.textContent
-                    else -> null
-                },
-                timerDefinition = when (element) {
-                    is CatchEvent -> element.eventDefinitions
-                            ?.filterIsInstance(TimerEventDefinition::class.java)
-                            ?.firstOrNull()
-                            ?.let { it.timeCycle ?: it.timeDate ?: it.timeDuration }
-                            ?.textContent
+            jobType = element
+                .getSingleExtensionElement(ZeebeTaskDefinition::class.java)
+                ?.type,
+            conditionExpression = when (element) {
+                is SequenceFlow -> element.conditionExpression?.textContent
+                else -> null
+            },
+            timerDefinition = when (element) {
+                is CatchEvent -> element.eventDefinitions
+                    ?.filterIsInstance(TimerEventDefinition::class.java)
+                    ?.firstOrNull()
+                    ?.let { it.timeCycle ?: it.timeDate ?: it.timeDuration }
+                    ?.textContent
 
-                    else -> null
-                },
-                errorCode = when (element) {
-                    is CatchEvent -> element.eventDefinitions
-                            ?.filterIsInstance(ErrorEventDefinition::class.java)
-                            ?.firstOrNull()
-                            ?.error
-                            ?.errorCode
+                else -> null
+            },
+            errorCode = when (element) {
+                is CatchEvent -> element.eventDefinitions
+                    ?.filterIsInstance(ErrorEventDefinition::class.java)
+                    ?.firstOrNull()
+                    ?.error
+                    ?.errorCode
 
-                    else -> null
-                },
-                calledProcessId = element
-                        .getSingleExtensionElement(ZeebeCalledElement::class.java)
-                        ?.processId,
-                messageSubscriptionDefinition = when (element) {
-                    is CatchEvent -> element.eventDefinitions
-                            ?.filterIsInstance(MessageEventDefinition::class.java)
-                            ?.firstOrNull()
-                            ?.message
-                            ?.let {
-                                MessageSubscriptionDefinition(
-                                        messageName = it.name,
-                                        messageCorrelationKey = it
-                                                .getSingleExtensionElement(ZeebeSubscription::class.java)
-                                                ?.correlationKey
-                                )
-                            }
+                else -> null
+            },
+            calledProcessId = element
+                .getSingleExtensionElement(ZeebeCalledElement::class.java)
+                ?.processId,
+            messageSubscriptionDefinition = when (element) {
+                is CatchEvent -> element.eventDefinitions
+                    ?.filterIsInstance(MessageEventDefinition::class.java)
+                    ?.firstOrNull()
+                    ?.message
+                    ?.let {
+                        MessageSubscriptionDefinition(
+                            messageName = it.name,
+                            messageCorrelationKey = it
+                                .getSingleExtensionElement(ZeebeSubscription::class.java)
+                                ?.correlationKey
+                        )
+                    }
 
-                    else -> null
+                else -> null
+            },
+            userTaskAssignmentDefinition = element
+                .getSingleExtensionElement(ZeebeAssignmentDefinition::class.java)
+                ?.let {
+                    UserTaskAssignmentDefinition(
+                        assignee = it.assignee,
+                        candidateGroups = it.candidateGroups
+                    )
                 },
-                userTaskAssignmentDefinition = element
-                        .getSingleExtensionElement(ZeebeAssignmentDefinition::class.java)
-                        ?.let {
-                            UserTaskAssignmentDefinition(
-                                    assignee = it.assignee,
-                                    candidateGroups = it.candidateGroups
-                            )
-                        },
-                userTaskForm = element
-                        .getSingleExtensionElement(ZeebeFormDefinition::class.java)
-                        ?.formKey
-                        ?.let { formKey ->
-                            UserTaskForm(
-                                    key = formKey,
-                                    resource = getForm(
-                                            model = element.modelInstance,
-                                            formKey = formKey
-                                    )
-                            )
-                        }
+            userTaskForm = element
+                .getSingleExtensionElement(ZeebeFormDefinition::class.java)
+                ?.formKey
+                ?.let { formKey ->
+                    UserTaskForm(
+                        key = formKey,
+                        resource = getForm(
+                            model = element.modelInstance,
+                            formKey = formKey
+                        )
+                    )
+                },
+            signalName = when (element) {
+                is CatchEvent -> element.eventDefinitions
+                    ?.filterIsInstance(SignalEventDefinition::class.java)
+                    ?.firstOrNull()
+                    ?.signal
+                    ?.name
+
+                else -> null
+            }
         )
     }
 
     @Cacheable(cacheNames = ["userTaskForm"])
     fun getForm(processDefinitionKey: Long, formKey: String): String? {
         return getBpmnModel(processDefinitionKey)
-                ?.let { getForm(model = it, formKey = formKey) }
+            ?.let { getForm(model = it, formKey = formKey) }
     }
 
     private fun getForm(model: ModelInstance, formKey: String): String? {
         val normalizedFormKey = formKey.replace(CAMUNDA_FORM_KEY_PREFIX, "")
 
         return model.getModelElementsByType(ZeebeUserTaskForm::class.java)
-                ?.firstOrNull { it.id == normalizedFormKey }
-                ?.textContent
+            ?.firstOrNull { it.id == normalizedFormKey }
+            ?.textContent
     }
 
 }

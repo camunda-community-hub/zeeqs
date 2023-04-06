@@ -1,0 +1,35 @@
+# A signal that was broadcasted.
+type Signal {
+    # The key of the signal.
+    key: ID!
+    # The name of the signal.
+    name: String!
+    # The time when the signal was broadcasted.
+    timestamp(zoneId: String = "Z"): String
+    # The variables of the signal.
+    variables: [SignalVariable!]
+}
+
+type SignalConnection {
+    totalCount: Int!
+    nodes: [Signal!]!
+}
+
+# A variable of a signal.
+type SignalVariable {
+    # The name of the variable.
+    name: String!
+    # The value of the variable as JSON.
+    value: String!
+}
+
+extend type Query {
+    # Find a signal by its key.
+    signal(key: ID!): Signal
+
+    # Fetch signals.
+    signals(
+        perPage: Int = 10,
+        page: Int = 0
+    ): SignalConnection!
+}
