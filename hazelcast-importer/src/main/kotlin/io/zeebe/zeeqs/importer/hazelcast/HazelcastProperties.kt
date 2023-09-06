@@ -3,7 +3,7 @@ package io.zeebe.zeeqs.importer.hazelcast
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 
-@ConstructorBinding
+//@ConstructorBinding
 @ConfigurationProperties("zeebe.client.worker.hazelcast")
 data class HazelcastProperties(
         val connection: String = "localhost:5701",

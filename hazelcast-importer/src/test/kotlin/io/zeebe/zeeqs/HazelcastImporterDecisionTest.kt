@@ -10,6 +10,7 @@ import io.zeebe.zeeqs.data.repository.DecisionRequirementsRepository
 import io.zeebe.zeeqs.data.repository.EvaluatedDecisionRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
+import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.BeforeEach
@@ -19,7 +20,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import javax.transaction.Transactional
 
 @SpringBootTest
 @Testcontainers

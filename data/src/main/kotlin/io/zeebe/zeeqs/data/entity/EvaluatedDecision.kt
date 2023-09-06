@@ -1,8 +1,8 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Lob
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Lob
 
 @Entity
 data class EvaluatedDecision(
@@ -10,4 +10,6 @@ data class EvaluatedDecision(
     val decisionKey: Long,
     @Lob val decisionOutput: String,
     val decisionEvaluationKey: Long
-)
+) {
+    constructor() : this("", 0, "", 0)
+}

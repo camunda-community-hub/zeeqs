@@ -1,6 +1,6 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class DecisionEvaluation(
@@ -14,4 +14,6 @@ data class DecisionEvaluation(
     @Lob val evaluationFailureMessage: String? = null,
     val processInstanceKey: Long? = null,
     val elementInstanceKey: Long? = null
-)
+) {
+    constructor() : this(0, 0, 0, "", DecisionEvaluationState.EVALUATED, 0, null, null, null, null)
+}

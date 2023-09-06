@@ -65,9 +65,11 @@ class MessageSubscriptionResolver(
     @SchemaMapping(typeName = "MessageSubscription", field = "element")
     fun element(messageSubscription: MessageSubscription): BpmnElement? {
         val processDefinitionKeyOfSubscription = messageSubscription.processDefinitionKey
-                ?: processInstanceRepository
-                        .findByIdOrNull(messageSubscription.processInstanceKey)
+                ?: messageSubscription.processInstanceKey?.let {
+                    processInstanceRepository
+                        .findByIdOrNull(it.toLong())
                         ?.processDefinitionKey
+                }
 
         return processDefinitionKeyOfSubscription?.let { processDefinitionKey ->
             messageSubscription.elementId?.let { elementId ->
