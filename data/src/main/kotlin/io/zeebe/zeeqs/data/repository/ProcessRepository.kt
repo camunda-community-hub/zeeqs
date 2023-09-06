@@ -7,4 +7,4 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ProcessRepository : JpaRepository<Process, Long>
+interface ProcessRepository : PagingAndSortingRepository<Process, Long>, CrudRepository<Process,Long>
