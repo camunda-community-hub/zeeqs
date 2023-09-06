@@ -41,7 +41,7 @@ class MessageSubscriptionResolver(
         return messageSubscription.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
                 ?: messageSubscription.processInstanceKey?.let {
                     processInstanceRepository.findByIdOrNull(it)
-                            ?.processDefinitionKey.let { processRepository.findByIdOrNull(it) }
+                            ?.processDefinitionKey?.let { processRepository.findByIdOrNull(it) }
                 }
     }
 
