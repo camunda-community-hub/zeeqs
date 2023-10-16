@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.zeebe.zeeqs</groupId>
     <artifactId>zeeqs-root</artifactId>
-    <version>2.9.1-SNAPSHOT</version>
+    <version>2.9.1</version>
   </parent>
 
   <artifactId>hazelcast-importer</artifactId>
