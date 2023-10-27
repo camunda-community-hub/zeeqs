@@ -1,11 +1,13 @@
 package io.zeebe.zeeqs.data.repository
 
 import io.zeebe.zeeqs.data.entity.SignalSubscription
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface SignalSubscriptionRepository : PagingAndSortingRepository<SignalSubscription, Long> {
+interface SignalSubscriptionRepository : PagingAndSortingRepository<SignalSubscription, Long>,
+    CrudRepository<SignalSubscription, Long> {
 
     fun findByProcessDefinitionKey(processDefinitionKey: Long): List<SignalSubscription>
 

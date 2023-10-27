@@ -1,16 +1,17 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class Job(
-        @Id @Column(name = "key_") val key: Long,
-        val position: Long,
-        val jobType: String,
-        val processInstanceKey: Long,
-        val elementInstanceKey: Long,
-        val processDefinitionKey: Long
+    @Id @Column(name = "key_") val key: Long,
+    val position: Long,
+    val jobType: String,
+    val processInstanceKey: Long,
+    val elementInstanceKey: Long,
+    val processDefinitionKey: Long
 ) {
+    constructor() : this(0, 0, "", 0, 0, 0)
 
     @Enumerated(EnumType.STRING)
     var state: JobState = JobState.ACTIVATABLE

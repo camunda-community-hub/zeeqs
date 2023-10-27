@@ -1,8 +1,8 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 
 @Entity
 class Signal(
@@ -10,4 +10,6 @@ class Signal(
     val position: Long,
     val name: String,
     var timestamp: Long
-)
+) {
+    constructor() : this(0, 0, "", 0)
+}

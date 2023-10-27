@@ -9,6 +9,7 @@ import io.zeebe.zeeqs.data.repository.JobRepository
 import io.zeebe.zeeqs.data.repository.UserTaskRepository
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastImporter
 import io.zeebe.zeeqs.importer.hazelcast.HazelcastProperties
+import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.BeforeEach
@@ -18,15 +19,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import javax.transaction.Transactional
 
 @SpringBootTest
 @Testcontainers
 @Transactional
 class HazelcastImporterJobTest(
-        @Autowired val importer: HazelcastImporter,
-        @Autowired val jobRepository: JobRepository,
-        @Autowired val userTaskRepository: UserTaskRepository) {
+    @Autowired val importer: HazelcastImporter,
+    @Autowired val jobRepository: JobRepository,
+    @Autowired val userTaskRepository: UserTaskRepository
+) {
 
 
     private val hazelcastPort = 5701
@@ -35,44 +36,46 @@ class HazelcastImporterJobTest(
 
     @Container
     var zeebe = ZeebeContainer(ZeebeTestcontainerUtil.ZEEBE_DOCKER_IMAGE)
-            .withAdditionalExposedPort(hazelcastPort)
+        .withAdditionalExposedPort(hazelcastPort)
 
     @BeforeEach
     fun `start importer`() {
         val port = zeebe.getMappedPort(hazelcastPort)
         val hazelcastProperties = HazelcastProperties(
-                "localhost:$port", "PT10S", "zeebe")
+            "localhost:$port", "PT10S", "zeebe"
+        )
         importer.start(hazelcastProperties)
     }
 
     @BeforeEach
     fun `create Zeebe client`() {
         zeebeClient = ZeebeClient.newClientBuilder()
-                .gatewayAddress(zeebe.externalGatewayAddress)
-                .usePlaintext()
-                .build()
+            .gatewayAddress(zeebe.externalGatewayAddress)
+            .usePlaintext()
+            .build()
     }
 
     @Test
     fun `should import job`() {
         // given
         zeebeClient.newDeployCommand()
-                .addProcessModel(
-                        Bpmn.createExecutableProcess("process")
-                                .startEvent()
-                                .serviceTask("A").zeebeJobType("A")
-                                .endEvent()
-                                .done(),
-                        "process.bpmn")
-                .send()
-                .join()
+            .addProcessModel(
+                Bpmn.createExecutableProcess("process")
+                    .startEvent()
+                    .serviceTask("A").zeebeJobType("A")
+                    .endEvent()
+                    .done(),
+                "process.bpmn"
+            )
+            .send()
+            .join()
 
         // when
         val processInstance = zeebeClient.newCreateInstanceCommand()
-                .bpmnProcessId("process")
-                .latestVersion()
-                .send()
-                .join()
+            .bpmnProcessId("process")
+            .latestVersion()
+            .send()
+            .join()
 
         // then
         await.untilAsserted { assertThat(jobRepository.findAll()).hasSize(1) }
@@ -91,25 +94,26 @@ class HazelcastImporterJobTest(
     fun `should import user task`() {
         // given
         zeebeClient.newDeployCommand()
-                .addProcessModel(
-                        Bpmn.createExecutableProcess("process")
-                                .startEvent()
-                                .userTask("A")
-                                .zeebeAssignee("test")
-                                .zeebeCandidateGroups("test-group")
-                                .zeebeUserTaskForm("form_A", """{"x": 1}""")
-                                .endEvent()
-                                .done(),
-                        "process.bpmn")
-                .send()
-                .join()
+            .addProcessModel(
+                Bpmn.createExecutableProcess("process")
+                    .startEvent()
+                    .userTask("A")
+                    .zeebeAssignee("test")
+                    .zeebeCandidateGroups("test-group")
+                    .zeebeUserTaskForm("form_A", """{"x": 1}""")
+                    .endEvent()
+                    .done(),
+                "process.bpmn"
+            )
+            .send()
+            .join()
 
         // when
         val processInstance = zeebeClient.newCreateInstanceCommand()
-                .bpmnProcessId("process")
-                .latestVersion()
-                .send()
-                .join()
+            .bpmnProcessId("process")
+            .latestVersion()
+            .send()
+            .join()
 
         // then
         await.untilAsserted { assertThat(userTaskRepository.findAll()).hasSize(1) }

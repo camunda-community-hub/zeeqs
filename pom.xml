@@ -28,7 +28,7 @@
 
     <zeebe.version>8.3.1</zeebe.version>
 
-    <spring.boot.version>2.7.16</spring.boot.version>
+    <spring.boot.version>3.1.2</spring.boot.version>
 
     <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
@@ -53,6 +53,12 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>net.logstash.logback</groupId>
+        <artifactId>logstash-logback-encoder</artifactId>
+        <version>6.6</version>
+      </dependency>
 
       <dependency>
         <groupId>io.zeebe.zeeqs</groupId>
@@ -180,7 +186,7 @@
             <plugin>spring</plugin>
             <plugin>jpa</plugin>
           </compilerPlugins>
-          <jvmTarget>11</jvmTarget>
+          <jvmTarget>17</jvmTarget>
         </configuration>
         <dependencies>
           <dependency>

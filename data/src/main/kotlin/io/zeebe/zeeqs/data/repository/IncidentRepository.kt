@@ -3,12 +3,13 @@ package io.zeebe.zeeqs.data.repository
 import io.zeebe.zeeqs.data.entity.Incident
 import io.zeebe.zeeqs.data.entity.IncidentState
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface IncidentRepository : PagingAndSortingRepository<Incident, Long> {
+interface IncidentRepository : PagingAndSortingRepository<Incident, Long>, CrudRepository<Incident, Long> {
 
     @Transactional(readOnly = true)
     fun findByProcessInstanceKey(processInstanceKey: Long): List<Incident>

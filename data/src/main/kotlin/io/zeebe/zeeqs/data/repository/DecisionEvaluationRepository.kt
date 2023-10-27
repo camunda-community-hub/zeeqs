@@ -3,11 +3,13 @@ package io.zeebe.zeeqs.data.repository
 import io.zeebe.zeeqs.data.entity.DecisionEvaluation
 import io.zeebe.zeeqs.data.entity.DecisionEvaluationState
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface DecisionEvaluationRepository : PagingAndSortingRepository<DecisionEvaluation, Long> {
+interface DecisionEvaluationRepository : PagingAndSortingRepository<DecisionEvaluation, Long>,
+    CrudRepository<DecisionEvaluation, Long> {
 
     fun findAllByDecisionKey(
         decisionKey: Long,

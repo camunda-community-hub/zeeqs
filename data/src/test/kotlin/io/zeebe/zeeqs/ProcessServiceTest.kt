@@ -6,6 +6,7 @@ import io.zeebe.zeeqs.data.entity.BpmnElementType
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ProcessRepository
 import io.zeebe.zeeqs.data.service.*
+import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.BeforeEach
@@ -16,7 +17,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import java.time.Instant
-import javax.transaction.Transactional
 
 @SpringBootTest
 @TestConfiguration

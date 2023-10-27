@@ -1,9 +1,9 @@
 package io.zeebe.zeeqs.data.entity
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Lob
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Lob
 
 @Entity
 data class DecisionEvaluationOutput(
@@ -14,4 +14,6 @@ data class DecisionEvaluationOutput(
     val evaluatedDecisionId: String,
     val ruleId: String,
     val ruleIndex: Int
-)
+) {
+    constructor() : this("", "", "", "", "", "", 0)
+}
