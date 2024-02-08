@@ -35,7 +35,7 @@
     <version.hazelcast>5.3.6</version.hazelcast>
 
     <zeebe-test-container.version>3.6.3</zeebe-test-container.version>
-    <test-container.version>1.19.4</test-container.version>
+    <test-container.version>1.19.5</test-container.version>
 
     <!-- release parent settings -->
     <version.java>17</version.java>
