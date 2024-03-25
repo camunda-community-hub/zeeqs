@@ -3,6 +3,7 @@ package io.zeebe.zeeqs.graphql.resolvers.query
 import io.zeebe.zeeqs.data.entity.ProcessInstance
 import io.zeebe.zeeqs.data.entity.ProcessInstanceState
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
+import io.zeebe.zeeqs.data.service.ProcessInstanceService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -12,18 +13,21 @@ import org.springframework.stereotype.Controller
 
 @Controller
 class ProcessInstanceQueryResolver(
-        val processInstanceRepository: ProcessInstanceRepository
+        val processInstanceRepository: ProcessInstanceRepository,
+        val processInstanceService: ProcessInstanceService
 ) {
 
     @QueryMapping
     fun processInstances(
             @Argument perPage: Int,
             @Argument page: Int,
-            @Argument stateIn: List<ProcessInstanceState>
+            @Argument stateIn: List<ProcessInstanceState>,
+            @Argument variableName: String?,
+            @Argument variableValue: String?
     ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
-                getItems = { processInstanceRepository.findByStateIn(stateIn, PageRequest.of(page, perPage)).toList() },
-                getCount = { processInstanceRepository.countByStateIn(stateIn) }
+                getItems = { processInstanceService.getProcessInstances(perPage, page, stateIn, variableName, variableValue) },
+                getCount = { processInstanceService.countProcessInstances(stateIn, variableName, variableValue) }
         )
     }
 
