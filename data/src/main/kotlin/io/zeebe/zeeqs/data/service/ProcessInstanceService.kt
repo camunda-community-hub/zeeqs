@@ -61,7 +61,7 @@ class ProcessInstanceService(
             return filteredProcessInstances;
         }
         else {
-            return processInstancesRepository.findByStateIn(stateIn, PageRequest.of(page, perPage)).toList();
+            return processInstancesRepository.findByProcessDefinitionKeyAndStateIn(processDefinitionKey, stateIn, PageRequest.of(page, perPage)).toList();
         }
     }
 
@@ -72,7 +72,7 @@ class ProcessInstanceService(
         }
 
         else {
-            return processInstancesRepository.countByStateIn(stateIn);
+            return processInstancesRepository.countByProcessDefinitionKeyAndStateIn(processDefinitionKey, stateIn);
         }
     }
 
