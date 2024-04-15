@@ -32,7 +32,7 @@
 
     <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
     <!-- pin Hazelcast version because of spring-boot-dependencies -->
-    <version.hazelcast>5.3.7</version.hazelcast>
+    <version.hazelcast>5.4.0</version.hazelcast>
 
     <zeebe-test-container.version>3.6.3</zeebe-test-container.version>
     <test-container.version>1.19.7</test-container.version>
