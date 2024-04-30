@@ -52,12 +52,12 @@ class ProcessServiceTest(
             // then
             assertThat(info)
                     .isNotNull()
-                    .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT, BpmnElementMetadata())))
-                    .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK, BpmnElementMetadata(jobType = "test"))))
+                    .contains(entry("s", BpmnElementInfo("s", "start", BpmnElementType.START_EVENT, BpmnElementMetadata(), listOf(BpmnElementExtensionProperties()), "")))
+                    .contains(entry("t", BpmnElementInfo("t", "task", BpmnElementType.SERVICE_TASK, BpmnElementMetadata(jobType = "test"), listOf(BpmnElementExtensionProperties()), "")))
                     .contains(entry("u", BpmnElementInfo("u", "userTask", BpmnElementType.USER_TASK, BpmnElementMetadata(
-                            userTaskAssignmentDefinition = UserTaskAssignmentDefinition(assignee = "user1", candidateGroups = "group1"))))
+                            userTaskAssignmentDefinition = UserTaskAssignmentDefinition(assignee = "user1", candidateGroups = "group1")), listOf(BpmnElementExtensionProperties()), ""))
                     )
-                    .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT, BpmnElementMetadata())))
+                    .contains(entry("e", BpmnElementInfo("e", null, BpmnElementType.END_EVENT, BpmnElementMetadata(), listOf(BpmnElementExtensionProperties()), "")))
         }
 
         @Test
@@ -90,7 +90,8 @@ class ProcessServiceTest(
                                                     key = "camunda-forms:bpmn:form_A",
                                                     resource = """{"x":1}"""
                                             )
-                                    )
+                                    ),
+                                    listOf(BpmnElementExtensionProperties()), ""
                             )
                     )
         }
