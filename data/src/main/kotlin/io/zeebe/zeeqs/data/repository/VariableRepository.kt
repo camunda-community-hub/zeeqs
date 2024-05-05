@@ -17,4 +17,8 @@ interface VariableRepository : PagingAndSortingRepository<Variable, Long> {
     @Transactional(readOnly = true)
     fun findByProcessInstanceKeyInAndName(processInstanceKey: List<Long>, name: String): List<Variable>
 
+
+    @Transactional(readOnly = true)
+    fun findByProcessInstanceKeyInAndNameIn(processInstanceKey: List<Long>, name: List<String>): List<Variable>
+
 }

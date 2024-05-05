@@ -2,6 +2,7 @@ package io.zeebe.zeeqs.graphql.resolvers.query
 
 import io.zeebe.zeeqs.data.entity.ProcessInstance
 import io.zeebe.zeeqs.data.entity.ProcessInstanceState
+import io.zeebe.zeeqs.data.entity.VariableFilter
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.service.ProcessInstanceService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
@@ -22,12 +23,11 @@ class ProcessInstanceQueryResolver(
             @Argument perPage: Int,
             @Argument page: Int,
             @Argument stateIn: List<ProcessInstanceState>,
-            @Argument variableName: String?,
-            @Argument variableValue: String?
+            @Argument variables: List<VariableFilter>?
     ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
-                getItems = { processInstanceService.getProcessInstances(perPage, page, stateIn, variableName, variableValue) },
-                getCount = { processInstanceService.countProcessInstances(stateIn, variableName, variableValue) }
+                getItems = { processInstanceService.getProcessInstances(perPage, page, stateIn, variables) },
+                getCount = { processInstanceService.countProcessInstances(stateIn, variables) }
         )
     }
 

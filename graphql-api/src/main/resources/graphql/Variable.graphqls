@@ -14,3 +14,15 @@ type VariableUpdate {
     value: String!
     timestamp(zoneId: String = "Z"): String!
 }
+
+input VariableFilter {
+    name: String!,
+    value: String!,
+    equalityOperation: EqualityOperation = EQUALS
+}
+
+# The type of a variable value filter
+enum EqualityOperation {
+    EQUALS,
+    CONTAINS
+}

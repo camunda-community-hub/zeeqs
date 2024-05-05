@@ -14,8 +14,7 @@ type Process {
         perPage: Int = 10,
         page: Int = 0,
         stateIn: [ProcessInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED]
-        variableName: String = null,
-        variableValue: String = null): ProcessInstanceConnection!
+        variables: [VariableFilter] = null): ProcessInstanceConnection!
     # the scheduled timers of the timer start events of the process
     timers: [Timer!]
     # the opened message subscriptions of the message start events of the process
