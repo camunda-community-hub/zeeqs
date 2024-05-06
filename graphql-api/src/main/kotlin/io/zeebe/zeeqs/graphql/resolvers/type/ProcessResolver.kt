@@ -30,8 +30,7 @@ class ProcessResolver(
         @Argument perPage: Int,
         @Argument page: Int,
         @Argument stateIn: List<ProcessInstanceState>,
-        @Argument variableName: String?,
-        @Argument variableValue: String?
+        @Argument variables: List<VariableFilter>?
     ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
             getItems = {
@@ -40,16 +39,14 @@ class ProcessResolver(
                         page,
                         stateIn,
                         process.key,
-                        variableName,
-                        variableValue
+                        variables
                 ).toList()
             },
             getCount = {
                 processInstanceService.countProcessInstances(
                         stateIn,
                         process.key,
-                        variableName,
-                        variableValue
+                        variables
                 )
             }
         )

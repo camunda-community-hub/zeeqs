@@ -168,11 +168,15 @@ class ProcessService(val processRepository: ProcessRepository) {
     }
 
     private fun getExtensionProperties(element: BaseElement): Collection<BpmnElementExtensionProperties>? {
-       return element.extensionElements?.elementsQuery
+        return element.extensionElements?.elementsQuery
                 ?.filterByType(ZeebeProperties::class.java)
-                ?.singleResult()
-                ?.properties
-                ?.map { BpmnElementExtensionProperties(name = it.name, value = it.value) }
+                ?.findSingleResult()
+                ?.map { properties ->
+                    properties.properties?.map { property ->
+                        BpmnElementExtensionProperties(name = property.name, value = property.value)
+                    }
+                }
+                ?.orElse(null)
     }
 
 

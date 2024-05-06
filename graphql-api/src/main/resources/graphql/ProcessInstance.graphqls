@@ -74,8 +74,7 @@ type Query {
         perPage: Int = 10,
         page: Int = 0,
         stateIn: [ProcessInstanceState!] = [ACTIVATED, COMPLETED, TERMINATED],
-        variableName: String = null,
-        variableValue: String = null
+        variables: [VariableFilter] = null
     ): ProcessInstanceConnection!
 
 }

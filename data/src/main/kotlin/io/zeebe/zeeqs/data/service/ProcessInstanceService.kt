@@ -1,8 +1,6 @@
 package io.zeebe.zeeqs.data.service
 
-import io.zeebe.zeeqs.data.entity.ProcessInstance
-import io.zeebe.zeeqs.data.entity.ProcessInstanceState
-import io.zeebe.zeeqs.data.entity.Variable
+import io.zeebe.zeeqs.data.entity.*
 import io.zeebe.zeeqs.data.repository.ProcessInstanceKeyOnly
 import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.repository.VariableRepository
@@ -14,26 +12,35 @@ class ProcessInstanceService(
         private val processInstancesRepository: ProcessInstanceRepository,
         private val variableRepository: VariableRepository) {
 
-    private fun getVariables(stateIn: List<ProcessInstanceState>, variableName: String, variableValue: String): List<Variable> {
+    private fun getVariables(stateIn: List<ProcessInstanceState>, variables: List<VariableFilter>): List<Variable> {
         val processInstances = processInstancesRepository.findByStateIn(stateIn).toList();
-        return getVariablesByProcessInstanceKeys(processInstances, variableName, variableValue);
+        return getVariablesByProcessInstanceKeys(processInstances, variables);
     }
 
-    private fun getVariables(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variableName: String, variableValue: String): List<Variable> {
+    private fun getVariables(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variables: List<VariableFilter>): List<Variable> {
         val processInstances = processInstancesRepository.findByProcessDefinitionKeyAndStateIn(processDefinitionKey, stateIn).toList();
-        return getVariablesByProcessInstanceKeys(processInstances, variableName, variableValue);
+        return getVariablesByProcessInstanceKeys(processInstances, variables);
 
     }
 
-    private fun getVariablesByProcessInstanceKeys(processInstances: List<ProcessInstanceKeyOnly>, variableName: String, variableValue: String): List<Variable> {
-        val variables = variableRepository.findByProcessInstanceKeyInAndName(processInstances.map { it.getKey() }, variableName);
-        val filteredVariables = variables.filter { it.value == variableValue };
+    private fun getVariablesByProcessInstanceKeys(processInstances: List<ProcessInstanceKeyOnly>, variables: List<VariableFilter>): List<Variable> {
+        val variableNames = variables.map { it.name }
+        val processInstancesKeys = processInstances.map { it.getKey() }
+        val variablesList = variableRepository.findByProcessInstanceKeyInAndNameIn(processInstancesKeys, variableNames);
+        val filteredVariables = variablesList.filter { variable ->
+            variables.any { filter ->
+                when (filter.equalityOperation) {
+                    EqualityOperation.EQUALS -> variable.name == filter.name && variable.value == filter.value
+                    EqualityOperation.CONTAINS -> variable.name == filter.name && variable.value.contains(filter.value)
+                }
+            }
+        }
         return filteredVariables;
     }
 
-    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, variableName: String?, variableValue: String?): List<ProcessInstance> {
-        if(variableName != null && variableValue != null) {
-            val filteredVariables = getVariables(stateIn, variableName, variableValue);
+    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, variables: List<VariableFilter>?): List<ProcessInstance> {
+        if(!variables.isNullOrEmpty()) {
+            val filteredVariables = getVariables(stateIn, variables);
             val filteredProcessInstances = processInstancesRepository.findByStateInAndKeyIn(stateIn, filteredVariables.map { it.processInstanceKey }, PageRequest.of(page, perPage)).toList();
             return filteredProcessInstances;
         }
@@ -42,9 +49,9 @@ class ProcessInstanceService(
         }
     }
 
-    fun countProcessInstances(stateIn: List<ProcessInstanceState>, variableName: String?, variableValue: String?): Long {
-        if(variableName != null && variableValue != null) {
-            val filteredVariables = getVariables(stateIn, variableName, variableValue);
+    fun countProcessInstances(stateIn: List<ProcessInstanceState>, variables: List<VariableFilter>?): Long {
+        if(!variables.isNullOrEmpty()) {
+            val filteredVariables = getVariables(stateIn, variables);
             return filteredVariables.count().toLong();
         }
 
@@ -54,9 +61,9 @@ class ProcessInstanceService(
     }
 
 
-    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variableName: String?, variableValue: String?): List<ProcessInstance> {
-        if(variableName != null && variableValue != null) {
-            val filteredVariables = getVariables(stateIn, processDefinitionKey, variableName, variableValue);
+    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variables: List<VariableFilter>?): List<ProcessInstance> {
+        if(!variables.isNullOrEmpty()) {
+            val filteredVariables = getVariables(stateIn, processDefinitionKey, variables);
             val filteredProcessInstances = processInstancesRepository.findByStateInAndKeyIn(stateIn, filteredVariables.map { it.processInstanceKey }, PageRequest.of(page, perPage)).toList();
             return filteredProcessInstances;
         }
@@ -65,9 +72,9 @@ class ProcessInstanceService(
         }
     }
 
-    fun countProcessInstances(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variableName: String?, variableValue: String?): Long {
-        if(variableName != null && variableValue != null) {
-            val filteredVariables = getVariables(stateIn, processDefinitionKey, variableName, variableValue);
+    fun countProcessInstances(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variables: List<VariableFilter>?): Long {
+        if(!variables.isNullOrEmpty()) {
+            val filteredVariables = getVariables(stateIn, processDefinitionKey, variables);
             return filteredVariables.count().toLong();
         }
 
