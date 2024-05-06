@@ -18,11 +18,20 @@ type VariableUpdate {
 input VariableFilter {
     name: String!,
     value: String!,
-    equalityOperation: EqualityOperation = EQUALS
+    comparisonOperation: ComparisonOperation!
 }
 
-# The type of a variable value filter
-enum EqualityOperation {
+input VariableFilterGroup {
+    variables: [VariableFilter!]
+    filterOperation: FilterOperation = OR
+}
+
+enum ComparisonOperation {
     EQUALS,
     CONTAINS
+}
+
+enum FilterOperation {
+    AND,
+    OR
 }
