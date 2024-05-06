@@ -12,35 +12,42 @@ class ProcessInstanceService(
         private val processInstancesRepository: ProcessInstanceRepository,
         private val variableRepository: VariableRepository) {
 
-    private fun getVariables(stateIn: List<ProcessInstanceState>, variables: List<VariableFilter>): List<Variable> {
+    private fun getVariables(stateIn: List<ProcessInstanceState>, variableFilterGroup: VariableFilterGroup): List<Variable> {
         val processInstances = processInstancesRepository.findByStateIn(stateIn).toList();
-        return getVariablesByProcessInstanceKeys(processInstances, variables);
+        return getVariablesByProcessInstanceKeys(processInstances, variableFilterGroup);
     }
 
-    private fun getVariables(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variables: List<VariableFilter>): List<Variable> {
+    private fun getVariables(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variableFilterGroup: VariableFilterGroup): List<Variable> {
         val processInstances = processInstancesRepository.findByProcessDefinitionKeyAndStateIn(processDefinitionKey, stateIn).toList();
-        return getVariablesByProcessInstanceKeys(processInstances, variables);
+        return getVariablesByProcessInstanceKeys(processInstances, variableFilterGroup);
 
     }
 
-    private fun getVariablesByProcessInstanceKeys(processInstances: List<ProcessInstanceKeyOnly>, variables: List<VariableFilter>): List<Variable> {
-        val variableNames = variables.map { it.name }
+    private fun matchesFilter(variable: Variable, filter: VariableFilter): Boolean {
+        return when (filter.comparisonOperation) {
+            ComparisonOperation.EQUALS -> variable.name == filter.name && variable.value == filter.value
+            ComparisonOperation.CONTAINS -> variable.name == filter.name && variable.value.contains(filter.value)
+        }
+    }
+
+    private fun getVariablesByProcessInstanceKeys(processInstances: List<ProcessInstanceKeyOnly>, variableFilterGroup: VariableFilterGroup): List<Variable> {
         val processInstancesKeys = processInstances.map { it.getKey() }
-        val variablesList = variableRepository.findByProcessInstanceKeyInAndNameIn(processInstancesKeys, variableNames);
-        val filteredVariables = variablesList.filter { variable ->
-            variables.any { filter ->
-                when (filter.equalityOperation) {
-                    EqualityOperation.EQUALS -> variable.name == filter.name && variable.value == filter.value
-                    EqualityOperation.CONTAINS -> variable.name == filter.name && variable.value.contains(filter.value)
-                }
+        val variableNames = variableFilterGroup.variables.map { it.name }
+        val variablesList = variableRepository.findByProcessInstanceKeyInAndNameIn(processInstancesKeys, variableNames)
+
+        return variablesList.filter { variable ->
+            if (variableFilterGroup.filterOperation == FilterOperation.AND) {
+                variableFilterGroup.variables.all { matchesFilter(variable, it) }
+            } else {
+                variableFilterGroup.variables.any { matchesFilter(variable, it) }
             }
         }
-        return filteredVariables;
     }
 
-    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, variables: List<VariableFilter>?): List<ProcessInstance> {
-        if(!variables.isNullOrEmpty()) {
-            val filteredVariables = getVariables(stateIn, variables);
+
+    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, variableFilterGroup: VariableFilterGroup?): List<ProcessInstance> {
+        if (variableFilterGroup?.variables?.isNotEmpty() == true) {
+            val filteredVariables = getVariables(stateIn, variableFilterGroup);
             val filteredProcessInstances = processInstancesRepository.findByStateInAndKeyIn(stateIn, filteredVariables.map { it.processInstanceKey }, PageRequest.of(page, perPage)).toList();
             return filteredProcessInstances;
         }
@@ -49,9 +56,9 @@ class ProcessInstanceService(
         }
     }
 
-    fun countProcessInstances(stateIn: List<ProcessInstanceState>, variables: List<VariableFilter>?): Long {
-        if(!variables.isNullOrEmpty()) {
-            val filteredVariables = getVariables(stateIn, variables);
+    fun countProcessInstances(stateIn: List<ProcessInstanceState>, variableFilterGroup: VariableFilterGroup?): Long {
+        if (variableFilterGroup?.variables?.isNotEmpty() == true) {
+            val filteredVariables = getVariables(stateIn, variableFilterGroup);
             return filteredVariables.count().toLong();
         }
 
@@ -61,9 +68,9 @@ class ProcessInstanceService(
     }
 
 
-    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variables: List<VariableFilter>?): List<ProcessInstance> {
-        if(!variables.isNullOrEmpty()) {
-            val filteredVariables = getVariables(stateIn, processDefinitionKey, variables);
+    fun getProcessInstances(perPage: Int, page: Int, stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variableFilterGroup: VariableFilterGroup?): List<ProcessInstance> {
+        if (variableFilterGroup?.variables?.isNotEmpty() == true) {
+            val filteredVariables = getVariables(stateIn, processDefinitionKey, variableFilterGroup);
             val filteredProcessInstances = processInstancesRepository.findByStateInAndKeyIn(stateIn, filteredVariables.map { it.processInstanceKey }, PageRequest.of(page, perPage)).toList();
             return filteredProcessInstances;
         }
@@ -72,9 +79,9 @@ class ProcessInstanceService(
         }
     }
 
-    fun countProcessInstances(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variables: List<VariableFilter>?): Long {
-        if(!variables.isNullOrEmpty()) {
-            val filteredVariables = getVariables(stateIn, processDefinitionKey, variables);
+    fun countProcessInstances(stateIn: List<ProcessInstanceState>, processDefinitionKey: Long, variableFilterGroup: VariableFilterGroup?): Long {
+        if (variableFilterGroup?.variables?.isNotEmpty() == true) {
+            val filteredVariables = getVariables(stateIn, processDefinitionKey, variableFilterGroup);
             return filteredVariables.count().toLong();
         }
 
