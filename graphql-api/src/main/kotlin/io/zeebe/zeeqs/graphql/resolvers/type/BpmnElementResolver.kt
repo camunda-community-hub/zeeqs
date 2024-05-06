@@ -5,6 +5,7 @@ import io.zeebe.zeeqs.data.entity.ElementInstanceState
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
+import io.zeebe.zeeqs.data.service.BpmnElementExtensionProperties
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
 import io.zeebe.zeeqs.data.service.BpmnElementMetadata
 import io.zeebe.zeeqs.data.service.ProcessService
@@ -39,6 +40,21 @@ class BpmnElementResolver(
         return findElementInfo(element)
                 ?.metadata
                 ?: BpmnElementMetadata()
+    }
+
+
+    @SchemaMapping(typeName = "BpmnElement", field = "extensionProperties")
+    fun extensionProperties(element: BpmnElement): Collection<BpmnElementExtensionProperties>? {
+        return findElementInfo(element)
+                ?.extensionProperties
+    }
+
+
+    @SchemaMapping(typeName = "BpmnElement", field = "documentation")
+    fun documentation(element: BpmnElement): String? {
+        return findElementInfo(element)
+                ?.documentation
+
     }
 
     @SchemaMapping(typeName = "BpmnElement", field = "process")

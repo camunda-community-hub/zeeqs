@@ -20,18 +20,28 @@ class ProcessService(val processRepository: ProcessRepository) {
     @Cacheable(cacheNames = ["bpmnElementInfo"])
     fun getBpmnElementInfo(processDefinitionKey: Long): Map<String, BpmnElementInfo>? {
         return getBpmnModel(processDefinitionKey)
-            ?.let { it.getModelElementsByType(FlowElement::class.java) }
-            ?.map { flowElement ->
-                Pair(
-                    flowElement.id, BpmnElementInfo(
-                        elementId = flowElement.id,
-                        elementName = flowElement.name,
-                        elementType = getBpmnElementType(flowElement),
-                        metadata = getMetadata(flowElement)
-                    )
-                )
-            }
-            ?.toMap()
+                ?.let { model ->
+                    (model.getModelElementsByType(FlowElement::class.java)?.associate { flowElement ->
+                        flowElement.id to BpmnElementInfo(
+                                elementId = flowElement.id,
+                                elementName = flowElement.name,
+                                elementType = getBpmnElementType(flowElement),
+                                metadata = getMetadata(flowElement),
+                                extensionProperties = getExtensionProperties(flowElement),
+                                documentation = getDocumentation(flowElement)
+                        )
+                    }.orEmpty() +
+                            model.getModelElementsByType(Group::class.java)?.associate { groupElement ->
+                                groupElement.id to BpmnElementInfo(
+                                        elementId = groupElement.id,
+                                        elementName = groupElement.category?.value ?: "",
+                                        elementType = getBpmnElementType(groupElement),
+                                        metadata = getMetadata(groupElement),
+                                        extensionProperties = getExtensionProperties(groupElement),
+                                        documentation = getDocumentation(groupElement)
+                                )
+                            }.orEmpty())
+                }
     }
 
     private fun getBpmnModel(processDefinitionKey: Long): BpmnModelInstance? {
@@ -41,7 +51,7 @@ class ProcessService(val processRepository: ProcessRepository) {
             ?.let { Bpmn.readModelFromStream(it) }
     }
 
-    private fun getBpmnElementType(element: FlowElement): BpmnElementType {
+    private fun getBpmnElementType(element: BaseElement): BpmnElementType {
         return when (element.elementType.typeName) {
             BpmnModelConstants.BPMN_ELEMENT_PROCESS -> BpmnElementType.PROCESS
             BpmnModelConstants.BPMN_ELEMENT_SUB_PROCESS -> getBpmnSubprocessType(element)
@@ -63,11 +73,12 @@ class ProcessService(val processRepository: ProcessRepository) {
             BpmnModelConstants.BPMN_ELEMENT_BUSINESS_RULE_TASK -> BpmnElementType.BUSINESS_RULE_TASK
             BpmnModelConstants.BPMN_ELEMENT_SCRIPT_TASK -> BpmnElementType.SCRIPT_TASK
             BpmnModelConstants.BPMN_ELEMENT_INCLUSIVE_GATEWAY -> BpmnElementType.INCLUSIVE_GATEWAY
+            BpmnModelConstants.BPMN_ELEMENT_GROUP -> BpmnElementType.GROUP
             else -> BpmnElementType.UNKNOWN
         }
     }
 
-    private fun getBpmnSubprocessType(element: FlowElement) =
+    private fun getBpmnSubprocessType(element: BaseElement) =
         if (element is SubProcess) {
             if (element.triggeredByEvent()) {
                 BpmnElementType.EVENT_SUB_PROCESS
@@ -78,7 +89,7 @@ class ProcessService(val processRepository: ProcessRepository) {
             BpmnElementType.UNKNOWN
         }
 
-    private fun getMetadata(element: FlowElement): BpmnElementMetadata {
+    private fun getMetadata(element: BaseElement): BpmnElementMetadata {
         return BpmnElementMetadata(
             jobType = element
                 .getSingleExtensionElement(ZeebeTaskDefinition::class.java)
@@ -154,6 +165,19 @@ class ProcessService(val processRepository: ProcessRepository) {
                 else -> null
             }
         )
+    }
+
+    private fun getExtensionProperties(element: BaseElement): Collection<BpmnElementExtensionProperties>? {
+       return element.extensionElements?.elementsQuery
+                ?.filterByType(ZeebeProperties::class.java)
+                ?.singleResult()
+                ?.properties
+                ?.map { BpmnElementExtensionProperties(name = it.name, value = it.value) }
+    }
+
+
+    private fun getDocumentation(element: BaseElement): String {
+        return element.documentations.joinToString(separator = "") { it.textContent }
     }
 
     @Cacheable(cacheNames = ["userTaskForm"])
