@@ -11,7 +11,7 @@ type BpmnElement {
     metadata: BpmnElementMetadata!
 
     # extension properties of the BPMN element
-    extensionProperties:  [BpmnElementExtensionProperties]
+    extensionElements:  BpmnExtensionElements
 
     # documentation of the BPMN element
     documentation: String
@@ -93,9 +93,22 @@ type UserTaskAssignmentDefinition {
     candidateGroups: String
 }
 
-type BpmnElementExtensionProperties {
-    # the name of property
-    name: String
-    # the value of property
-    value: String
+type BpmnExtensionProperty {
+  name: String
+  value: String
+}
+
+type IoMapping {
+  source: String
+  target: String
+}
+
+type ExtensionIoMapping {
+  inputs: [IoMapping]
+  outputs: [IoMapping]
+}
+
+type BpmnExtensionElements {
+  properties: [BpmnExtensionProperty]
+  ioMapping: ExtensionIoMapping
 }

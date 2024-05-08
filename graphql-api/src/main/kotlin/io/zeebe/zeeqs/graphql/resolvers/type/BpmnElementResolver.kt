@@ -5,10 +5,7 @@ import io.zeebe.zeeqs.data.entity.ElementInstanceState
 import io.zeebe.zeeqs.data.entity.Process
 import io.zeebe.zeeqs.data.repository.ElementInstanceRepository
 import io.zeebe.zeeqs.data.repository.ProcessRepository
-import io.zeebe.zeeqs.data.service.BpmnElementExtensionProperties
-import io.zeebe.zeeqs.data.service.BpmnElementInfo
-import io.zeebe.zeeqs.data.service.BpmnElementMetadata
-import io.zeebe.zeeqs.data.service.ProcessService
+import io.zeebe.zeeqs.data.service.*
 import io.zeebe.zeeqs.graphql.resolvers.connection.ElementInstanceConnection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -43,10 +40,10 @@ class BpmnElementResolver(
     }
 
 
-    @SchemaMapping(typeName = "BpmnElement", field = "extensionProperties")
-    fun extensionProperties(element: BpmnElement): Collection<BpmnElementExtensionProperties>? {
+    @SchemaMapping(typeName = "BpmnElement", field = "extensionElements")
+    fun extensionElements(element: BpmnElement): BpmnExtensionElements? {
         return findElementInfo(element)
-                ?.extensionProperties
+                ?.extensionElements
     }
 
 
