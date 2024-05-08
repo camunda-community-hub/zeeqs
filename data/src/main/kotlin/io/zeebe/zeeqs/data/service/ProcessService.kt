@@ -27,7 +27,7 @@ class ProcessService(val processRepository: ProcessRepository) {
                                 elementName = flowElement.name,
                                 elementType = getBpmnElementType(flowElement),
                                 metadata = getMetadata(flowElement),
-                                extensionProperties = getExtensionProperties(flowElement),
+                                extensionElements = getExtensionElements(flowElement),
                                 documentation = getDocumentation(flowElement)
                         )
                     }.orEmpty() +
@@ -37,7 +37,7 @@ class ProcessService(val processRepository: ProcessRepository) {
                                         elementName = groupElement.category?.value ?: "",
                                         elementType = getBpmnElementType(groupElement),
                                         metadata = getMetadata(groupElement),
-                                        extensionProperties = getExtensionProperties(groupElement),
+                                        extensionElements = getExtensionElements(groupElement),
                                         documentation = getDocumentation(groupElement)
                                 )
                             }.orEmpty())
@@ -167,16 +167,34 @@ class ProcessService(val processRepository: ProcessRepository) {
         )
     }
 
-    private fun getExtensionProperties(element: BaseElement): Collection<BpmnElementExtensionProperties>? {
-        return element.extensionElements?.elementsQuery
+    private fun getExtensionElements(element: BaseElement): BpmnExtensionElements {
+
+        val properties = element.extensionElements?.elementsQuery
                 ?.filterByType(ZeebeProperties::class.java)
                 ?.findSingleResult()
                 ?.map { properties ->
                     properties.properties?.map { property ->
-                        BpmnElementExtensionProperties(name = property.name, value = property.value)
+                        BpmnExtensionProperty(name = property.name, value = property.value)
                     }
                 }
-                ?.orElse(null)
+                ?.orElse(emptyList()) ?: emptyList()
+
+        val ioMapping = element.extensionElements?.elementsQuery
+                ?.filterByType(ZeebeIoMapping::class.java)
+                ?.findSingleResult()
+                ?.map { mapping ->
+                    ExtensionIoMapping(
+                            inputs = mapping.inputs?.map { input ->
+                                IoMapping(source = input.source, target = input.target)
+                            } ?: emptyList(),
+                            outputs = mapping.outputs?.map { output ->
+                                IoMapping(source = output.source, target = output.target)
+                            } ?: emptyList()
+                    )
+                }
+                ?.orElse(ExtensionIoMapping(inputs = emptyList(), outputs = emptyList())) ?: ExtensionIoMapping(inputs = emptyList(), outputs = emptyList())
+
+        return BpmnExtensionElements(properties = properties, ioMapping = ioMapping)
     }
 
 
