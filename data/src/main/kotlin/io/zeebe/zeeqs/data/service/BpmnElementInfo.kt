@@ -6,5 +6,7 @@ data class BpmnElementInfo(
         val elementId: String,
         val elementName: String?,
         val elementType: BpmnElementType,
-        val metadata: BpmnElementMetadata
+        val metadata: BpmnElementMetadata,
+        val extensionElements: BpmnExtensionElements?,
+        val documentation: String?
 )

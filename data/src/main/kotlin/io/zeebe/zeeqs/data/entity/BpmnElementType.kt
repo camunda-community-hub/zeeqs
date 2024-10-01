@@ -25,5 +25,6 @@ enum class BpmnElementType {
     BUSINESS_RULE_TASK,
     SCRIPT_TASK,
     SEND_TASK,
-    INCLUSIVE_GATEWAY
+    INCLUSIVE_GATEWAY,
+    GROUP
 }
