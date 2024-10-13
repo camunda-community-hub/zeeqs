@@ -10,6 +10,12 @@ type BpmnElement {
     # the metadata of the BPMN element
     metadata: BpmnElementMetadata!
 
+    # extension properties of the BPMN element
+    extensionElements:  BpmnExtensionElements
+
+    # documentation of the BPMN element
+    documentation: String
+
     # the process that contains the BPMN element
     process: Process
     # the instances of the BPMN element
@@ -46,6 +52,7 @@ enum BpmnElementType {
     SCRIPT_TASK
     SEND_TASK
     INCLUSIVE_GATEWAY
+    GROUP
 }
 
 # Additional metadata that are defined statically on the BPMN element.
@@ -84,4 +91,24 @@ type UserTaskAssignmentDefinition {
     assignee: String
     # the candidate groups
     candidateGroups: String
+}
+
+type BpmnExtensionProperty {
+  name: String
+  value: String
+}
+
+type IoMapping {
+  source: String
+  target: String
+}
+
+type ExtensionIoMapping {
+  inputs: [IoMapping]
+  outputs: [IoMapping]
+}
+
+type BpmnExtensionElements {
+  properties: [BpmnExtensionProperty]
+  ioMapping: ExtensionIoMapping
 }

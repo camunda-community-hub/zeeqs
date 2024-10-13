@@ -14,3 +14,24 @@ type VariableUpdate {
     value: String!
     timestamp(zoneId: String = "Z"): String!
 }
+
+input VariableFilter {
+    name: String!,
+    value: String!,
+    comparisonOperation: ComparisonOperation!
+}
+
+input VariableFilterGroup {
+    variables: [VariableFilter!]
+    filterOperation: FilterOperation = OR
+}
+
+enum ComparisonOperation {
+    EQUALS,
+    CONTAINS
+}
+
+enum FilterOperation {
+    AND,
+    OR
+}

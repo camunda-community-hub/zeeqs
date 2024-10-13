@@ -6,6 +6,7 @@ import io.zeebe.zeeqs.data.repository.ProcessInstanceRepository
 import io.zeebe.zeeqs.data.repository.SignalSubscriptionRepository
 import io.zeebe.zeeqs.data.repository.TimerRepository
 import io.zeebe.zeeqs.data.service.BpmnElementInfo
+import io.zeebe.zeeqs.data.service.ProcessInstanceService
 import io.zeebe.zeeqs.data.service.ProcessService
 import io.zeebe.zeeqs.graphql.resolvers.connection.ProcessInstanceConnection
 import org.springframework.data.domain.PageRequest
@@ -19,6 +20,7 @@ class ProcessResolver(
     val timerRepository: TimerRepository,
     val messageSubscriptionRepository: MessageSubscriptionRepository,
     val processService: ProcessService,
+    val processInstanceService: ProcessInstanceService,
     private val signalSubscriptionRepository: SignalSubscriptionRepository
 ) {
 
@@ -27,20 +29,24 @@ class ProcessResolver(
         process: Process,
         @Argument perPage: Int,
         @Argument page: Int,
-        @Argument stateIn: List<ProcessInstanceState>
+        @Argument stateIn: List<ProcessInstanceState>,
+        @Argument variablesFilter: VariableFilterGroup?
     ): ProcessInstanceConnection {
         return ProcessInstanceConnection(
             getItems = {
-                processInstanceRepository.findByProcessDefinitionKeyAndStateIn(
-                    process.key,
-                    stateIn,
-                    PageRequest.of(page, perPage)
+                processInstanceService.getProcessInstances(
+                        perPage,
+                        page,
+                        stateIn,
+                        process.key,
+                        variablesFilter
                 ).toList()
             },
             getCount = {
-                processInstanceRepository.countByProcessDefinitionKeyAndStateIn(
-                    process.key,
-                    stateIn
+                processInstanceService.countProcessInstances(
+                        stateIn,
+                        process.key,
+                        variablesFilter
                 )
             }
         )
